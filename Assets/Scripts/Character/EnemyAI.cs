@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
@@ -34,6 +35,7 @@ public class EnemyAI : MonoBehaviour
 
     void AI()
     {
+        if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.CharacterState == CharacterState.Idle)
         {
             if (_target == null)

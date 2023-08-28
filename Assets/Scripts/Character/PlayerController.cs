@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Character _character;
+    House _inHouse;
 
     private void Awake()
     {
@@ -28,6 +29,27 @@ public class PlayerController : MonoBehaviour
         {
             _character.Jump();
         }
+
+        if(Input.GetKeyDown(KeyCode.S))
+        {
+            if(_inHouse == null)
+            {
+                House house = _character.GetOverrapGameObject<House>();
+                if (house != null)
+                {
+                    house.EnterCharacter(_character);
+                    _inHouse = house;
+                }
+            }
+            else
+            {
+                _inHouse.LeaveCharacter();
+                _inHouse = null;
+            }
+
+            
+        }
+
         _character.SetCharacterDirection(moveDirection);
     }
 
