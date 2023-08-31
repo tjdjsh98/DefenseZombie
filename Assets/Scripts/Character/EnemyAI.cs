@@ -5,27 +5,46 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    Character _character;
+    ZombieCharacter _character;
 
     [SerializeField]Range _searchRange;
     [SerializeField]Range _attackRange;
 
-    Character _target;
+    Range AttackRange
+    {
+        get
+        {
+            Range range = _attackRange;
+            range.center.x = _attackRange.center.x * transform.lossyScale.x;
+            range.size.x = _attackRange.size.x * transform.lossyScale.x;
+
+            return range;
+        }
+    }
+    Range SearchRange
+    {
+        get
+        {
+            Range range = _searchRange;
+            range.center.x = _searchRange.center.x * transform.lossyScale.x;
+
+            return range;
+        }
+    }
 
     private void Awake()
     {
-        _character = GetComponent<Character>();
-
-        _character.TurnHandler += OnTurn;
+        _character = GetComponent<ZombieCharacter>();
+        _character.Speed = Random.Range(_character.Speed-3, _character.Speed+2);
     }
 
-    private void OnDrawGizmosSelected()
+    protected void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(transform.position + _searchRange.center, _searchRange.size);
+        Gizmos.DrawWireCube(transform.position + SearchRange.center, SearchRange.size);
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position + _attackRange.center, _attackRange.size);
+        Gizmos.DrawWireCube(transform.position + AttackRange.center, AttackRange.size);
     }
 
     private void Update()
@@ -35,16 +54,27 @@ public class EnemyAI : MonoBehaviour
 
     void AI()
     {
-        if (_target != null && !_target.gameObject.activeSelf) _target = null;
+        if (_character.Target != null && !_character.Target.gameObject.activeSelf) _character.Target = null;
+        if (_character.IsAttacking) return;
+
         if (_character.CharacterState == CharacterState.Idle)
         {
-            if (_target == null)
+            if (_character.Target == null)
             {
                 Search();
             }
             else
             {
-                _character.SetCharacterDirection(_target.transform.position - transform.position);
+                if (Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character")) == _character.Target)
+                {
+                    _character.SetCharacterDirection(Vector2.zero);
+                    _character.IsAttacking = true;
+                }
+                else
+                {
+                    _character.IsAttacking = false;
+                    _character.SetCharacterDirection(_character.Target.transform.position - transform.position);
+                }
             }
         }
         else
@@ -56,23 +86,21 @@ public class EnemyAI : MonoBehaviour
 
     void Search()
     {
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + _searchRange.center, _searchRange.size, 0, Vector2.zero);
+        int layerMask = LayerMask.GetMask("Character");
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + SearchRange.center, SearchRange.size, 0, Vector2.zero,0,layerMask);
         if (hits.Length <= 0) return;
 
         foreach(RaycastHit2D hit in hits)
         {
-            Character character = hit.collider.gameObject.GetComponentInParent<Character>();
-            if (character != null)
+            if (hit.collider.gameObject.tag == "Player")
             {
-                _target = character;
-                break;
+                Character character = hit.collider.gameObject.GetComponentInParent<Character>();
+                if (character != null)
+                {
+                    _character.Target = character;
+                    break;
+                }
             }
         }
-    }
-
-    void OnTurn(float direction)
-    {
-        _attackRange.center.x = Mathf.Abs(_attackRange.center.x) * direction > 0 ? 1 : -1; 
-        _searchRange.center.x = Mathf.Abs(_searchRange.center.x) * direction > 0 ? 1 : -1; 
     }
 }

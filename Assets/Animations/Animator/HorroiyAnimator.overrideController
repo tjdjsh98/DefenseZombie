@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: HorroiyAnimator
+  m_Controller: {fileID: 9100000, guid: 49fe1992b4587a44b9db7eaffa6d4d77, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: d821fa2bd3960ec48a3119581172b29f, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: d821fa2bd3960ec48a3119581172b29f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 1f19d16b84fc56c459f0758790dfc22a, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 1f19d16b84fc56c459f0758790dfc22a, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: de67bbf2a3ddc244da0d18cd5456cbd5, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 8e711b09007afd045ad0c9e19915197e, type: 2}

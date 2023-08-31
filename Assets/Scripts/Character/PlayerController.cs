@@ -46,8 +46,13 @@ public class PlayerController : MonoBehaviour
                 _inHouse.LeaveCharacter();
                 _inHouse = null;
             }
+        }
 
-            
+        if(Input.GetKeyDown(KeyCode.D))
+        {
+            Manager.Building.GenreateBuilding();
+                Manager.Building.StartBuildingDraw(this.gameObject, "CommanderHouse");
+
         }
 
         _character.SetCharacterDirection(moveDirection);

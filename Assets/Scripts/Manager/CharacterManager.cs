@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
+    PlayerCharacter _main;
+    public PlayerCharacter MainCharacter
+    {
+        get { if(_main == null)
+                _main = GameObject.Find("Character").GetComponent<PlayerCharacter>();
+                    return _main; 
+        }
+    }
     public void Init()
     {
 

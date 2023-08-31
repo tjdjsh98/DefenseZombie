@@ -9,12 +9,12 @@ public class House : MonoBehaviour
     public void EnterCharacter(Character character)
     {
         _character = character;
-        _character.gameObject.SetActive(false);
+        _character.HideCharacter();
     }
 
     public void LeaveCharacter()
     {
-        _character.gameObject.SetActive(true);
+        _character.ShowCharacter();
         _character = null;
     }
 }

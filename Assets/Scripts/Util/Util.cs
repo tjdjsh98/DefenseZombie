@@ -28,7 +28,6 @@ public static class Util
 
         T result = null;
 
-        Debug.Log(hits.Length);
 
         foreach(var hit in hits)
         {

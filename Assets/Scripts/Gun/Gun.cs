@@ -5,45 +5,85 @@ using UnityEngine;
 public class Gun : MonoBehaviour
 {
     Character _character;
+    AnimatorHandler _animatorHandler;
+
     [SerializeField] Range _attackRange;
+    [SerializeField] int _damage;
+    [SerializeField] float _power;
+    [SerializeField] float _stagger;
+    [SerializeField] int _penetrationPower = 0;
+    
+    [SerializeField] string _enableAttackLayer = "Character";
+
+    bool _isPress;
 
     private void Awake()
     {
         _character = GetComponentInParent<Character>();
-
-        _character.TurnHandler += OnTurn;
+        _animatorHandler = GetComponentInParent<AnimatorHandler>();
+        _animatorHandler.AttackHandler += Fire;
+        _animatorHandler.AttackEndHandler += OnAttackEnd;
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawLine(transform.position + _attackRange.center, transform.position + _attackRange.center + _attackRange.size * transform.parent.localScale.x);
+
+        if (_character == null)
+        {
+            Gizmos.DrawLine(transform.position + _attackRange.center, transform.position + _attackRange.center + _attackRange.size * transform.parent.localScale.x);
+        }
+        else
+        {
+            Range attackRange = _attackRange;
+            attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? _attackRange.center.x : -_attackRange.center.x);
+            Gizmos.DrawLine(transform.position + attackRange.center, transform.position + attackRange.center + attackRange.size * transform.parent.localScale.x);
+        }
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.A))
-            Fire();
-    }
-
-    public void Fire()
-    {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position + _attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, _attackRange.size.x);
-
-        if(hit.collider != null)
         {
-            Character character = hit.collider.GetComponentInParent<Character>();
-            if (character != null)
-                character.Damage(1, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, 20);
+            _isPress = true;
+            _character.IsAttacking = true;
+        }
+        if (Input.GetKeyUp(KeyCode.A))
+        {
+            _isPress = false;
         }
     }
 
-    void OnTurn(float direction)
+
+    public void Fire()
     {
-        if (direction > 0)
-            _attackRange.center.x = Mathf.Abs(_attackRange.center.x);
-        else
-            _attackRange.center.x = -Mathf.Abs(_attackRange.center.x);
+        Range attackRange = _attackRange;
+        attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? _attackRange.center.x : -_attackRange.center.x);
+
+        int layerMask = LayerMask.GetMask(_enableAttackLayer);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x,layerMask);
+
+        int penetration = 0;
+
+        if(hits.Length > 0)
+        {
+            foreach(RaycastHit2D hit in hits)
+            {
+                Character character = hit.collider.GetComponentInParent<Character>();
+                if (character != null)
+                {
+                    character.Damage(_damage, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, _power,_stagger);
+                    penetration++;
+                    if(penetration > _penetrationPower) break;
+                }
+            }
+        }
+    }
+
+    void OnAttackEnd()
+    {
+        if(!_isPress)
+            _character.IsAttacking = false;
     }
 }
 
