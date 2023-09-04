@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class CharacterManager : MonoBehaviour
 {
-    PlayerCharacter _main;
-    public PlayerCharacter MainCharacter
+    Character _main;
+    public Character MainCharacter
     {
         get { if(_main == null)
-                _main = GameObject.Find("Character").GetComponent<PlayerCharacter>();
+                _main = GameObject.FindWithTag("Player").GetComponent<Character>();
                     return _main; 
         }
     }
@@ -23,7 +23,7 @@ public class CharacterManager : MonoBehaviour
 
         if (characterOrigin == null) return null;
 
-        Character character = Instantiate(characterOrigin );
+        Character character = Instantiate(characterOrigin);
         character.transform.position = position;
 
         return character;

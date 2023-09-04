@@ -2,30 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gun : MonoBehaviour
+public class Gun : Weapon
 {
-    Character _character;
-    AnimatorHandler _animatorHandler;
-
-    [SerializeField] Range _attackRange;
-    [SerializeField] int _damage;
-    [SerializeField] float _power;
-    [SerializeField] float _stagger;
-    [SerializeField] int _penetrationPower = 0;
-    
-    [SerializeField] string _enableAttackLayer = "Character";
-
-    bool _isPress;
-
-    private void Awake()
-    {
-        _character = GetComponentInParent<Character>();
-        _animatorHandler = GetComponentInParent<AnimatorHandler>();
-        _animatorHandler.AttackHandler += Fire;
-        _animatorHandler.AttackEndHandler += OnAttackEnd;
-    }
-
-    private void OnDrawGizmosSelected()
+    protected override void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
 
@@ -41,21 +20,7 @@ public class Gun : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            _isPress = true;
-            _character.IsAttacking = true;
-        }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            _isPress = false;
-        }
-    }
-
-
-    public void Fire()
+    public override void Attack()
     {
         Range attackRange = _attackRange;
         attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? _attackRange.center.x : -_attackRange.center.x);
@@ -79,17 +44,4 @@ public class Gun : MonoBehaviour
             }
         }
     }
-
-    void OnAttackEnd()
-    {
-        if(!_isPress)
-            _character.IsAttacking = false;
-    }
-}
-
-[System.Serializable]
-public struct Range
-{
-    public Vector3 center;
-    public Vector3 size;
 }

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
+using UnityEditorInternal;
 using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
@@ -23,8 +25,8 @@ public class BuildingManager : MonoBehaviour
         {
             int drawCount = 0;
             Vector3Int fixedPos = Vector3Int.zero;
-            fixedPos.x = Mathf.RoundToInt(_builder.transform.position.x + 1 * (_builder.transform.localScale.x > 0 ? 1 : -1));
-            fixedPos.y = Mathf.RoundToInt(_builder.transform.position.y + 1);
+            fixedPos.x = Mathf.RoundToInt(_builder.transform.position.x) +  (_builder.transform.localScale.x > 0 ? 1 : -1);
+            fixedPos.y = Mathf.CeilToInt(_builder.transform.position.y);
             for (int i =0; i < _drawingBuilding.BuildingSize.width * _drawingBuilding.BuildingSize.height;i++)
             {
                 if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
@@ -63,16 +65,16 @@ public class BuildingManager : MonoBehaviour
     {
         if (_drawingBuilding == null) return null;
 
-        Vector3Int fixedPos = Vector3Int.zero;
-        fixedPos.x = Mathf.RoundToInt(_builder.transform.position.x + 1 * (_builder.transform.localScale.x > 0 ? 1 : -1));
-        fixedPos.y = Mathf.RoundToInt(_builder.transform.position.y + 1);
+        Vector3Int startPos = Vector3Int.zero;
+        startPos.x = Mathf.RoundToInt(_builder.transform.position.x + (_builder.transform.localScale.x > 0 ? 1 : -1));
+        startPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
         // 겹치는 곳이 있는지 확인
         for (int i = 0; i < _drawingBuilding.BuildingSize.width * _drawingBuilding.BuildingSize.height; i++)
         {
             if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
            
-            Vector3Int pos = fixedPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
+            Vector3Int pos = startPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
 
             if (_buildingCoordiate.ContainsKey(pos.x))
             {
@@ -84,7 +86,10 @@ public class BuildingManager : MonoBehaviour
         }
 
         Building building = Instantiate(_drawingBuilding);
-        building.transform.position = new Vector3(_drawingBuilding.BuildingSize.width / 2 * 1 * (_builder.transform.localScale.x > 0 ? 1 : -1) + fixedPos.x, fixedPos.y - 1);
+        Vector3 buildingPos = new Vector3(startPos.x + (_drawingBuilding.BuildingSize.width-1)/2f*(_builder.transform.localScale.x > 0 ? 1 : -1), startPos.y-0.5f);
+
+        
+        building.transform.position = buildingPos;
 
 
         // 겹치는 부분에 좌표 설정
@@ -92,7 +97,7 @@ public class BuildingManager : MonoBehaviour
         {
             if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
 
-            Vector3Int pos = fixedPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
+            Vector3Int pos = startPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
 
             
             if (!_buildingCoordiate.ContainsKey(pos.x))

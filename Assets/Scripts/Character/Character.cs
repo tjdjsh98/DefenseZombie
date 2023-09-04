@@ -240,5 +240,5 @@ public enum CharacterState
 {
     Idle,
     Attack,
-    Damage
+    Damage,
 }
