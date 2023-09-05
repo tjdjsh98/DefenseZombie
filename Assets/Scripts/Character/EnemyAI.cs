@@ -14,21 +14,20 @@ public class EnemyAI : MonoBehaviour
     {
         get
         {
-            Range range = _attackRange;
-            range.center.x = _attackRange.center.x * transform.lossyScale.x;
-            range.size.x = _attackRange.size.x * transform.lossyScale.x;
+            Range temp = _attackRange;
+            temp.center.x = transform.localScale.x > 0 ? temp.center.x : -temp.center.x;
 
-            return range;
+            return temp;
         }
     }
     Range SearchRange
     {
         get
         {
-            Range range = _searchRange;
-            range.center.x = _searchRange.center.x * transform.lossyScale.x;
+            Range temp = _searchRange;
+            temp.center.x = transform.localScale.x > 0 ? temp.center.x : -temp.center.x;
 
-            return range;
+            return temp;
         }
     }
 
@@ -65,10 +64,14 @@ public class EnemyAI : MonoBehaviour
             }
             else
             {
-                if (Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character")) == _character.Target)
+                PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character"));
+                Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, LayerMask.GetMask("Character"));
+
+                if (character != null || building != null)
                 {
                     _character.SetCharacterDirection(Vector2.zero);
                     _character.IsAttacking = true;
+                    _character.CharacterState = CharacterState.Attack;
                 }
                 else
                 {
@@ -92,6 +95,7 @@ public class EnemyAI : MonoBehaviour
 
         foreach(RaycastHit2D hit in hits)
         {
+            if (hit.collider.gameObject == _character.gameObject) continue;
             if (hit.collider.gameObject.tag == "Player")
             {
                 Character character = hit.collider.gameObject.GetComponentInParent<Character>();

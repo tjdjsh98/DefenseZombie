@@ -11,7 +11,10 @@ public class BuildingManager : MonoBehaviour
     GameObject _blankBox;
     List<SpriteRenderer> _blankBoxList = new List<SpriteRenderer>();
     GameObject _builder;
-    
+
+    bool _isDrawing = false;
+    public bool IsDrawing => _isDrawing;
+
     Dictionary<int,Dictionary<int,Building>> _buildingCoordiate = new Dictionary<int, Dictionary<int, Building>>();
 
     public void Init()
@@ -39,6 +42,7 @@ public class BuildingManager : MonoBehaviour
                     _blankBoxList.Add(sr);
                 }
                 sr = _blankBoxList[drawCount];
+                sr.gameObject.SetActive(true);
                 Color color = new Color();
                 color.g = 1;
                 color.a = 0.2f;
@@ -48,8 +52,11 @@ public class BuildingManager : MonoBehaviour
                 {
                     if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
                     {
-                        color.g = 0;
-                        color.r = 1;
+                        if (_buildingCoordiate[pos.x][pos.y] != null)
+                        {
+                            color.g = 0;
+                            color.r = 1;
+                        }
                     }
                 }
 
@@ -65,7 +72,7 @@ public class BuildingManager : MonoBehaviour
     {
         if (_drawingBuilding == null) return null;
 
-        Vector3Int startPos = Vector3Int.zero;
+        Vector2Int startPos = Vector2Int.zero;
         startPos.x = Mathf.RoundToInt(_builder.transform.position.x + (_builder.transform.localScale.x > 0 ? 1 : -1));
         startPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
@@ -74,13 +81,14 @@ public class BuildingManager : MonoBehaviour
         {
             if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
            
-            Vector3Int pos = startPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
+            Vector2Int pos = startPos + new Vector2Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width);
 
             if (_buildingCoordiate.ContainsKey(pos.x))
             {
                 if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
                 {
-                    return null;
+                    if (_buildingCoordiate[pos.x][pos.y] != null)
+                        return null;
                 }
             }
         }
@@ -97,7 +105,7 @@ public class BuildingManager : MonoBehaviour
         {
             if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
 
-            Vector3Int pos = startPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
+            Vector2Int pos = startPos + new Vector2Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width);
 
             
             if (!_buildingCoordiate.ContainsKey(pos.x))
@@ -108,6 +116,11 @@ public class BuildingManager : MonoBehaviour
             {
                 _buildingCoordiate[pos.x].Add(pos.y, building);
             }
+            else
+            {
+                _buildingCoordiate[pos.x][pos.y] = building;
+            }
+            building.AddCoordinate(pos);
         }
       
         return building;
@@ -121,7 +134,32 @@ public class BuildingManager : MonoBehaviour
 
         if(_drawingBuilding == null) return false;
 
+        _isDrawing = true;
+
         return true;
     }
 
+    public void StopBuildingDrawing()
+    {
+        _builder = null;
+        _drawingBuilding = null;
+        _isDrawing = false;
+
+        foreach(var blankBox in _blankBoxList)
+        {
+            blankBox.gameObject.SetActive(false);
+        }
+    }
+
+    public void RemoveBuilding(Building building)
+    {
+        List<Vector2Int> list = building.GetCoordinate();
+        foreach (var pos in list)
+        {
+            if(_buildingCoordiate[pos.x][pos.y] == building)
+            {
+                _buildingCoordiate[pos.x][pos.y] = null;
+            }
+        }
+    }
 }

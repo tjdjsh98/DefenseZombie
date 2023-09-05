@@ -31,6 +31,13 @@ public class ParabolaProjectile : MonoBehaviour
 
             if (playerCharacter != null) Destroy(gameObject);
         }
+        else if(collision?.gameObject.tag == "Building")
+        {
+            Building building = collision.gameObject.GetComponent<Building>();
+            building?.Damage(1);
+
+            if (building != null) Destroy(gameObject);
+        }
     }
 
     private void FixedUpdate()

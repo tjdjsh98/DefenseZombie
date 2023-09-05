@@ -1,18 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
+using UnityEngine.U2D.IK;
 
 public class ZombieCharacter : Character
 {
     AnimatorHandler _animatorHandler;
     [SerializeField] Range _attackRange;
     [SerializeField] Vector3 _injectPosition;
-    [SerializeField] public Vector3 InjectPosition
+    Vector3 InjectPosition
     {
         get
         {
             Vector3 temp = _injectPosition;
             temp.x = transform.localScale.x > 0 ? temp.x : -temp.x;
+            return temp;
+        }
+    }
+    Range AttackRange
+    {
+        get
+        {
+            Range temp = _attackRange;
+            temp.center.x = transform.localScale.x > 0 ? temp.center.x : -temp.center.x;
+
             return temp;
         }
     }
@@ -32,7 +46,7 @@ public class ZombieCharacter : Character
     {
         base.OnDrawGizmosSelected();
         Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position + _attackRange.center, _attackRange.size);
+        Gizmos.DrawWireCube(transform.position + AttackRange.center, AttackRange.size);
         Gizmos.DrawWireSphere(transform.position + InjectPosition, 0.05f);
     }
 
@@ -47,9 +61,17 @@ public class ZombieCharacter : Character
     {
         if (_projectile == null)
         {
-            PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, _attackRange, LayerMask.GetMask("Character"));
+            PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character"));
+            Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, LayerMask.GetMask("Character"));
 
-            character?.Damage(1, Vector2.right * transform.localScale.x, 10, 0.1f);
+            if (character != null)
+            {
+                character?.Damage(1, Vector2.right * transform.localScale.x, 10, 0.1f);
+            }
+            else if(building != null)
+            {
+                building?.Damage(1);
+            }
         }
         else
         {
@@ -62,6 +84,7 @@ public class ZombieCharacter : Character
     void OnAttackEnd()
     {
         IsAttacking = false;
+        CharacterState = CharacterState.Idle;
     }
 
 }

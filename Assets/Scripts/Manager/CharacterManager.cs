@@ -7,9 +7,14 @@ public class CharacterManager : MonoBehaviour
     Character _main;
     public Character MainCharacter
     {
-        get { if(_main == null)
-                _main = GameObject.FindWithTag("Player").GetComponent<Character>();
-                    return _main; 
+        get 
+        { 
+            if(_main == null)
+            {
+                GameObject g = GameObject.FindWithTag("Player");
+                _main = g?.GetComponent<Character>();
+            }
+           return _main;
         }
     }
     public void Init()

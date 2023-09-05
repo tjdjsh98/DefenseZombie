@@ -50,9 +50,16 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.D))
         {
-            Manager.Building.GenreateBuilding();
-                Manager.Building.StartBuildingDraw(this.gameObject, "CommanderHouse");
+            if(!Manager.Building.IsDrawing)
+                Manager.Building.StartBuildingDraw(this.gameObject, "Barricade");
+            else
+                Manager.Building.GenreateBuilding();
 
+        }
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (Manager.Building.IsDrawing)
+                Manager.Building.StopBuildingDrawing();
         }
 
         _character.SetCharacterDirection(moveDirection);

@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO.Compression;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
@@ -7,11 +9,8 @@ public abstract class Weapon : MonoBehaviour
     protected Character _character;
     protected AnimatorHandler _animatorHandler;
 
-    [SerializeField] protected Range _attackRange;
-    [SerializeField] protected int _damage;
-    [SerializeField] protected float _power;
-    [SerializeField] protected float _stagger;
-    [SerializeField] protected int _penetrationPower = 0;
+    [SerializeField] protected int _attackType;
+    [SerializeField] protected Attack[] _attacks;
 
     [SerializeField] protected string _enableAttackLayer = "Character";
     
@@ -21,13 +20,34 @@ public abstract class Weapon : MonoBehaviour
     {
         _character = GetComponentInParent<Character>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
-        _animatorHandler.AttackHandler += Attack;
-        _animatorHandler.AttackEndHandler += OnAttackEnd;
+        
     }
 
     protected virtual void OnDrawGizmosSelected()
     {
-    
+        if (_attackType >= _attacks.Length) return;
+
+        Gizmos.color = Color.red;
+
+        Range attackRange = _attacks[_attackType].attackRange;
+        if(_character != null)
+            attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
+
+        switch (_attacks[_attackType].attacKShape)
+        {
+            case Define.AttacKShape.Rectagle:
+                Gizmos.DrawWireCube(transform.position + attackRange.center, attackRange.size);
+                break;
+            case Define.AttacKShape.Circle:
+                Gizmos.DrawWireSphere(transform.position + attackRange.center, attackRange.size.x);
+                break;
+            case Define.AttacKShape.Raycast:
+                Gizmos.DrawRay(transform.position + attackRange.center, (_character == null ? Vector3.right : _character.transform.localPosition.x> 0 ? Vector3.right : Vector3.left) * attackRange.size.x );
+                break;
+        }
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(transform.position, _attacks[_attackType].AttackDirection.normalized);
+
     }
 
     protected virtual void Update()
@@ -36,6 +56,9 @@ public abstract class Weapon : MonoBehaviour
         {
             _isPress = true;
             _character.IsAttacking = true;
+            _character.AttackType = _attackType;
+            _animatorHandler.AttackHandler = Attack;
+            _animatorHandler.AttackEndHandler = OnAttackEnd;
         }
         if (Input.GetKeyUp(KeyCode.A))
         {
@@ -46,11 +69,25 @@ public abstract class Weapon : MonoBehaviour
 
     public virtual void Attack()
     {
-        Range attackRange = _attackRange;
-        attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? _attackRange.center.x : -_attackRange.center.x);
+        if (_attacks.Length <= _attackType) return;
+
+        Range attackRange = _attacks[_attackType].attackRange;
+        attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? _attacks[_attackType].attackRange.center.x : -_attacks[_attackType].attackRange.center.x);
 
         int layerMask = LayerMask.GetMask(_enableAttackLayer);
-        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
+        RaycastHit2D[] hits;
+        switch (_attacks[_attackType].attacKShape)
+        {
+            case Define.AttacKShape.Rectagle:
+                hits = Physics2D.BoxCastAll(transform.position + attackRange.center,  attackRange.size,0,Vector2.zero,0,layerMask);
+                break;
+            case Define.AttacKShape.Raycast:
+                hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
+                break;
+            default:
+                hits = Physics2D.BoxCastAll(transform.position + attackRange.center,  attackRange.size,0,Vector2.zero,0,layerMask);
+                break;
+        }
 
         int penetration = 0;
 
@@ -61,9 +98,11 @@ public abstract class Weapon : MonoBehaviour
                 Character character = hit.collider.GetComponentInParent<Character>();
                 if (character != null && character != _character)
                 {
-                    character.Damage(_damage, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, _power, _stagger);
+                    Vector3 attackDirection = _attacks[_attackType].AttackDirection;
+                    attackDirection.x = _character.transform.localScale.x >0 ? attackDirection.x : -attackDirection.x;
+                    character.Damage(_attacks[_attackType].damage, attackDirection, _attacks[_attackType].power, _attacks[_attackType].stagger);
                     penetration++;
-                    if (penetration > _penetrationPower) break;
+                    if (penetration > _attacks[_attackType].penetrationPower) break;
                 }
             }
 
@@ -73,13 +112,11 @@ public abstract class Weapon : MonoBehaviour
     protected virtual void OnAttackEnd()
     {
         if (!_isPress)
+        {
             _character.IsAttacking = false;
+            _animatorHandler.AttackHandler = null;
+            _animatorHandler.AttackEndHandler = null;
+        }
     }
 }
 
-[System.Serializable]
-public struct Range
-{
-    public Vector3 center;
-    public Vector3 size;
-}

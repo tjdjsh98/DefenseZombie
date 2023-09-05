@@ -20,6 +20,14 @@ public class HammerPlayerCharacter : PlayerCharacter
             }
         }
 
+        SetAnimatorInteger("AttackType", AttackType);
         SetAnimatorBool("Attack", IsAttacking);
+
+        if (IsJumping)
+        {
+            SetAnimatorFloat("VelocityY", _rigidBody.velocity.y);
+        }
+
+        SetAnimatorBool("ContactGround", IsContactGround);
     }
 }

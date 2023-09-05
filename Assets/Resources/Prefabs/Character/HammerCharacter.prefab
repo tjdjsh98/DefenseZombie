@@ -226,7 +226,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4000396483343218081}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.967, y: -0.027, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -246,13 +246,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51e5c7e18c4e6704b839c2201c27e8fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackRange:
-    center: {x: -0.31, y: 0.55, z: 0}
-    size: {x: 1.42, y: 1.26, z: 0}
-  _damage: 1
-  _power: 5
-  _stagger: 2
-  _penetrationPower: 0
+  _attackType: 0
+  _attacks:
+  - attackRange:
+      center: {x: 0.81, y: 0.57, z: 0}
+      size: {x: 1.75, y: 1.16, z: 0}
+    AttackDirection: {x: 0.67, y: -0.21, z: 0}
+    attacKShape: 0
+    damage: 1
+    power: 5
+    stagger: 1
+    penetrationPower: 0
+  - attackRange:
+      center: {x: 0.95, y: 0.51, z: 0}
+      size: {x: 2.39, y: 1.17, z: 0}
+    AttackDirection: {x: 1, y: 0.75, z: 0}
+    attacKShape: 0
+    damage: 1
+    power: 10
+    stagger: 1
+    penetrationPower: 0
   _enableAttackLayer: Character
 --- !u!1 &4150402401142959157
 GameObject:
@@ -291,7 +304,7 @@ Transform:
   - {fileID: 5172616259548170067}
   - {fileID: 8659276421532395740}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &6373177708722685989
 CapsuleCollider2D:
@@ -391,14 +404,15 @@ MonoBehaviour:
   _characterSize:
     center: {x: -0.06, y: 0.51, z: 0}
     size: {x: 0.56, y: 1.03, z: 0}
+  _maxHp: 10
   _accelSpeed: 20
-  _breakSpeed: 40
+  _groundBreakSpeed: 40
+  _airBreakSpeed: 10
   _speed: 5
   _groundCheckRange:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.1, y: 0.26, z: 0}
   _jumpPower: 10
-  _maxHp: 10
 --- !u!114 &8968115752908950544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -496,12 +510,12 @@ SpriteRenderer:
   m_SortingLayerID: 872912963
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: -6298493606858270984, guid: 336dfe574f1d0db48bcc9b8d3f6c291d, type: 3}
+  m_Sprite: {fileID: -759835076253408978, guid: 336dfe574f1d0db48bcc9b8d3f6c291d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.27, y: 0.31}
+  m_Size: {x: 0.84375, y: 0.96875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

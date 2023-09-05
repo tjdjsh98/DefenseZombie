@@ -97,9 +97,9 @@ GameObject:
   - component: {fileID: 7715304793495419924}
   - component: {fileID: 4871240490897745323}
   - component: {fileID: 8583667906555671318}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CommanderHouse
-  m_TagString: Untagged
+  m_TagString: Building
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -118,7 +118,7 @@ Transform:
   m_Children:
   - {fileID: 853718508074277364}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &2584478750194567660
 BoxCollider2D:
@@ -216,6 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6cf88c6f736d6344e9d2a7b2cbeab7ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <HP>k__BackingField: 0
   _size:
     isShow: 1
     width: 6

@@ -19,24 +19,33 @@ public class Character : MonoBehaviour
     public CharacterState CharacterState { set; get; }
     protected Vector2 _characterMoveDirection;
 
+
+    // 캐릭터 상태
+    [SerializeField] protected int _maxHp;
+    int _hp;
+    public int Hp { get { return _hp; } set { _hp = value; if (_hp <= 0) Dead(); } }
+    public int AttackType { get; set; } = 0;
+    // 속도
     protected float _currentSpeed;
     [SerializeField]protected float _accelSpeed = 2.0f;
-    [SerializeField]protected float _breakSpeed = 5.0f;
+    [SerializeField] protected float _groundBreakSpeed;
+    [SerializeField] protected float _airBreakSpeed;
+    protected float BreakSpeed => IsContactGround? _groundBreakSpeed : _airBreakSpeed;
     [SerializeField]protected float _speed = 5.0f;
     public float Speed { set { _speed = value; } get { return _speed; } }
 
+    // 점프
     [SerializeField] protected Range _groundCheckRange;
     [SerializeField] protected float _jumpPower = 10.0f;
     protected int _jumpCount = 0;
 
     public Action<float> TurnHandler;
 
-    [SerializeField] protected int _maxHp;
-    int _hp;
-    public int Hp { get { return _hp; } set { _hp = value; if (_hp <= 0) Dead(); } }
-
+    
+    // 행동 상태
     public bool IsAttacking { set; get; }
     public bool IsJumping { set; get; }
+    public bool IsContactGround { set; get; }
 
     protected virtual void Awake()
     {
@@ -76,13 +85,13 @@ public class Character : MonoBehaviour
             _currentSpeed = _rigidBody.velocity.x;
             if (_currentSpeed < 0)
             {
-                _currentSpeed += _breakSpeed * Time.deltaTime;
+                _currentSpeed += BreakSpeed * Time.deltaTime;
                 if (_currentSpeed > 0)
                     _currentSpeed = 0;
             }
             if (_currentSpeed > 0)
             {
-                _currentSpeed -= _breakSpeed * Time.deltaTime;
+                _currentSpeed -= BreakSpeed * Time.deltaTime;
                 if (_currentSpeed < 0)
                     _currentSpeed = 0;
             }
@@ -94,13 +103,13 @@ public class Character : MonoBehaviour
         {
             if (_currentSpeed < 0)
             {
-                _currentSpeed += _breakSpeed * Time.deltaTime;
+                _currentSpeed += BreakSpeed * Time.deltaTime;
                 if (_currentSpeed > 0)
                     _currentSpeed = 0;
             }
             if (_currentSpeed > 0)
             {
-                _currentSpeed -= _breakSpeed * Time.deltaTime;
+                _currentSpeed -= BreakSpeed * Time.deltaTime;
                 if (_currentSpeed < 0)
                     _currentSpeed = 0;
             }
@@ -109,7 +118,7 @@ public class Character : MonoBehaviour
         {
             if (_currentSpeed < 0)
             {
-                _currentSpeed += _breakSpeed * Time.deltaTime;
+                _currentSpeed += BreakSpeed * Time.deltaTime;
             }
             else
             {
@@ -124,7 +133,7 @@ public class Character : MonoBehaviour
         {
             if (_currentSpeed > 0)
             {
-                _currentSpeed -= _breakSpeed * Time.deltaTime;
+                _currentSpeed -= BreakSpeed * Time.deltaTime;
             }
             else
             {
@@ -146,12 +155,18 @@ public class Character : MonoBehaviour
         if(Util.GetGameObjectByPhysics(transform.position, _groundCheckRange, LayerMask.GetMask("Ground")))
         {
             IsJumping = false;
-            if(ySpeed < 0)
+
+            IsContactGround = true;
+
+            if (ySpeed < 0)
+            {
                 _jumpCount = 0;
+            }
         }
         else
         {
             IsJumping = true;
+            IsContactGround = false;
         }
     }
 
@@ -164,7 +179,7 @@ public class Character : MonoBehaviour
         if (_jumpCount == 0)
         {
             _rigidBody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
-            _jumpCount++;
+            IsJumping = true;
         }
     }
 
@@ -181,7 +196,7 @@ public class Character : MonoBehaviour
     public void Damage(int dmg, Vector2 attackDirection, float power, float staggerTime)
     {
         _rigidBody.velocity = Vector2.zero;
-        _rigidBody.AddForce(attackDirection * power, ForceMode2D.Impulse);
+        _rigidBody.AddForce(attackDirection.normalized * power, ForceMode2D.Impulse);
         CharacterState = CharacterState.Damage;
         Invoke("TurnToIdle", staggerTime);
 
@@ -233,8 +248,11 @@ public class Character : MonoBehaviour
     }
 
     public void SetAnimatorBool(string name, bool value) => _animator.SetBool(name, value);
+    public void SetAnimatorInteger(string name, int value) => _animator.SetInteger(name, value);
     public void SetAnimatorTrigger(string name) => _animator.SetTrigger(name);
     public void ResetAnimatorTrigger(string name) => _animator.ResetTrigger(name); 
+
+    public void SetAnimatorFloat(string name, float value) => _animator.SetFloat(name, value);
 }
 public enum CharacterState
 {

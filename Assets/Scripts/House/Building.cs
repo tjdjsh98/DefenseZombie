@@ -5,9 +5,11 @@ using static UnityEditor.ObjectChangeEventStream;
 
 public class Building : MonoBehaviour
 {
+    [field: SerializeField] public int HP { set; get; } 
     [SerializeField] BuildingSize _size;
     public BuildingSize BuildingSize => _size;
 
+    List<Vector2Int> _coordinate = new List<Vector2Int>();
     private void OnDrawGizmosSelected()
     {
         if (_size.isShow)
@@ -30,6 +32,25 @@ public class Building : MonoBehaviour
                 Gizmos.DrawWireCube(pos, Vector3.one);
             }
         }
+    }
 
+    public void Damage(int dmg)
+    {
+        HP -= dmg;
+        if(HP <=0)
+        {
+            Manager.Building.RemoveBuilding(this);
+            Destroy(gameObject);
+        }
+    }
+
+    public void AddCoordinate(Vector2Int pos)
+    {
+        _coordinate.Add(pos);
+    }
+
+    public List<Vector2Int> GetCoordinate()
+    {
+        return _coordinate;
     }
 }
