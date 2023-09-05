@@ -7,7 +7,8 @@ public class AnimatorHandler : MonoBehaviour
 {
     public Action AttackHandler;
     public Action AttackEndHandler;
-
+    public Action ConnectComboHandler;
+    public Action DestroyHandler;
     public void Attack()
     {
         AttackHandler?.Invoke();
@@ -15,5 +16,16 @@ public class AnimatorHandler : MonoBehaviour
     public void AttackEnd()
     {
         AttackEndHandler?.Invoke();
+    }
+
+    public void ConnectCombo()
+    {
+        ConnectComboHandler?.Invoke();
+    }
+
+    public void Destroy()
+    {
+        DestroyHandler?.Invoke();
+        Destroy(gameObject);
     }
 }

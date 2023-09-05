@@ -22,6 +22,7 @@ public class Hammer : Weapon
             _isPress = true;
             _character.IsAttacking = true;
             _animatorHandler.AttackHandler = Attack;
+            _animatorHandler.ConnectComboHandler = OnConnectCombo;
             _animatorHandler.AttackEndHandler = OnAttackEnd;
 
         }
@@ -31,6 +32,10 @@ public class Hammer : Weapon
         }
     }
 
+    protected void OnConnectCombo()
+    {
+        _character.IsConncetCombo= true;
+    }
 
     protected override void OnAttackEnd()
     {
@@ -39,6 +44,7 @@ public class Hammer : Weapon
             _character.IsAttacking = false;
             _animatorHandler.AttackHandler = null;
             _animatorHandler.AttackEndHandler = null;
+            _animatorHandler.ConnectComboHandler = null;
             if (_character.CharacterState == CharacterState.Attack)
             {
                 _character.CharacterState = CharacterState.Idle;

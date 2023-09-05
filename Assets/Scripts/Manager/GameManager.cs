@@ -40,7 +40,7 @@ public class GameManager : MonoBehaviour
             Vector3 genPosition = Random.Range(0, 2) == 0 ? new Vector3(20, -3.88f, -3.88f) : new Vector3(-20, -3.88f, 0);
             for (int i = 0; i < Random.Range(3, 7); i++)
             {
-                Manager.Character.GenerateCharacter("Zombie", genPosition);
+                Manager.Character.GenerateCharacter(i%2==0 ? "Horriy":"Zombie", genPosition);
             }
         }
     }

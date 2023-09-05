@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Compression;
+using System.Net.NetworkInformation;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -98,9 +99,17 @@ public abstract class Weapon : MonoBehaviour
                 Character character = hit.collider.GetComponentInParent<Character>();
                 if (character != null && character != _character)
                 {
+                    Camera.main.GetComponent<CameraMove>().ShakeCamera(_attacks[_attackType].power, 0.4f);
                     Vector3 attackDirection = _attacks[_attackType].AttackDirection;
                     attackDirection.x = _character.transform.localScale.x >0 ? attackDirection.x : -attackDirection.x;
                     character.Damage(_attacks[_attackType].damage, attackDirection, _attacks[_attackType].power, _attacks[_attackType].stagger);
+                    Vector3 point = hit.point;
+                    if (_attacks[_attackType].effect)
+                    {
+                        GameObject g = Instantiate(_attacks[_attackType].effect);
+                        g.transform.position = point;
+                    }
+
                     penetration++;
                     if (penetration > _attacks[_attackType].penetrationPower) break;
                 }

@@ -29,5 +29,11 @@ public class HammerPlayerCharacter : PlayerCharacter
         }
 
         SetAnimatorBool("ContactGround", IsContactGround);
+
+        if(IsConncetCombo)
+        {
+            SetAnimatorTrigger("ConnectCombo");
+            IsConncetCombo = false;
+        }
     }
 }

@@ -46,6 +46,7 @@ public class Character : MonoBehaviour
     public bool IsAttacking { set; get; }
     public bool IsJumping { set; get; }
     public bool IsContactGround { set; get; }
+    public bool IsConncetCombo { set; get; }
 
     protected virtual void Awake()
     {
