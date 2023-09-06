@@ -175,6 +175,10 @@ public class Character : MonoBehaviour
     {
         _characterMoveDirection = moveDirection;
     }
+    public void AddForce(Vector2 direction, float power)
+    {
+        _rigidBody.AddForce(direction.normalized * power, ForceMode2D.Impulse);
+    }
     public void Jump()
     {
         if (_jumpCount == 0)

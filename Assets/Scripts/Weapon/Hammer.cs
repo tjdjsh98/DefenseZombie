@@ -34,7 +34,8 @@ public class Hammer : Weapon
 
     protected void OnConnectCombo()
     {
-        _character.IsConncetCombo= true;
+        if(_isPress)
+            _character.IsConncetCombo= true;
     }
 
     protected override void OnAttackEnd()

@@ -34,6 +34,13 @@ public abstract class Weapon : MonoBehaviour
         if(_character != null)
             attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
 
+        if (_attacks[_attackType].attackEffect)
+        {
+            Vector3 point = _attacks[_attackType].attackEffectPoint;
+
+            Gizmos.DrawWireSphere(transform.position + point, 0.1f);
+        }
+
         switch (_attacks[_attackType].attacKShape)
         {
             case Define.AttacKShape.Rectagle:
@@ -60,6 +67,19 @@ public abstract class Weapon : MonoBehaviour
             _character.AttackType = _attackType;
             _animatorHandler.AttackHandler = Attack;
             _animatorHandler.AttackEndHandler = OnAttackEnd;
+            if (_attacks[_attackType].attackEffect!= null)
+            {
+                GameObject effect = Instantiate(_attacks[_attackType].attackEffect);
+                
+                Vector3 point = _attacks[_attackType].attackEffectPoint;
+                point.x *= _character.transform.localScale.x > 0 ? 1 : -1;
+
+                effect.transform.position = transform.position + point;
+                Vector3 scale = Vector3.one;
+                scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
+                effect.transform.localScale = scale;
+
+            }
         }
         if (Input.GetKeyUp(KeyCode.A))
         {
@@ -104,9 +124,9 @@ public abstract class Weapon : MonoBehaviour
                     attackDirection.x = _character.transform.localScale.x >0 ? attackDirection.x : -attackDirection.x;
                     character.Damage(_attacks[_attackType].damage, attackDirection, _attacks[_attackType].power, _attacks[_attackType].stagger);
                     Vector3 point = hit.point;
-                    if (_attacks[_attackType].effect)
+                    if (_attacks[_attackType].hitEffect)
                     {
-                        GameObject g = Instantiate(_attacks[_attackType].effect);
+                        GameObject g = Instantiate(_attacks[_attackType].hitEffect);
                         g.transform.position = point;
                     }
 

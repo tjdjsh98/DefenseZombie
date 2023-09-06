@@ -12,7 +12,9 @@ public struct Range
 [System.Serializable]
 public struct Attack
 {
-    public GameObject effect;
+    public GameObject attackEffect;
+    public Vector3 attackEffectPoint;
+    public GameObject hitEffect;
     public Range attackRange;
     public Vector3 AttackDirection;
     public AttacKShape attacKShape;
