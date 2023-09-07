@@ -61,7 +61,11 @@ public class BuildingManager : MonoBehaviour
                 }
 
                 sr.color = color;
-                sr.transform.position = pos;
+                Vector3 pos2 = pos;
+                pos2.x -= 0.5f;
+                pos2.y -= 0.5f;
+                
+                sr.transform.position = pos2;
                 drawCount++;
             }
 
@@ -94,7 +98,7 @@ public class BuildingManager : MonoBehaviour
         }
 
         Building building = Instantiate(_drawingBuilding);
-        Vector3 buildingPos = new Vector3(startPos.x + (_drawingBuilding.BuildingSize.width-1)/2f*(_builder.transform.localScale.x > 0 ? 1 : -1), startPos.y-0.5f);
+        Vector3 buildingPos = new Vector3(startPos.x + (_drawingBuilding.BuildingSize.width-1)/2f*(_builder.transform.localScale.x > 0 ? 1 : -1) - 0.5f, startPos.y-1f);
 
         
         building.transform.position = buildingPos;

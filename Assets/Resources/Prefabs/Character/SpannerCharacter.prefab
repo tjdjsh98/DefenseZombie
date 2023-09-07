@@ -24,6 +24,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 196430787119312000}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -31,7 +32,6 @@ Transform:
   m_Children:
   - {fileID: 4839331237270454815}
   m_Father: {fileID: 6998693495617837062}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6362435396642687543
 MonoBehaviour:
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6908728d0da55c4aa76240b942a385f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _attackType: 0
+  _attackType: 1
   _attacks:
   - attackEffect: {fileID: 1878775153127377543, guid: e5230070942a56346a008dd3fcb309a3, type: 3}
     attackEffectPoint: {x: 0.28, y: 0, z: 0}
@@ -59,7 +59,22 @@ MonoBehaviour:
     power: 0
     stagger: 0
     penetrationPower: 0
+  - attackEffect: {fileID: 0}
+    attackEffectPoint: {x: 0, y: 0, z: 0}
+    hitEffect: {fileID: 718218832349118837, guid: a7e25ab3d44881d489ae40a6286454c2, type: 3}
+    attackRange:
+      center: {x: 1.25, y: 0.68, z: 0}
+      size: {x: 2.62, y: 1.39, z: 0}
+    AttackDirection: {x: 2.03, y: 0.83, z: 0}
+    attacKShape: 0
+    damage: 1
+    power: 10
+    stagger: 1
+    penetrationPower: 10
   _enableAttackLayer: Character
+  _dashPower: 0
+  _coolDuration: 0.5
+  _coolElapsed: 0
 --- !u!1 &1487303016436361282
 GameObject:
   m_ObjectHideFlags: 0
@@ -84,13 +99,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1487303016436361282}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.3024, z: 0}
   m_LocalScale: {x: 0.8969, y: 0.39520195, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4839331237270454815}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8968912532362505386
 SpriteRenderer:
@@ -168,13 +183,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1915419919059416727}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6998693495617837062}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7164083316215842859
 SpriteRenderer:
@@ -251,6 +266,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1929564823257840483}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -259,7 +275,6 @@ Transform:
   - {fileID: 856077766994080851}
   - {fileID: 7320211205343939666}
   m_Father: {fileID: 8894882928473633727}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8347257604728201154
 GameObject:
@@ -285,13 +300,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8347257604728201154}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.335, y: 0.0928, z: 0}
   m_LocalScale: {x: 0.2303, y: 0.8144, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4839331237270454815}
-  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6159379839150325691
 SpriteRenderer:
@@ -374,6 +389,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8379385886174126559}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -3.88, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -382,7 +398,6 @@ Transform:
   - {fileID: 3225983661942842211}
   - {fileID: 8894882928473633727}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &868303132654481512
 CapsuleCollider2D:

@@ -34,7 +34,6 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         _character = GetComponent<ZombieCharacter>();
-        _character.Speed = Random.Range(_character.Speed-3, _character.Speed+2);
     }
 
     protected void OnDrawGizmosSelected()
@@ -67,6 +66,7 @@ public class EnemyAI : MonoBehaviour
                 PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character"));
                 Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, LayerMask.GetMask("Character"));
 
+              
                 if (character != null || building != null)
                 {
                     _character.SetCharacterDirection(Vector2.zero);

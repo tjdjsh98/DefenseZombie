@@ -24,10 +24,9 @@ public class Building : MonoBehaviour
 
                 Vector3 pos =  new Vector3Int(i % BuildingSize.width * (transform.localScale.x > 0 ? 1 : -1), i / BuildingSize.width, 0);
                 pos.x += Mathf.RoundToInt(transform.position.x - (_size.width%2 == 0?0.5f:0));
-                pos.x -= (_size.width-1) / 2;
-                pos.y += Mathf.RoundToInt(transform.position.y - (_size.height % 2 == 0 ? 0.5f : 0));
+                pos.x -= (_size.width-1) / 2f;
+                pos.y += Mathf.RoundToInt(transform.position.y );
                 pos.y += 0.5f;
-
                 Gizmos.color = color;
                 Gizmos.DrawWireCube(pos, Vector3.one);
             }

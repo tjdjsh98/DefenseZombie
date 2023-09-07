@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class Character : MonoBehaviour
 {
     protected Rigidbody2D _rigidBody;
+    public Rigidbody2D RigidBody => _rigidBody;
     protected SpriteRenderer _spriteRenderer;
     protected CapsuleCollider2D _capsuleCollider;
     protected Animator _animator;
@@ -30,6 +31,7 @@ public class Character : MonoBehaviour
     [SerializeField]protected float _accelSpeed = 2.0f;
     [SerializeField] protected float _groundBreakSpeed;
     [SerializeField] protected float _airBreakSpeed;
+    public float CurrentSpeed => _currentSpeed;
     protected float BreakSpeed => IsContactGround? _groundBreakSpeed : _airBreakSpeed;
     [SerializeField]protected float _speed = 5.0f;
     public float Speed { set { _speed = value; } get { return _speed; } }
@@ -170,6 +172,8 @@ public class Character : MonoBehaviour
             IsContactGround = false;
         }
     }
+
+    public Vector2 GetVelocity() => _rigidBody.velocity;
 
     public void SetCharacterDirection(Vector2 moveDirection)
     {

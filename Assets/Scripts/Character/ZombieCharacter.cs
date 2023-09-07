@@ -9,7 +9,7 @@ using UnityEngine.U2D.IK;
 public class ZombieCharacter : Character
 {
     AnimatorHandler _animatorHandler;
-    [SerializeField] Range _attackRange;
+    [SerializeField] Attack _attack;
     [SerializeField] Vector3 _injectPosition;
     Vector3 InjectPosition
     {
@@ -24,7 +24,7 @@ public class ZombieCharacter : Character
     {
         get
         {
-            Range temp = _attackRange;
+            Range temp = _attack.attackRange;
             temp.center.x = transform.localScale.x > 0 ? temp.center.x : -temp.center.x;
 
             return temp;
@@ -54,6 +54,18 @@ public class ZombieCharacter : Character
     {
         base.ControlAnimation();
 
+        if(CharacterState == CharacterState.Idle)
+        {
+            if(_currentSpeed != 0)
+            {
+                SetAnimatorBool("Walk", true);
+            }
+            else
+            {
+                SetAnimatorBool("Walk", false);
+            }
+        }
+
         SetAnimatorBool("Attack", IsAttacking);
     }
 
@@ -61,23 +73,42 @@ public class ZombieCharacter : Character
     {
         if (_projectile == null)
         {
-            PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character"));
-            Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, LayerMask.GetMask("Character"));
 
-            if (character != null)
+            RaycastHit2D[] hits;
+            Util.GetHItsByPhysics(transform, _attack, LayerMask.GetMask("Character"), out hits);
+
+            foreach(var hit in hits)
             {
-                character?.Damage(1, Vector2.right * transform.localScale.x, 10, 0.1f);
-            }
-            else if(building != null)
-            {
-                building?.Damage(1);
+                PlayerCharacter character = hit.collider.gameObject.GetComponent<PlayerCharacter>();
+                Building building = hit.collider.gameObject.GetComponent<Building>();
+                if (character != null)
+                {
+                    character?.Damage(_attack.damage, Vector2.right * transform.localScale.x, _attack.power, _attack.stagger);
+                    if (_attack.hitEffect != null)
+                    {
+                        Instantiate(_attack.hitEffect).transform.position = hit.point;
+                    }
+                }
+                else if (building != null)
+                {
+                    building?.Damage(1);
+                    if (_attack.hitEffect != null)
+                    {
+                        Instantiate(_attack.hitEffect).transform.position = hit.point;
+                    }
+                }
+
+             
             }
         }
         else
         {
-            ParabolaProjectile projectile = Instantiate(_projectile);
-            projectile.transform.position = transform.position + InjectPosition;
-            projectile.StartAttack(Target.transform.position, 5, 2);
+            if (Target != null)
+            {
+                ParabolaProjectile projectile = Instantiate(_projectile);
+                projectile.transform.position = transform.position + InjectPosition;
+                projectile.StartAttack(Target.transform.position, 5, 2);
+            }
         }
     }
 

@@ -33,14 +33,31 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         time += Time.deltaTime;
-        if (time > 20)
+        if (time > 7)
         {
             time = 0;
 
             Vector3 genPosition = Random.Range(0, 2) == 0 ? new Vector3(20, -3.88f, -3.88f) : new Vector3(-20, -3.88f, 0);
             for (int i = 0; i < Random.Range(3, 7); i++)
             {
-                Manager.Character.GenerateCharacter(i%2==0 ? "Horriy":"Zombie", genPosition);
+                string enemyName = "";
+
+                switch(Random.Range(0,3))
+                {
+                    case 0:
+                        enemyName = "Horriy";
+                        break;
+                    case 1:
+                        enemyName = "ShieldJr";
+                        break;
+                    case 2:
+                        enemyName = "Zombie";
+                        break;
+                    default:
+                        enemyName = "SheidJr";
+                        break;
+                }
+                Manager.Character.GenerateCharacter(enemyName, genPosition);
             }
         }
     }

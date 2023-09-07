@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public static class Util
 {
@@ -40,4 +41,23 @@ public static class Util
         return result;
     }
 
+    public static void GetHItsByPhysics(Transform transform, Attack attack, int layerMask , out RaycastHit2D[] hits)
+    {
+        Range attackRange = attack.attackRange;
+        
+        attackRange.center.x = (transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
+
+        switch (attack.attacKShape)
+        {
+            case Define.AttacKShape.Rectagle:
+                hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, 0, Vector2.zero, 0, layerMask);
+                break;
+            case Define.AttacKShape.Raycast:
+                hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
+                break;
+            default:
+                hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, 0, Vector2.zero, 0, layerMask);
+                break;
+        }
+    }
 }
