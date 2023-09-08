@@ -1,8 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
-using UnityEditorInternal;
 using UnityEngine;
 
 public class BuildingManager : MonoBehaviour
