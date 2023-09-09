@@ -18,7 +18,7 @@ public class Server : MonoBehaviour
     {
         string host = Dns.GetHostName();
         IPHostEntry entry = Dns.GetHostEntry(host);
-        IPAddress ipAddress = entry.AddressList[0];
+        IPAddress ipAddress = IPAddress.Parse("192.168.25.16");
         
         IPEndPoint endPoint = new IPEndPoint(ipAddress, _port);
 

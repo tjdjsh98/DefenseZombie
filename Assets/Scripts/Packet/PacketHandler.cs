@@ -48,7 +48,6 @@ class PacketHandler
 
     public static void S_BroadcastEnterGameHandler(PacketSession session, IPacket packet)
     {
-        throw new NotImplementedException();
     }
 
     public static void S_BroadcastLeaveGameHandler(PacketSession session, IPacket packet)

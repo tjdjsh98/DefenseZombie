@@ -40,7 +40,6 @@ public class Listener
     }
     void OnAcceptCompleted(object sender, SocketAsyncEventArgs args)
     {
-        Debug.Log("Accep");
         if (args.SocketError == SocketError.Success)
         {
             Session session = _sessionFactory.Invoke();

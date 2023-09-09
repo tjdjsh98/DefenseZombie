@@ -1,19 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-
+using UnityEngine;
+using UnityEngine.UIElements;
+using Debug = UnityEngine.Debug;
 public class Connector
 {
     Func<Session> _sessionFactory;
+    Action _successConnectHandler;
 
-    public void Connect(IPEndPoint endPoint, Func<Session> sessionFactory)
+    public void Connect(IPEndPoint endPoint, Func<Session> sessionFactory,Action successConnectHandler)
     {
         Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
         _sessionFactory = sessionFactory;
+        _successConnectHandler += successConnectHandler;
 
         SocketAsyncEventArgs args = new SocketAsyncEventArgs();
         args.Completed += OnConnectCompleted;
@@ -29,7 +34,6 @@ public class Connector
         if (socket == null)
             return;
 
-
         bool pending = socket.ConnectAsync(args);
         if (!pending)
             OnConnectCompleted(null, args);
@@ -39,9 +43,12 @@ public class Connector
     {
         if(args.SocketError == SocketError.Success)
         {
+            Debug.Log("Connet");
             Session session = _sessionFactory.Invoke();
             session.Start(args.ConnectSocket);
             session.OnConnected(args.RemoteEndPoint);
+
+            _successConnectHandler.Invoke();
         }
         else
         {

@@ -39,7 +39,8 @@ public class Login : MonoBehaviour
         GameObject temp = new GameObject("Client");
         DontDestroyOnLoad(temp);
         Client client = temp.AddComponent<Client>();
-        client.Init(_inputField.text);
-        SceneManager.LoadScene("InGame");
+        string ip = _inputField.text.TrimEnd();
+        ip = ip.Remove(ip.Length - 1, 1);
+        client.Init(ip);
     }
 }

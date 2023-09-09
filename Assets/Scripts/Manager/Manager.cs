@@ -40,5 +40,7 @@ public class Manager : MonoBehaviour
         _character.Init();
         _building.Init();
         _game.Init();
+
+        Application.runInBackground = true;
     }
 }
