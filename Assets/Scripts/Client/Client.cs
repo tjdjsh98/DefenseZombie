@@ -9,11 +9,18 @@ public class Client : MonoBehaviour
 {
     static Client _clinet;
     public static Client Instance { get { return _clinet; } }
-
     public bool IsEnterStart { get; private set; }
 
     static ServerSession _session = new ServerSession();
 
+    public int ClientId = -1;
+
+    bool _sendRequest = false;
+    bool _recvAnswer = false;
+    bool _isEnableEnterGame = false;
+    bool _successEnterGame = false;
+
+    [field:SerializeField]public float Delay = 0;
     public void Send(ArraySegment<byte> segment)
     {
         _session.Send(segment);
@@ -21,13 +28,9 @@ public class Client : MonoBehaviour
 
     public void Init(string ipAddress)
     {
-        // DNS
-        //string host = Dns.GetHostName();
-        //IPHostEntry entry = Dns.GetHostEntry(host);
+        _clinet = this;
         IPAddress ipAddr = IPAddress.Parse(ipAddress);
-
         IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
-
         Connector connecter = new Connector();
 
         connecter.Connect(endPoint, () => { return _session; },EnterGame);
@@ -41,12 +44,28 @@ public class Client : MonoBehaviour
         {
             PacketManager.Instance.HandlePacket(_session, packet);
         }
-
-        if (IsEnterStart)
+        if (IsEnterStart && !_successEnterGame)
         {
-            IsEnterStart = false;
-            SceneManager.LoadScene("InGame");
+            if(_recvAnswer)
+            {
+                if(_isEnableEnterGame)
+                {
+                    SceneManager.LoadScene("InGame");
+                    _successEnterGame = true;
+                }
+                else
+                {
+                    Destroy(this.gameObject);
+                }
+            }
         }
+    }
+
+    public void AnswerRequest(bool enable)
+    {
+        _recvAnswer = true;
+        _isEnableEnterGame = enable;
+        Delay = Time.time - Delay;
     }
 
     public void EnterGame()

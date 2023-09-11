@@ -4,6 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
+
+using Debug = UnityEngine.Debug;
 
 
 class SessionManager
@@ -24,8 +27,6 @@ class SessionManager
             ClientSession session = new ClientSession();
             session.SessionId = sessionId;
             _sessions.Add(sessionId, session);
-
-            Console.WriteLine($"Connected : {sessionId}");
 
             return session;
         }

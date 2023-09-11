@@ -10,6 +10,7 @@ public class Login : MonoBehaviour
     [SerializeField]GameObject _loginPage;
     [SerializeField]TextMeshProUGUI _inputField;
 
+    string _ip = "172.25.2.70";
     private void Start()
     {
         _loginPage.SetActive(false);
@@ -21,8 +22,14 @@ public class Login : MonoBehaviour
         Server server = temp.AddComponent<Server>();
         server.Init();
 
-        SceneManager.LoadScene("InGame");
-
+        string clientName = "Client";
+        if (GameObject.Find(clientName) == null)
+        {
+            temp = new GameObject(clientName);
+            DontDestroyOnLoad(temp);
+            Client client = temp.AddComponent<Client>();
+            client.Init(_ip);
+        }
     }
 
     public void OpenLoginPage()
@@ -36,11 +43,14 @@ public class Login : MonoBehaviour
 
     public void LoginClient()
     {
-        GameObject temp = new GameObject("Client");
-        DontDestroyOnLoad(temp);
-        Client client = temp.AddComponent<Client>();
-        string ip = _inputField.text.TrimEnd();
-        ip = ip.Remove(ip.Length - 1, 1);
-        client.Init(ip);
+        string clientName = "Client";
+        if (GameObject.Find(clientName) == null){
+            GameObject temp = new GameObject(clientName);
+            DontDestroyOnLoad(temp);
+            Client client = temp.AddComponent<Client>();
+            string ip = _inputField.text.TrimEnd();
+            ip = ip.Remove(ip.Length - 1, 1);
+            client.Init(ip);
+        }
     }
 }

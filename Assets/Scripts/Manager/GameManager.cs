@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         time += Time.deltaTime;
-        if (time > 7)
+        if (time > 712038)
         {
             time = 0;
 

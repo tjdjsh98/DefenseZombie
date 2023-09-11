@@ -8,6 +8,7 @@ using UnityEngine;
 public abstract class Weapon : MonoBehaviour
 {
     protected Character _character;
+    protected PlayerController _playerController;
     protected AnimatorHandler _animatorHandler;
 
     [SerializeField] protected int _attackType;
@@ -20,6 +21,7 @@ public abstract class Weapon : MonoBehaviour
     protected virtual void Awake()
     {
         _character = GetComponentInParent<Character>();
+        _playerController = GetComponentInParent<PlayerController>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
         
     }
@@ -60,6 +62,8 @@ public abstract class Weapon : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (!_playerController.IsControllerable) return;
+
         if (Input.GetKeyDown(KeyCode.A))
         {
             _isPress = true;

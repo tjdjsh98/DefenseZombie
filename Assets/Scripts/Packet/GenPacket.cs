@@ -8,12 +8,13 @@ public enum PacketID
 {
     C_RequestEnterGame = 1,
 	S_AnswerEnterGame = 2,
-	S_BroadcastEnterGame = 3,
-	C_LeaveGame = 4,
-	S_BroadcastLeaveGame = 5,
-	S_PlayerList = 6,
-	C_Move = 7,
-	S_BroadcastMove = 8,
+	C_SuccessToEnterServer = 3,
+	S_BroadcastEnterGame = 4,
+	C_LeaveGame = 5,
+	S_BroadcastLeaveGame = 6,
+	S_PlayerList = 7,
+	C_Move = 8,
+	S_BroadcastMove = 9,
 	
 }
 
@@ -89,6 +90,36 @@ public class S_AnswerEnterGame : IPacket
 		Array.Copy(BitConverter.GetBytes(playerId), 0,segment.Array ,segment.Offset + count, sizeof(int));
 		count += sizeof(int);
 		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class C_SuccessToEnterServer : IPacket
+{
+    
+
+    public ushort Protocol { get { return (ushort)PacketID.C_SuccessToEnterServer; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.C_SuccessToEnterServer), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        
 
         Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
 
@@ -312,6 +343,15 @@ public class C_Move : IPacket
     public float posX;
 	public float posY;
 	public float posZ;
+	public float currentSpeed;
+	public float ySpeed;
+	public int characterState;
+	public float characterMoveDirection;
+	public int attackType;
+	public bool isAttacking;
+	public bool isJumping;
+	public bool isContactGround;
+	public bool isConnectCombo;
 
     public ushort Protocol { get { return (ushort)PacketID.C_Move; } }
 
@@ -329,6 +369,33 @@ public class C_Move : IPacket
 		
 		this.posZ = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
+		
+		this.currentSpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.ySpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.characterState = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.characterMoveDirection = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.attackType = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.isAttacking = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
+		this.isJumping = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
+		this.isContactGround = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
+		this.isConnectCombo = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
 		
     }
     public ArraySegment<byte> Write()
@@ -348,6 +415,33 @@ public class C_Move : IPacket
 		Array.Copy(BitConverter.GetBytes(posZ), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
+		Array.Copy(BitConverter.GetBytes(currentSpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(ySpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(characterState), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(characterMoveDirection), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(attackType), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(isAttacking), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
+		Array.Copy(BitConverter.GetBytes(isJumping), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
+		Array.Copy(BitConverter.GetBytes(isContactGround), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
+		Array.Copy(BitConverter.GetBytes(isConnectCombo), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
 
         Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
 
@@ -361,6 +455,15 @@ public class S_BroadcastMove : IPacket
 	public float posX;
 	public float posY;
 	public float posZ;
+	public float currentSpeed;
+	public float ySpeed;
+	public int characterState;
+	public float characterMoveDirection;
+	public int attackType;
+	public bool isAttacking;
+	public bool isJumping;
+	public bool isContactGround;
+	public bool isConnectCombo;
 
     public ushort Protocol { get { return (ushort)PacketID.S_BroadcastMove; } }
 
@@ -382,6 +485,33 @@ public class S_BroadcastMove : IPacket
 		this.posZ = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
+		this.currentSpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.ySpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.characterState = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.characterMoveDirection = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.attackType = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.isAttacking = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
+		this.isJumping = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
+		this.isContactGround = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
+		this.isConnectCombo = BitConverter.ToBoolean(segment.Array, segment.Offset + count);
+		count += sizeof(bool);
+		
     }
     public ArraySegment<byte> Write()
     {
@@ -402,6 +532,33 @@ public class S_BroadcastMove : IPacket
 		
 		Array.Copy(BitConverter.GetBytes(posZ), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(currentSpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(ySpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(characterState), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(characterMoveDirection), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(attackType), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(isAttacking), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
+		Array.Copy(BitConverter.GetBytes(isJumping), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
+		Array.Copy(BitConverter.GetBytes(isContactGround), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
+		
+		Array.Copy(BitConverter.GetBytes(isConnectCombo), 0,segment.Array ,segment.Offset + count, sizeof(bool));
+		count += sizeof(bool);
 		
 
         Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));

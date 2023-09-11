@@ -43,7 +43,6 @@ public class Connector
     {
         if(args.SocketError == SocketError.Success)
         {
-            Debug.Log("Connet");
             Session session = _sessionFactory.Invoke();
             session.Start(args.ConnectSocket);
             session.OnConnected(args.RemoteEndPoint);

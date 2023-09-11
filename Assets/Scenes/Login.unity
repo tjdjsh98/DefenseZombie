@@ -136,7 +136,7 @@ GameObject:
   - component: {fileID: 125027107}
   - component: {fileID: 125027106}
   m_Layer: 5
-  m_Name: Server
+  m_Name: ServerButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -406,7 +406,7 @@ GameObject:
   - component: {fileID: 185660902}
   - component: {fileID: 185660901}
   m_Layer: 5
-  m_Name: Client
+  m_Name: ClientButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1422,7 +1422,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f4d27c823164d84590968e98adbbb39, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loginString: 
   _loginPage: {fileID: 1428148941}
   _inputField: {fileID: 1131498708}
 --- !u!4 &1481880952
@@ -2230,7 +2229,7 @@ GameObject:
   - component: {fileID: 2107369173}
   - component: {fileID: 2107369172}
   m_Layer: 5
-  m_Name: Login
+  m_Name: LoginText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

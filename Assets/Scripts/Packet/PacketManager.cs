@@ -22,6 +22,8 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_RequestEnterGame, PacketHandler.C_RequestEnterGameHandler);
       _makeFunc.Add((ushort)PacketID.S_AnswerEnterGame, MakePacket<S_AnswerEnterGame>);
         _handler.Add((ushort)PacketID.S_AnswerEnterGame, PacketHandler.S_AnswerEnterGameHandler);
+      _makeFunc.Add((ushort)PacketID.C_SuccessToEnterServer, MakePacket<C_SuccessToEnterServer>);
+        _handler.Add((ushort)PacketID.C_SuccessToEnterServer, PacketHandler.C_SuccessToEnterServerHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastEnterGame, MakePacket<S_BroadcastEnterGame>);
         _handler.Add((ushort)PacketID.S_BroadcastEnterGame, PacketHandler.S_BroadcastEnterGameHandler);
       _makeFunc.Add((ushort)PacketID.C_LeaveGame, MakePacket<C_LeaveGame>);

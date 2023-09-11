@@ -19,6 +19,7 @@ public class Character : MonoBehaviour
 
     public CharacterState CharacterState { set; get; }
     protected Vector2 _characterMoveDirection;
+    public Vector2 CharacterMoveDirection => _characterMoveDirection;
 
 
     // 캐릭터 상태
@@ -43,6 +44,8 @@ public class Character : MonoBehaviour
 
     public Action<float> TurnHandler;
 
+    protected float _ySpeed;
+    public float YSpeed=>_ySpeed;
     
     // 행동 상태
     public bool IsAttacking { set; get; }
@@ -68,7 +71,7 @@ public class Character : MonoBehaviour
         Gizmos.DrawWireCube(transform.position + _groundCheckRange.center, _groundCheckRange.size);
     }
 
-    protected void Update()
+    protected virtual void Update()
     {
         MoveCharacter();
         CheckGround();
@@ -81,7 +84,7 @@ public class Character : MonoBehaviour
     }
 
 
-    protected void MoveCharacter()
+    protected virtual void MoveCharacter()
     {
         if (CharacterState != CharacterState.Idle )
         {
@@ -147,13 +150,18 @@ public class Character : MonoBehaviour
             if (_currentSpeed < -_speed)
                 _currentSpeed = -_speed;
         }
-
+        if (_jumpCount == 0 && IsJumping)
+        {
+            _rigidBody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
+            IsJumping = false;
+            _jumpCount++;
+        }
         _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
     }
 
     protected void CheckGround()
     {
-        float ySpeed = _rigidBody.velocity.y;
+        _ySpeed = _rigidBody.velocity.y;
 
         if(Util.GetGameObjectByPhysics(transform.position, _groundCheckRange, LayerMask.GetMask("Ground")))
         {
@@ -161,14 +169,13 @@ public class Character : MonoBehaviour
 
             IsContactGround = true;
 
-            if (ySpeed < 0)
+            if (_ySpeed < 0)
             {
                 _jumpCount = 0;
             }
         }
         else
         {
-            IsJumping = true;
             IsContactGround = false;
         }
     }
@@ -185,9 +192,8 @@ public class Character : MonoBehaviour
     }
     public void Jump()
     {
-        if (_jumpCount == 0)
+        if(_jumpCount == 0)
         {
-            _rigidBody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
             IsJumping = true;
         }
     }

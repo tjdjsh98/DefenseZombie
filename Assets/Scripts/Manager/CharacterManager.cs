@@ -1,22 +1,29 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CharacterManager : MonoBehaviour
 {
-    Character _main;
-    public Character MainCharacter
+    PlayerCharacter _main;
+    public PlayerCharacter MainCharacter
     {
         get 
         { 
             if(_main == null)
             {
-                GameObject g = GameObject.FindWithTag("Player");
-                _main = g?.GetComponent<Character>();
+                PlayerCharacter p = _playerList.Find((c) => { return c.CharacterId == Client.Instance.ClientId; });
+                _main = p;
             }
            return _main;
         }
     }
+
+    List<PlayerCharacter> _playerList = new List<PlayerCharacter>();
+    public List<PlayerCharacter> PlayerList => _playerList;
+
+    List<DummyCharacter> _dummyList = new List<DummyCharacter>();
+    public List<DummyCharacter> DummyList => _dummyList;
     public void Init()
     {
 
@@ -30,6 +37,11 @@ public class CharacterManager : MonoBehaviour
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
+
+        if(character is PlayerCharacter)
+            _playerList.Add(character as PlayerCharacter);
+        if(character is DummyCharacter)
+            _dummyList.Add (character as DummyCharacter);
 
         return character;
     }
