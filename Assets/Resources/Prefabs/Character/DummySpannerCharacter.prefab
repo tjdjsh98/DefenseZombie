@@ -86,8 +86,9 @@ GameObject:
   - component: {fileID: 5590800644782717904}
   - component: {fileID: 7169367114434983242}
   - component: {fileID: 5762600361255094450}
-  - component: {fileID: 8361873968778255373}
+  - component: {fileID: 387796557048807584}
   - component: {fileID: 7489111743016768573}
+  - component: {fileID: 18707442344382057}
   m_Layer: 6
   m_Name: DummySpannerCharacter
   m_TagString: Player
@@ -195,7 +196,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &8361873968778255373
+--- !u!114 &387796557048807584
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -204,7 +205,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1836766058541231278}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 871c5caf7dea7774f8c4d1869dcc7a68, type: 3}
+  m_Script: {fileID: 11500000, guid: 4cbf80e7da827aa4ead5ff74df6e04e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _characterSize:
@@ -229,6 +230,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 83c1b7dfc7848284aa4b0ec56af1ce88, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &18707442344382057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1836766058541231278}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb2f9bb5cf861a2499f437f7ee2810fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &9157269866904046371

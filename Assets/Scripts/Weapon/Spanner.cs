@@ -9,6 +9,8 @@ public class Spanner : Weapon
     [SerializeField] float _coolElapsed;
     protected override void Update()
     {
+        if (!Controllable) return;
+
         if (Input.GetKeyUp(KeyCode.A))
         {
             _isPress = false;
@@ -57,9 +59,10 @@ public class Spanner : Weapon
                 _character.RigidBody.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
                 _character.AddForce(_character.transform.localScale.x > 0 ? Vector2.right : Vector2.left, _dashPower);
             }
+
+
             _character.CharacterState = CharacterState.Attack;
             _coolElapsed = 0;
-
         }
     }
 

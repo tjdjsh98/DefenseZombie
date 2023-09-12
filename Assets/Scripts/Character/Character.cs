@@ -53,6 +53,9 @@ public class Character : MonoBehaviour
     public bool IsContactGround { set; get; }
     public bool IsConncetCombo { set; get; }
 
+    public int CharacterId { set; get; } = -1;
+    public bool IsDummy { set; get; }
+    
     protected virtual void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
@@ -260,6 +263,14 @@ public class Character : MonoBehaviour
         _rigidBody.isKinematic = false;
         _capsuleCollider.enabled = true;
         _spriteRenderer.enabled = true;
+    }
+    public void SetVelocity(Vector2 velocity)
+    {
+        _rigidBody.velocity = velocity;
+    }
+    public void SetCurrentSpeed(float speed)
+    {
+        _currentSpeed = speed;
     }
 
     public void SetAnimatorBool(string name, bool value) => _animator.SetBool(name, value);

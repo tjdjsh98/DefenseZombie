@@ -4,5 +4,4 @@ using UnityEngine;
 
 public class PlayerCharacter : Character
 {
-    public int CharacterId { set; get; } = -1;
 }

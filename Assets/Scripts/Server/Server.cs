@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Net;
+using System.Threading;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Server : MonoBehaviour
@@ -10,16 +12,18 @@ public class Server : MonoBehaviour
     public static GameRoom Room = new();
     private bool _initDone;
 
+
+    Thread _jobFlushThread;
     static void FlushRoom()
     {
         Room.Push(() => Room.Flush());
-        JobTimer.Instance.Push(FlushRoom, 250);
+        JobTimer.Instance.Push(FlushRoom, 40);
     }
     public void Init()
     {
         string host = Dns.GetHostName();
         IPHostEntry entry = Dns.GetHostEntry(host);
-        IPAddress ipAddress = IPAddress.Parse("172.25.2.70");
+        IPAddress ipAddress = IPAddress.Parse("172.25.2.137");
         
 
         IPEndPoint endPoint = new IPEndPoint(ipAddress, _port);
@@ -29,25 +33,35 @@ public class Server : MonoBehaviour
 
         _initDone = true;
 
-        StartCoroutine(CorJobFlush());
+        //_jobFlushThread = new Thread(CorJobFlush);
+        //_jobFlushThread.Start();
     }
+
     private void Update()
     {
-        Debug.Log("BB");
-    }
-    IEnumerator CorJobFlush()
-    {
-        while (!_initDone)
-        {
-            yield return new WaitForSeconds(1);
-        }
+        if (!_initDone) return;
 
+        JobTimer.Instance.Flush();
+    }
+
+    private void OnDestroy()
+    {
+        if(_jobFlushThread != null)
+            _jobFlushThread.Interrupt();
+    }
+
+    void CorJobFlush()
+    {
         while (true)
         {
-            JobTimer.Instance.Flush();
-
-            Debug.Log("AA");
-            yield return new WaitForSeconds(0.001f);
+            try
+            {
+                JobTimer.Instance.Flush();
+            }
+            catch (ThreadInterruptedException e)
+            {
+                Debug.Log($"Exit : {e}");
+            }
         }
     }
 }

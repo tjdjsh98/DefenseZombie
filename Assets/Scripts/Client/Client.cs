@@ -42,6 +42,7 @@ public class Client : MonoBehaviour
         List<IPacket> packets = PacketQueue.Instance.PopAll();
         foreach (IPacket packet in packets)
         {
+            S_BroadcastMove pkt = packet as S_BroadcastMove;
             PacketManager.Instance.HandlePacket(_session, packet);
         }
         if (IsEnterStart && !_successEnterGame)

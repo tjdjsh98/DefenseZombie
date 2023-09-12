@@ -18,6 +18,7 @@ public abstract class Weapon : MonoBehaviour
     
     protected bool _isPress;
 
+    public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
     protected virtual void Awake()
     {
         _character = GetComponentInParent<Character>();
@@ -62,7 +63,7 @@ public abstract class Weapon : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (!_playerController.IsControllerable) return;
+        if (!Controllable) return;
 
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -127,6 +128,8 @@ public abstract class Weapon : MonoBehaviour
                     Vector3 attackDirection = _attacks[_attackType].AttackDirection;
                     attackDirection.x = _character.transform.localScale.x >0 ? attackDirection.x : -attackDirection.x;
                     character.Damage(_attacks[_attackType].damage, attackDirection, _attacks[_attackType].power, _attacks[_attackType].stagger);
+
+                    SendAttackPacket(character.CharacterId);
                     Vector3 point = hit.point;
                     if (_attacks[_attackType].hitEffect)
                     {
@@ -150,6 +153,22 @@ public abstract class Weapon : MonoBehaviour
             _animatorHandler.AttackHandler = null;
             _animatorHandler.AttackEndHandler = null;
         }
+    }
+
+    void SendAttackPacket(int damageCharacterId)
+    {
+        C_Attack packet = new C_Attack();
+        Attack attack = _attacks[_attackType];
+        Vector3 attackDirection = attack.AttackDirection;
+        attackDirection.x = _character.transform.localScale.x > 0 ? attackDirection.x : -attackDirection.x;
+        packet.characterId = damageCharacterId;
+        packet.attackDirectionX = attackDirection.x;
+        packet.attackDirectionY = attackDirection.y;
+        packet.power = attack.power;
+        packet.staggerTime = attack.stagger;
+        packet.damage = attack.damage;
+
+        Client.Instance.Send(packet.Write());
     }
 }
 

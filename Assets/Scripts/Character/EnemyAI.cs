@@ -1,11 +1,13 @@
+using System.Collections;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    ZombieCharacter _character;
+    EnemyCharacter _character;
 
     [SerializeField]Range _searchRange;
     [SerializeField]Range _attackRange;
+    private float _movePacketDelay = 0.1f;
 
     Range AttackRange
     {
@@ -30,7 +32,8 @@ public class EnemyAI : MonoBehaviour
 
     private void Awake()
     {
-        _character = GetComponent<ZombieCharacter>();
+        _character = GetComponent<EnemyCharacter>();
+        StartCoroutine(CorSendMovePacket());
     }
 
     protected void OnDrawGizmosSelected()
@@ -69,6 +72,7 @@ public class EnemyAI : MonoBehaviour
                     _character.SetCharacterDirection(Vector2.zero);
                     _character.IsAttacking = true;
                     _character.CharacterState = CharacterState.Attack;
+                    SendMoveData();
                 }
                 else
                 {
@@ -103,5 +107,35 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
+    }
+
+    IEnumerator CorSendMovePacket()
+    {
+        while (true)
+        {
+
+            SendMoveData();
+            yield return new WaitForSeconds(_movePacketDelay);
+        }
+    }
+
+    void SendMoveData()
+    {
+        C_Move packet = new C_Move();
+        packet.characterId = _character.CharacterId;
+        packet.posX = transform.position.x;
+        packet.posY = transform.position.y;
+        packet.posZ = transform.position.z;
+        packet.currentSpeed = _character.CurrentSpeed;
+        packet.ySpeed = _character.YSpeed;
+        packet.characterState = (int)_character.CharacterState;
+        packet.characterMoveDirection = _character.CharacterMoveDirection.x;
+        packet.attackType = _character.AttackType;
+        packet.isAttacking = _character.IsAttacking;
+        packet.isJumping = _character.IsJumping;
+        packet.isContactGround = _character.IsContactGround;
+        packet.isConnectCombo = _character.IsConncetCombo;
+
+        Client.Instance.Send(packet.Write());
     }
 }

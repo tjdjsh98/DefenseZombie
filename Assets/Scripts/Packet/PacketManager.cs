@@ -34,8 +34,18 @@ public class PacketManager
         _handler.Add((ushort)PacketID.S_PlayerList, PacketHandler.S_PlayerListHandler);
       _makeFunc.Add((ushort)PacketID.C_Move, MakePacket<C_Move>);
         _handler.Add((ushort)PacketID.C_Move, PacketHandler.C_MoveHandler);
+      _makeFunc.Add((ushort)PacketID.C_Attack, MakePacket<C_Attack>);
+        _handler.Add((ushort)PacketID.C_Attack, PacketHandler.C_AttackHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastAttack, MakePacket<S_BroadcastAttack>);
+        _handler.Add((ushort)PacketID.S_BroadcastAttack, PacketHandler.S_BroadcastAttackHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastMove, MakePacket<S_BroadcastMove>);
         _handler.Add((ushort)PacketID.S_BroadcastMove, PacketHandler.S_BroadcastMoveHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestGenerateCharacter, MakePacket<C_RequestGenerateCharacter>);
+        _handler.Add((ushort)PacketID.C_RequestGenerateCharacter, PacketHandler.C_RequestGenerateCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateCharacter, MakePacket<S_BroadcastGenerateCharacter>);
+        _handler.Add((ushort)PacketID.S_BroadcastGenerateCharacter, PacketHandler.S_BroadcastGenerateCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.S_CharacterList, MakePacket<S_CharacterList>);
+        _handler.Add((ushort)PacketID.S_CharacterList, PacketHandler.S_CharacterListHandler);
 
     }
 

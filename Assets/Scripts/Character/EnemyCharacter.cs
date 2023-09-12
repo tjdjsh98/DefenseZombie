@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.U2D.IK;
 
-public class ZombieCharacter : Character
+public class EnemyCharacter : Character
 {
     AnimatorHandler _animatorHandler;
     [SerializeField] Attack _attack;

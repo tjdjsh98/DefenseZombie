@@ -55,7 +55,7 @@ public class PlayerController : MonoBehaviour
             _character.Jump();
         }
 
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Space))
         {
             SendMoveData();
         }
@@ -119,6 +119,7 @@ public class PlayerController : MonoBehaviour
     void SendMoveData()
     {
         C_Move packet = new C_Move();
+        packet.characterId = _character.CharacterId;
         packet.posX = transform.position.x;
         packet.posY = transform.position.y;
         packet.posZ = transform.position.z;

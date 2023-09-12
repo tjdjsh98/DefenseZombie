@@ -10,7 +10,7 @@ public class Login : MonoBehaviour
     [SerializeField]GameObject _loginPage;
     [SerializeField]TextMeshProUGUI _inputField;
 
-    string _ip = "172.25.2.70";
+    string _ip = "172.25.2.137";
     private void Start()
     {
         _loginPage.SetActive(false);
