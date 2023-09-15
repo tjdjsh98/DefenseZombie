@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
+using TMPro;
 using UnityEngine;
 
 public class Spanner : Weapon
@@ -37,45 +39,52 @@ public class Spanner : Weapon
             _isPress = true;
             _character.IsAttacking = true;
             _character.AttackType = _attackType;
-            _animatorHandler.AttackHandler = Attack;
-            _animatorHandler.AttackEndHandler = OnAttackEnd;
+
             if (_attackType == 0)
             {
-                if (_attacks[_attackType].attackEffect != null)
+                GameObject attackEffect = Manager.Data.GetEffect(_attacks[_attackType].attackEffectName);
+                if (attackEffect != null)
                 {
-                    GameObject effect = Instantiate(_attacks[_attackType].attackEffect);
+                    GameObject effect = Instantiate(attackEffect);
+                    effect.transform.parent = transform;
 
                     Vector3 point = _attacks[_attackType].attackEffectPoint;
-                    point.x *= _character.transform.localScale.x > 0 ? 1 : -1;
 
-                    effect.transform.position = transform.position + point;
-                    Vector3 scale = Vector3.one;
-                    scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
-                    effect.transform.localScale = scale;
-
-                    _character.RigidBody.velocity = new Vector2(_character.RigidBody.velocity.x, 0);
-
+                    effect.transform.localPosition = point;
+                    effect.transform.localScale = Vector3.one;
                 }
-                _character.RigidBody.constraints = RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
-                _character.AddForce(_character.transform.localScale.x > 0 ? Vector2.right : Vector2.left, _dashPower);
+
+                _character.RigidBody.velocity = new Vector2(_character.RigidBody.velocity.x, 0);
+                _character.AddForce(_character.transform.localScale.x > 0 ? Vector2.right : Vector2.left, _dashPower,
+                    (int)(RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation));
+
+                _character.CharacterState = CharacterState.Attack;
+
+                Client.Instance.SendMove(_character);
+                Client.Instance.SendAddForce(_character, _character.transform.localScale.x > 0 ? Vector2.right : Vector2.left, _dashPower, (int)_character.RigidBody.constraints);
+                Client.Instance.SendAttack(_character, _attacks[_attackType]);
+
+                _coolElapsed = 0;
             }
-
-
-            _character.CharacterState = CharacterState.Attack;
-            _coolElapsed = 0;
+            else if(_attackType == 1)
+            {
+                _character.CharacterState = CharacterState.Attack;
+                Client.Instance.SendMove(_character);
+            }
         }
     }
 
     protected override void OnAttackEnd()
     {
-        _character.IsAttacking = false;
-        
-        _character.RigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
-        _animatorHandler.AttackHandler = null;
-        _animatorHandler.AttackEndHandler = null;
+        if (_attackType == 0)
+        {
+            _character.RigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
+            Client.Instance.SendAddForce(_character, Vector2.zero, 0, (int)_character.RigidBody.constraints);
+        }
         if (_character.CharacterState == CharacterState.Attack)
         {
             _character.CharacterState = CharacterState.Idle;
         }
+        Client.Instance.SendMove(_character);
     }
 }

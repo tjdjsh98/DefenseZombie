@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO.Compression;
+using System.Runtime.CompilerServices;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -55,7 +56,23 @@ public class Character : MonoBehaviour
 
     public int CharacterId { set; get; } = -1;
     public bool IsDummy { set; get; }
-    
+
+    public Action RegisterAttackHandler;
+
+    public Vector2 GetVelocity => _rigidBody.velocity;
+
+    Coroutine _damageCoroutine;
+    DummyController _dummyController;
+    public DummyController DummyController
+    {
+        get
+        {
+            if (_dummyController == null)
+                _dummyController = GetComponent<DummyController>();
+            return _dummyController;
+        }
+    }
+
     protected virtual void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
@@ -89,9 +106,9 @@ public class Character : MonoBehaviour
 
     protected virtual void MoveCharacter()
     {
-        if (CharacterState != CharacterState.Idle )
+        _currentSpeed = _rigidBody.velocity.x;
+        if (CharacterState != CharacterState.Idle)
         {
-            _currentSpeed = _rigidBody.velocity.x;
             if (_currentSpeed < 0)
             {
                 _currentSpeed += BreakSpeed * Time.deltaTime;
@@ -104,10 +121,9 @@ public class Character : MonoBehaviour
                 if (_currentSpeed < 0)
                     _currentSpeed = 0;
             }
-
-            _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
             return;
         }
+
         if (_characterMoveDirection.x == 0)
         {
             if (_currentSpeed < 0)
@@ -183,15 +199,17 @@ public class Character : MonoBehaviour
         }
     }
 
-    public Vector2 GetVelocity() => _rigidBody.velocity;
-
     public void SetCharacterDirection(Vector2 moveDirection)
     {
         _characterMoveDirection = moveDirection;
     }
-    public void AddForce(Vector2 direction, float power)
+    public void AddForce(Vector2 direction, float power, int constraints = -1)
     {
-        _rigidBody.AddForce(direction.normalized * power, ForceMode2D.Impulse);
+        if(constraints != -1)
+            _rigidBody.constraints = (RigidbodyConstraints2D)constraints;
+        
+        if(power != 0)
+            _rigidBody.AddForce(direction.normalized * power, ForceMode2D.Impulse);
     }
     public void Jump()
     {
@@ -214,22 +232,37 @@ public class Character : MonoBehaviour
     public void Damage(int dmg, Vector2 attackDirection, float power, float staggerTime)
     {
         _rigidBody.velocity = Vector2.zero;
-        _rigidBody.AddForce(attackDirection.normalized * power, ForceMode2D.Impulse);
+        AddForce(attackDirection, power);
         CharacterState = CharacterState.Damage;
-        Invoke("TurnToIdle", staggerTime);
+
+        if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
+        _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
 
         Hp -= dmg;
 
+        // 메인 클라가 아니고 다른 클라라면 데미지 패킷을 보냅니다.
+        if (Client.Instance.IsMain)
+        {
+            if (CharacterId < 100 && Client.Instance.ClientId != CharacterId)
+            {
+                Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
+            }
+        }
     }
 
     protected void Dead()
     {
-        Destroy(this.gameObject);
+       Manager.Character.RemoveCharacter(CharacterId);
     }
 
-    protected void TurnToIdle()
+    IEnumerator CorTurnToIdle(float time)
     {
+        yield return new WaitForSeconds(time);
+
         CharacterState = CharacterState.Idle;
+        Client.Instance.SendMove(this);
+
+        _damageCoroutine = null;
     }
 
     public GameObject GetOverrapGameObject(int layerMask = -1)
@@ -279,6 +312,22 @@ public class Character : MonoBehaviour
     public void ResetAnimatorTrigger(string name) => _animator.ResetTrigger(name); 
 
     public void SetAnimatorFloat(string name, float value) => _animator.SetFloat(name, value);
+
+    public void RegisterAttack()
+    {
+        RegisterAttackHandler?.Invoke();
+    }
+    public void SetMovePacket(S_BroadcastMove packet)
+    {
+        SetCharacterDirection(new Vector2(packet.characterMoveDirection, 0));
+        SetCurrentSpeed(packet.xSpeed);
+        SetVelocity(new Vector2(packet.xSpeed, packet.ySpeed));
+        AttackType = packet.attackType;
+        IsJumping = packet.isJumping;
+        IsAttacking = packet.isAttacking;
+        IsConncetCombo = packet.isConnectCombo;
+        CharacterState = (CharacterState)packet.characterState;
+    }
 }
 public enum CharacterState
 {

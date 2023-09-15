@@ -21,9 +21,7 @@ public class Hammer : Weapon
             _character.AttackType = _attackType;
             _isPress = true;
             _character.IsAttacking = true;
-            _animatorHandler.AttackHandler = Attack;
             _animatorHandler.ConnectComboHandler = OnConnectCombo;
-            _animatorHandler.AttackEndHandler = OnAttackEnd;
 
         }
         if (Input.GetKeyUp(KeyCode.A))
@@ -42,9 +40,6 @@ public class Hammer : Weapon
     {
         if (!_isPress)
         {
-            _character.IsAttacking = false;
-            _animatorHandler.AttackHandler = null;
-            _animatorHandler.AttackEndHandler = null;
             _animatorHandler.ConnectComboHandler = null;
             if (_character.CharacterState == CharacterState.Attack)
             {

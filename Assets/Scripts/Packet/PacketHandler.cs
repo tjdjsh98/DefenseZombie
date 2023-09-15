@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Data;
+using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using static S_PlayerList;
 using Debug = UnityEngine.Debug;
 
@@ -78,25 +82,26 @@ class PacketHandler
 
         foreach (var player in Manager.Character.PlayerList)
         {
-            if(!player.IsDummy) continue;
-
-            if (Client.Instance.ClientId != pkt.playerId)
+            if (player.CharacterId == pkt.playerId)
             {
-                if (player.CharacterId == pkt.playerId)
+                if (player.IsDummy)
                 {
-                    player.GetComponent<DummyController>().SetMovePacket(pkt);
+                    player.DummyController.SetMovePacket(pkt);
                     return;
                 }
             }
+            
         }
 
         foreach (var enemy in Manager.Character.EnemyList)
         {
-            if (!enemy.IsDummy) continue;
-
             if (enemy.CharacterId == pkt.playerId)
             {
-                enemy.GetComponent<DummyController>().SetMovePacket(pkt);
+                if (enemy.IsDummy)
+                {
+                    enemy.DummyController.SetMovePacket(pkt);
+                    return;
+                }
             }
         }
 
@@ -106,12 +111,10 @@ class PacketHandler
     {
         S_PlayerList pkt = packet as S_PlayerList;
 
-        Debug.Log(pkt.players.Count);
         foreach (var player in pkt.players)
         {
             Vector3 pos = new Vector3(player.posX, player.posY, player.posZ);
             Character character = Manager.Character.GenerateCharacter("SpannerCharacter", pos, !player.isSelf);
-            Debug.Log(character);
             character.CharacterId = player.playerId;
         }
     }
@@ -131,10 +134,40 @@ class PacketHandler
 
     public static void C_AttackHandler(PacketSession session, IPacket pakcet)
     {
+        ClientSession clientSession = session as ClientSession;
+        C_Attack pkt = pakcet as C_Attack;
+
+        if (pkt == null || clientSession.Room == null)
+        {
+            return;
+        }
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => { room.Attack(pkt); });
     }
 
-    public static void S_BroadcastAttackHandler(PacketSession arg1, IPacket arg2)
+    public static void S_BroadcastAttackHandler(PacketSession session, IPacket packet)
     {
+        S_BroadcastAttack pkt = packet as S_BroadcastAttack;
+        if (pkt == null) return;
+
+        if (pkt.attackerId == Client.Instance.ClientId) return;
+
+        Character character = Manager.Character.GetCharacter(pkt.attackerId);
+
+        if (character == null) return;
+
+        GameObject effectOrigin = Manager.Data.GetEffect(pkt.attackEffectName);
+        Vector3 effectPoint = new Vector3(pkt.attackPointX, pkt.attackPointY,0);
+        
+        if (effectOrigin != null)
+        {
+            GameObject effect = GameObject.Instantiate(effectOrigin);
+            effect.transform.parent = character.transform;
+            effect.transform.localPosition = effectPoint;
+            effect.transform.localScale = Vector3.one;
+        }
+
     }
 
     public static void C_RequestGenerateCharacterHandler(PacketSession session, IPacket packet)
@@ -150,15 +183,96 @@ class PacketHandler
     public static void S_BroadcastGenerateCharacterHandler(PacketSession session, IPacket packet)
     {
         // 메인 클라이언트면 생략
-        if (Client.Instance.ClientId == 1) return;
+        if (Client.Instance.IsMain) return;
 
         S_BroadcastGenerateCharacter pkt = packet as S_BroadcastGenerateCharacter;
 
         Manager.Character.GenerateDummyCharacter(pkt);
     }
 
-    public static void S_CharacterListHandler(PacketSession arg1, IPacket arg2)
+    public static void S_CharacterListHandler(PacketSession session, IPacket packet)
     {
-        throw new NotImplementedException();
+    }
+
+    public static void C_HitHandler(PacketSession session, IPacket packet)
+    {
+        C_Hit pkt = packet as C_Hit;
+    }
+
+    public static void S_BroadcastHitHandler(PacketSession session, IPacket packet)
+    {
+    }
+
+    public static void C_RemoveCharacterHandler(PacketSession session, IPacket packet)
+    {
+        ClientSession clientSession = session as ClientSession;
+        if (clientSession == null || clientSession.Room == null) return;
+
+        C_RemoveCharacter pkt = packet as C_RemoveCharacter;
+        
+        GameRoom room = clientSession.Room as GameRoom;
+        room.Push(() => { room.RemoveCharacter(pkt); });
+    }
+
+    public static void S_BroadcastRemoveCharacterHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastRemoveCharacter pkt = packet as S_BroadcastRemoveCharacter;
+
+        Manager.Character.RemoveCharacter(pkt.characterId);
+    }
+
+    public static void C_AddForceHandler(PacketSession session, IPacket packet)
+    {
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession == null) return;
+
+        C_AddForce pkt= packet as C_AddForce;
+        S_BroadcastAddForce sendPacket = new S_BroadcastAddForce();
+
+        sendPacket.characterId = pkt.characterId;
+        sendPacket.forceX= pkt.forceX;
+        sendPacket.forceY = pkt.forceY;
+        sendPacket.power = pkt.power;
+        sendPacket.constraints = pkt.constraints;
+     
+        GameRoom room = clientSession.Room;
+
+        room?.Push(() => { room.Broadcast(sendPacket.Write()); });
+    }
+
+    public static void S_BroadcastAddForceHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastAddForce pkt = packet as S_BroadcastAddForce;
+
+        Character character= Manager.Character.GetCharacter(pkt.characterId);
+
+        if (character == null) return;
+
+        character.AddForce(new Vector2(pkt.forceX, pkt.forceY), pkt.power,pkt.constraints);
+    }
+
+    public static void C_DamageHandler(PacketSession session, IPacket packet)
+    {
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession == null) return;
+
+        C_Damage pkt = packet as C_Damage;
+
+        GameRoom room = clientSession.Room;
+
+        room?.Push(() => { room.Damage(pkt); });
+    }
+
+    public static void S_BroadcastDamageHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastDamage pkt = packet as S_BroadcastDamage;
+
+        Character character = Manager.Character.GetCharacter(pkt.characterId);
+
+        if(character == null) return;
+
+        character.Damage(0,new Vector2(pkt.directionX,pkt.directionY),pkt.power,pkt.stagger);
     }
 }

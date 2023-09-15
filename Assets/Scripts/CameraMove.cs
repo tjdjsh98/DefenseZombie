@@ -33,8 +33,12 @@ public class CameraMove : MonoBehaviour
         while (currentTime < time)
         {
             currentTime += Time.fixedDeltaTime;
-            Vector3 lerpPosition = Manager.Character.MainCharacter.transform.position
-            + Vector3.up * 2;
+            Vector3 lerpPosition = Vector3.zero;
+            if (Manager.Character.MainCharacter != null)
+                lerpPosition = Manager.Character.MainCharacter.transform.position + Vector3.up * 2;
+            else
+                lerpPosition = transform.position;
+            
             lerpPosition.z = -10;
 
             lerpPosition += (Vector3)Random.insideUnitCircle * Mathf.Log(power, 10000);

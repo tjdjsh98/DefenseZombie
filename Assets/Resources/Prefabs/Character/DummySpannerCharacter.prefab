@@ -46,9 +46,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _attackType: 1
   _attacks:
-  - attackEffect: {fileID: 1878775153127377543, guid: e5230070942a56346a008dd3fcb309a3, type: 3}
+  - attackEffectName: 
     attackEffectPoint: {x: 2, y: 0.6, z: 0}
-    hitEffect: {fileID: 718218832349118837, guid: a7e25ab3d44881d489ae40a6286454c2, type: 3}
+    hitEffectName: 
     attackRange:
       center: {x: 1.37, y: 0.55, z: 0}
       size: {x: 5.95, y: 3.71, z: 0}
@@ -58,9 +58,9 @@ MonoBehaviour:
     power: 5
     stagger: 0.2
     penetrationPower: 10
-  - attackEffect: {fileID: 0}
+  - attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
-    hitEffect: {fileID: 718218832349118837, guid: a7e25ab3d44881d489ae40a6286454c2, type: 3}
+    hitEffectName: 
     attackRange:
       center: {x: 1.25, y: 0.68, z: 0}
       size: {x: 2.62, y: 1.39, z: 0}
@@ -71,7 +71,7 @@ MonoBehaviour:
     stagger: 1
     penetrationPower: 10
   _enableAttackLayer: Character
-  _dashPower: 15
+  _dashPower: 5
   _coolDuration: 0.5
   _coolElapsed: 0
 --- !u!1 &1836766058541231278

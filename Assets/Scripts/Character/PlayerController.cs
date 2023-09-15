@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    float _movePacketDelay = 0.1f;
+    float _movePacketDelay = 0.25f;
 
     public bool IsControllerable { get {
             if (Client == null) return false;
@@ -57,7 +57,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Space))
         {
-            SendMoveData();
+            Client.Instance.SendMove(_character);
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) ||
             Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Space))
         {
-            SendMoveData();
+            Client.Instance.SendMove(_character);
         }
     }
 
@@ -104,35 +104,16 @@ public class PlayerController : MonoBehaviour
     {
         while (true)
         {
-            if (IsControllerable)
+            if (IsControllerable )
             {
-                SendMoveData();
-                yield return new WaitForSeconds(_movePacketDelay);
+                Client.Instance.SendMove(_character);
+                yield return new WaitForSeconds(Client.SendPacketInterval);
             }
             else
             {
-                yield return new WaitForSeconds(5f);
+                yield return new WaitForSeconds(0.1f);
             }
         }
     }
 
-    void SendMoveData()
-    {
-        C_Move packet = new C_Move();
-        packet.characterId = _character.CharacterId;
-        packet.posX = transform.position.x;
-        packet.posY = transform.position.y;
-        packet.posZ = transform.position.z;
-        packet.currentSpeed = _character.CurrentSpeed;
-        packet.ySpeed = _character.YSpeed;
-        packet.characterState = (int)_character.CharacterState;
-        packet.characterMoveDirection = _character.CharacterMoveDirection.x;
-        packet.attackType = _character.AttackType;
-        packet.isAttacking = _character.IsAttacking;
-        packet.isJumping = _character.IsJumping;
-        packet.isContactGround = _character.IsContactGround;
-        packet.isConnectCombo = _character.IsConncetCombo;
-
-        Client.Instance.Send(packet.Write());
-    }
 }

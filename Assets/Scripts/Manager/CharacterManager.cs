@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,6 +28,7 @@ public class CharacterManager : MonoBehaviour
     List<EnemyCharacter> _enemyList = new List<EnemyCharacter>();
     public List<EnemyCharacter> EnemyList => _enemyList;
 
+
     public void Init()
     {
 
@@ -43,8 +45,9 @@ public class CharacterManager : MonoBehaviour
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
+        
         character.IsDummy = isDummy;
-
+     
         if (character is PlayerCharacter)
         {
             _playerList.Add(character as PlayerCharacter);
@@ -57,25 +60,55 @@ public class CharacterManager : MonoBehaviour
         return character;
     }
 
-    public void RemoveCharacter(int id)
+    public Character GetCharacter(int id)
     {
-        foreach(var dummy in _playerList)
+        foreach (var dummy in _playerList)
         {
-            if(dummy.CharacterId == id)
+            if (dummy.CharacterId == id)
             {
-                Destroy(dummy.gameObject);
-                _playerList.Remove(dummy);
-                return;
+                return dummy;
             }
         }
         foreach (var dummy in _enemyList)
         {
             if (dummy.CharacterId == id)
             {
-                Destroy(dummy.gameObject);
-                _enemyList.Remove(dummy);
-                return;
+                return dummy;
             }
+        }
+
+        return null;
+    }
+
+    public void RemoveCharacter(int id)
+    {
+        int removeId = -1;
+        foreach(var dummy in _playerList)
+        {
+            if(dummy.CharacterId == id)
+            {
+                Destroy(dummy.gameObject);
+                _playerList.Remove(dummy);
+                removeId = id;
+                break;
+            }
+        }
+        if (removeId == -1)
+        {
+            foreach (var dummy in _enemyList)
+            {
+                if (dummy.CharacterId == id)
+                {
+                    Destroy(dummy.gameObject);
+                    _enemyList.Remove(dummy);
+                    removeId = id;
+                    break;
+                }
+            }
+        }
+        if(removeId != -1 && Client.Instance.IsMain)
+        {
+            Client.Instance.SendRemoveCharacter(id);
         }
     }
     public Character GenerateAndSendPacket(string name, Vector3 position, bool isDummy = false)
@@ -86,13 +119,11 @@ public class CharacterManager : MonoBehaviour
 
         if (characterOrigin == null) return null;
 
-        SendGenreateCharacter(name, position);
-
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
-        character.CharacterId = _characterId;
+        character.CharacterId = ++_characterId;
         character.IsDummy = isDummy;
-
+            
         if (character is PlayerCharacter)
         {
             _playerList.Add(character as PlayerCharacter);
@@ -101,6 +132,9 @@ public class CharacterManager : MonoBehaviour
         {
             _enemyList.Add(character as EnemyCharacter);
         }
+
+        Client.Instance.SendGenreateCharacter(name, _characterId, position);
+
         return character;
     }
 
@@ -128,15 +162,6 @@ public class CharacterManager : MonoBehaviour
 
         return character;
     }
-    void SendGenreateCharacter(string name, Vector3 position)
-    {
-        C_RequestGenerateCharacter pkt = new C_RequestGenerateCharacter();
-        pkt.characterId = ++_characterId;
-        pkt.characterName = name;
-        pkt.posX = position.x;
-        pkt.posY = position.y;
-        pkt.posZ = position.z;
 
-        Client.Instance.Send(pkt.Write());
-    }
+
 }

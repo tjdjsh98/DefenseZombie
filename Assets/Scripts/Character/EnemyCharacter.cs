@@ -84,18 +84,12 @@ public class EnemyCharacter : Character
                 if (character != null)
                 {
                     character?.Damage(_attack.damage, Vector2.right * transform.localScale.x, _attack.power, _attack.stagger);
-                    if (_attack.hitEffect != null)
-                    {
-                        Instantiate(_attack.hitEffect).transform.position = hit.point;
-                    }
+                    
                 }
                 else if (building != null)
                 {
                     building?.Damage(1);
-                    if (_attack.hitEffect != null)
-                    {
-                        Instantiate(_attack.hitEffect).transform.position = hit.point;
-                    }
+                    
                 }
 
              

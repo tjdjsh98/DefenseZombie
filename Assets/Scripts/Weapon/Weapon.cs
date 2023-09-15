@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Net.NetworkInformation;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Weapon : MonoBehaviour
@@ -24,7 +19,12 @@ public abstract class Weapon : MonoBehaviour
         _character = GetComponentInParent<Character>();
         _playerController = GetComponentInParent<PlayerController>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
-        
+
+        if (Client.Instance.IsMain)
+        {
+            _animatorHandler.AttackHandler += Attack;
+        }
+        _animatorHandler.AttackEndHandler += OnAttackEnd;
     }
 
     protected virtual void OnDrawGizmosSelected()
@@ -37,12 +37,9 @@ public abstract class Weapon : MonoBehaviour
         if(_character != null)
             attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
 
-        if (_attacks[_attackType].attackEffect)
-        {
-            Vector3 point = _attacks[_attackType].attackEffectPoint;
+        Vector3 point = _attacks[_attackType].attackEffectPoint;
 
-            Gizmos.DrawWireSphere(transform.position + point, 0.1f);
-        }
+        Gizmos.DrawWireSphere(transform.position + point, 0.1f);
 
         switch (_attacks[_attackType].attacKShape)
         {
@@ -70,11 +67,11 @@ public abstract class Weapon : MonoBehaviour
             _isPress = true;
             _character.IsAttacking = true;
             _character.AttackType = _attackType;
-            _animatorHandler.AttackHandler = Attack;
-            _animatorHandler.AttackEndHandler = OnAttackEnd;
-            if (_attacks[_attackType].attackEffect!= null)
+            GameObject attackEffect = Manager.Data.GetEffect(_attacks[_attackType].attackEffectName);
+
+            if (attackEffect != null)
             {
-                GameObject effect = Instantiate(_attacks[_attackType].attackEffect);
+                GameObject effect = Instantiate(attackEffect);
                 
                 Vector3 point = _attacks[_attackType].attackEffectPoint;
                 point.x *= _character.transform.localScale.x > 0 ? 1 : -1;
@@ -83,8 +80,9 @@ public abstract class Weapon : MonoBehaviour
                 Vector3 scale = Vector3.one;
                 scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
                 effect.transform.localScale = scale;
-
             }
+            Client.Instance.SendMove(_character);
+            Client.Instance.SendAttack(_character, _attacks[_attackType]);
         }
         if (Input.GetKeyUp(KeyCode.A))
         {
@@ -125,18 +123,22 @@ public abstract class Weapon : MonoBehaviour
                 if (character != null && character != _character)
                 {
                     Camera.main.GetComponent<CameraMove>().ShakeCamera(_attacks[_attackType].power, 0.4f);
-                    Vector3 attackDirection = _attacks[_attackType].AttackDirection;
-                    attackDirection.x = _character.transform.localScale.x >0 ? attackDirection.x : -attackDirection.x;
-                    character.Damage(_attacks[_attackType].damage, attackDirection, _attacks[_attackType].power, _attacks[_attackType].stagger);
 
-                    SendAttackPacket(character.CharacterId);
-                    Vector3 point = hit.point;
-                    if (_attacks[_attackType].hitEffect)
+                    if (Client.Instance.IsMain)
                     {
-                        GameObject g = Instantiate(_attacks[_attackType].hitEffect);
-                        g.transform.position = point;
-                    }
+                        Vector3 attackDirection = _attacks[_attackType].AttackDirection;
+                        attackDirection.x = _character.transform.localScale.x > 0 ? attackDirection.x : -attackDirection.x;
+                        character.Damage(_attacks[_attackType].damage, attackDirection, _attacks[_attackType].power, _attacks[_attackType].stagger);
 
+                        Vector3 point = hit.point;
+
+                        GameObject hitEffect = Manager.Data.GetEffect(_attacks[_attackType].hitEffectName);
+                        if (hitEffect)
+                        {
+                            GameObject g = Instantiate(hitEffect);
+                            g.transform.position = point;
+                        }
+                    }
                     penetration++;
                     if (penetration > _attacks[_attackType].penetrationPower) break;
                 }
@@ -149,26 +151,8 @@ public abstract class Weapon : MonoBehaviour
     {
         if (!_isPress)
         {
-            _character.IsAttacking = false;
-            _animatorHandler.AttackHandler = null;
-            _animatorHandler.AttackEndHandler = null;
+            Client.Instance.SendMove(_character);
         }
-    }
-
-    void SendAttackPacket(int damageCharacterId)
-    {
-        C_Attack packet = new C_Attack();
-        Attack attack = _attacks[_attackType];
-        Vector3 attackDirection = attack.AttackDirection;
-        attackDirection.x = _character.transform.localScale.x > 0 ? attackDirection.x : -attackDirection.x;
-        packet.characterId = damageCharacterId;
-        packet.attackDirectionX = attackDirection.x;
-        packet.attackDirectionY = attackDirection.y;
-        packet.power = attack.power;
-        packet.staggerTime = attack.stagger;
-        packet.damage = attack.damage;
-
-        Client.Instance.Send(packet.Write());
     }
 }
 

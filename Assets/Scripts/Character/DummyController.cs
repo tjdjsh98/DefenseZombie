@@ -45,12 +45,13 @@ public class DummyController : MonoBehaviour
         _time = 0;
 
         _character.SetCharacterDirection(new Vector2(packet.characterMoveDirection, 0));
-        _character.SetCurrentSpeed (packet.currentSpeed);
-        _character.SetVelocity(new Vector2(packet.currentSpeed, packet.ySpeed));
+        _character.SetCurrentSpeed (packet.xSpeed);
+        _character.SetVelocity(new Vector2(packet.xSpeed, packet.ySpeed));
         _character.AttackType = packet.attackType;
         _character.IsJumping = packet.isJumping;
         _character.IsAttacking = packet.isAttacking;
         _character.IsConncetCombo = packet.isConnectCombo;
+        _character.CharacterState = (CharacterState)packet.characterState;
 
         if (_interval == 0)
         {

@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.TextCore.Text;
 
 public class Client : MonoBehaviour
 {
@@ -21,6 +24,9 @@ public class Client : MonoBehaviour
     bool _successEnterGame = false;
 
     [field:SerializeField]public float Delay = 0;
+
+    public static float SendPacketInterval = 0.1f;
+    public bool IsMain => ClientId == 1;
     public void Send(ArraySegment<byte> segment)
     {
         _session.Send(segment);
@@ -39,12 +45,13 @@ public class Client : MonoBehaviour
 
     void Update()
     {
+        
         List<IPacket> packets = PacketQueue.Instance.PopAll();
         foreach (IPacket packet in packets)
         {
-            S_BroadcastMove pkt = packet as S_BroadcastMove;
             PacketManager.Instance.HandlePacket(_session, packet);
         }
+       
         if (IsEnterStart && !_successEnterGame)
         {
             if(_recvAnswer)
@@ -72,5 +79,97 @@ public class Client : MonoBehaviour
     public void EnterGame()
     {
         IsEnterStart = true;    
+    }
+
+    public void SendDamage(int characterId,Vector2 attackDirection, float power, float staggerTime)
+    {
+        C_Damage sendPacket = new C_Damage();
+        sendPacket.characterId = characterId;
+        sendPacket.directionX = attackDirection.x;
+        sendPacket.directionY = attackDirection.y;
+        sendPacket.stagger = staggerTime;
+        sendPacket.power = power;
+
+        Send(sendPacket.Write());
+    }
+
+    public void SendMove(Character character,bool syncController = false)
+    {
+        C_Move packet = new C_Move();
+        packet.characterId = character.CharacterId;
+        packet.posX = character.transform.position.x;
+        packet.posY = character.transform.position.y;
+        packet.posZ = character.transform.position.z;
+        packet.xSpeed = character.GetVelocity.x;
+        packet.ySpeed = character.GetVelocity.y;
+        packet.characterState = (int)character.CharacterState;
+        packet.characterMoveDirection = character.CharacterMoveDirection.x;
+        packet.attackType = character.AttackType;
+        packet.isAttacking = character.IsAttacking;
+        packet.isJumping = character.IsJumping;
+        packet.isContactGround = character.IsContactGround;
+        packet.isConnectCombo = character.IsConncetCombo;
+
+        Send(packet.Write());
+    }
+
+    public void SendAddForce(Character character, Vector2 direction, float power,int constraint = -1)
+    {
+        C_AddForce packet = new C_AddForce();
+        packet.characterId = character.CharacterId;
+        packet.power = power;  
+        packet.forceX = direction.x;
+        packet.forceY = direction.y;
+        packet.constraints = constraint;
+
+        Send(packet.Write());
+    }
+
+    public void SendGenreateCharacter(string name,int characterId, Vector3 position)
+    {
+        C_RequestGenerateCharacter pkt = new C_RequestGenerateCharacter();
+        pkt.characterId = characterId;
+        pkt.characterName = name;
+        pkt.posX = position.x;
+        pkt.posY = position.y;
+        pkt.posZ = position.z;
+
+        Send(pkt.Write());
+    }
+    public void SendAttack(Character attacker, Attack attack)
+    {
+        C_Attack packet = new C_Attack();
+
+        packet.attackerId = attacker.CharacterId;
+        packet.attackPointX = attack.attackEffectPoint.x;
+        packet.attackPointY = attack.attackEffectPoint.y;
+        packet.attackEffectName = attack.attackEffectName;
+        Send(packet.Write());
+    }
+
+    public void SendHit(Character attacker, Character hitedCharacter, Attack attack)
+    {
+        C_Hit packet = new C_Hit();
+
+        Vector3 attackDirection = attack.AttackDirection;
+        attackDirection.x = attack.AttackDirection.x * (transform.localScale.x > 0 ? 1 : -1);
+
+        packet.attackerId = attacker.CharacterId;
+        packet.hitedCharacterId = hitedCharacter.CharacterId;
+        packet.attackDirectionX = attackDirection.x;
+        packet.attackDirectionY = attackDirection.y;
+        packet.power = attack.power;
+        packet.damage = attack.damage;
+        packet.hitEffectName = attack.hitEffectName;
+        packet.stagger = attack.stagger;
+
+        Send(packet.Write());
+    }
+    public void SendRemoveCharacter(int id)
+    {
+        C_RemoveCharacter pkt = new C_RemoveCharacter();
+        pkt.characterId = id;
+
+        Send(pkt.Write());
     }
 }

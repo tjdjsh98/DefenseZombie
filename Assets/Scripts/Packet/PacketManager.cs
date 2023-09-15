@@ -38,6 +38,14 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_Attack, PacketHandler.C_AttackHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastAttack, MakePacket<S_BroadcastAttack>);
         _handler.Add((ushort)PacketID.S_BroadcastAttack, PacketHandler.S_BroadcastAttackHandler);
+      _makeFunc.Add((ushort)PacketID.C_Damage, MakePacket<C_Damage>);
+        _handler.Add((ushort)PacketID.C_Damage, PacketHandler.C_DamageHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastDamage, MakePacket<S_BroadcastDamage>);
+        _handler.Add((ushort)PacketID.S_BroadcastDamage, PacketHandler.S_BroadcastDamageHandler);
+      _makeFunc.Add((ushort)PacketID.C_Hit, MakePacket<C_Hit>);
+        _handler.Add((ushort)PacketID.C_Hit, PacketHandler.C_HitHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastHit, MakePacket<S_BroadcastHit>);
+        _handler.Add((ushort)PacketID.S_BroadcastHit, PacketHandler.S_BroadcastHitHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastMove, MakePacket<S_BroadcastMove>);
         _handler.Add((ushort)PacketID.S_BroadcastMove, PacketHandler.S_BroadcastMoveHandler);
       _makeFunc.Add((ushort)PacketID.C_RequestGenerateCharacter, MakePacket<C_RequestGenerateCharacter>);
@@ -46,6 +54,14 @@ public class PacketManager
         _handler.Add((ushort)PacketID.S_BroadcastGenerateCharacter, PacketHandler.S_BroadcastGenerateCharacterHandler);
       _makeFunc.Add((ushort)PacketID.S_CharacterList, MakePacket<S_CharacterList>);
         _handler.Add((ushort)PacketID.S_CharacterList, PacketHandler.S_CharacterListHandler);
+      _makeFunc.Add((ushort)PacketID.C_RemoveCharacter, MakePacket<C_RemoveCharacter>);
+        _handler.Add((ushort)PacketID.C_RemoveCharacter, PacketHandler.C_RemoveCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveCharacter, MakePacket<S_BroadcastRemoveCharacter>);
+        _handler.Add((ushort)PacketID.S_BroadcastRemoveCharacter, PacketHandler.S_BroadcastRemoveCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.C_AddForce, MakePacket<C_AddForce>);
+        _handler.Add((ushort)PacketID.C_AddForce, PacketHandler.C_AddForceHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastAddForce, MakePacket<S_BroadcastAddForce>);
+        _handler.Add((ushort)PacketID.S_BroadcastAddForce, PacketHandler.S_BroadcastAddForceHandler);
 
     }
 

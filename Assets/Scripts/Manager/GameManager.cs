@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
         if (Client.Instance.ClientId != 1) return;
 
         time += Time.deltaTime;
-        if (time > 20)
+        if (time > 50)
         {
             time = 0;
 

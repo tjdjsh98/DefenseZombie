@@ -16,10 +16,18 @@ public enum PacketID
 	C_Move = 8,
 	C_Attack = 9,
 	S_BroadcastAttack = 10,
-	S_BroadcastMove = 11,
-	C_RequestGenerateCharacter = 12,
-	S_BroadcastGenerateCharacter = 13,
-	S_CharacterList = 14,
+	C_Damage = 11,
+	S_BroadcastDamage = 12,
+	C_Hit = 13,
+	S_BroadcastHit = 14,
+	S_BroadcastMove = 15,
+	C_RequestGenerateCharacter = 16,
+	S_BroadcastGenerateCharacter = 17,
+	S_CharacterList = 18,
+	C_RemoveCharacter = 19,
+	S_BroadcastRemoveCharacter = 20,
+	C_AddForce = 21,
+	S_BroadcastAddForce = 22,
 	
 }
 
@@ -349,7 +357,7 @@ public class C_Move : IPacket
 	public float posX;
 	public float posY;
 	public float posZ;
-	public float currentSpeed;
+	public float xSpeed;
 	public float ySpeed;
 	public int characterState;
 	public float characterMoveDirection;
@@ -379,7 +387,7 @@ public class C_Move : IPacket
 		this.posZ = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
-		this.currentSpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		this.xSpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
 		this.ySpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
@@ -427,7 +435,7 @@ public class C_Move : IPacket
 		Array.Copy(BitConverter.GetBytes(posZ), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
-		Array.Copy(BitConverter.GetBytes(currentSpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		Array.Copy(BitConverter.GetBytes(xSpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
 		Array.Copy(BitConverter.GetBytes(ySpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
@@ -463,12 +471,10 @@ public class C_Move : IPacket
 
 public class C_Attack : IPacket
 {
-    public int characterId;
-	public int damage;
-	public float attackDirectionX;
-	public float attackDirectionY;
-	public float power;
-	public float staggerTime;
+    public int attackerId;
+	public float attackPointX;
+	public float attackPointY;
+	public string attackEffectName;
 
     public ushort Protocol { get { return (ushort)PacketID.C_Attack; } }
 
@@ -478,23 +484,19 @@ public class C_Attack : IPacket
 
         count += sizeof(ushort);
         count += sizeof(ushort);
-        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+        this.attackerId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
 		count += sizeof(int);
 		
-		this.damage = BitConverter.ToInt32(segment.Array, segment.Offset + count);
-		count += sizeof(int);
-		
-		this.attackDirectionX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		this.attackPointX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
-		this.attackDirectionY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		this.attackPointY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
-		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
-		count += sizeof(float);
-		
-		this.staggerTime = BitConverter.ToSingle(segment.Array, segment.Offset + count);
-		count += sizeof(float);
+		ushort attackEffectNameLen = BitConverter.ToUInt16(segment.Array, segment.Offset + count);
+		count += sizeof(ushort);
+		this.attackEffectName = Encoding.Unicode.GetString(segment.Array, segment.Offset + count, attackEffectNameLen);
+		count += attackEffectNameLen;
 		
     }
     public ArraySegment<byte> Write()
@@ -505,23 +507,19 @@ public class C_Attack : IPacket
         count += sizeof(ushort);
         Array.Copy(BitConverter.GetBytes((ushort)PacketID.C_Attack), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
         count += sizeof(ushort);
-        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+        Array.Copy(BitConverter.GetBytes(attackerId), 0,segment.Array ,segment.Offset + count, sizeof(int));
 		count += sizeof(int);
 		
-		Array.Copy(BitConverter.GetBytes(damage), 0,segment.Array ,segment.Offset + count, sizeof(int));
-		count += sizeof(int);
-		
-		Array.Copy(BitConverter.GetBytes(attackDirectionX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		Array.Copy(BitConverter.GetBytes(attackPointX), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
-		Array.Copy(BitConverter.GetBytes(attackDirectionY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		Array.Copy(BitConverter.GetBytes(attackPointY), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
-		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
-		count += sizeof(float);
-		
-		Array.Copy(BitConverter.GetBytes(staggerTime), 0,segment.Array ,segment.Offset + count, sizeof(float));
-		count += sizeof(float);
+		ushort attackEffectNameLen = (ushort)Encoding.Unicode.GetBytes(this.attackEffectName,0,attackEffectName.Length,segment.Array, segment.Offset + count + sizeof(ushort));
+		Array.Copy(BitConverter.GetBytes(attackEffectNameLen), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+		count += sizeof(ushort);
+		count += attackEffectNameLen;
 		
 
         Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
@@ -532,13 +530,10 @@ public class C_Attack : IPacket
 
 public class S_BroadcastAttack : IPacket
 {
-    public int playerId;
-	public int characterId;
-	public int damage;
-	public float attackDirectionX;
-	public float attackDirectionY;
-	public float power;
-	public float staggerTime;
+    public int attackerId;
+	public float attackPointX;
+	public float attackPointY;
+	public string attackEffectName;
 
     public ushort Protocol { get { return (ushort)PacketID.S_BroadcastAttack; } }
 
@@ -548,26 +543,19 @@ public class S_BroadcastAttack : IPacket
 
         count += sizeof(ushort);
         count += sizeof(ushort);
-        this.playerId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+        this.attackerId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
 		count += sizeof(int);
 		
-		this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
-		count += sizeof(int);
-		
-		this.damage = BitConverter.ToInt32(segment.Array, segment.Offset + count);
-		count += sizeof(int);
-		
-		this.attackDirectionX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		this.attackPointX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
-		this.attackDirectionY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		this.attackPointY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
-		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
-		count += sizeof(float);
-		
-		this.staggerTime = BitConverter.ToSingle(segment.Array, segment.Offset + count);
-		count += sizeof(float);
+		ushort attackEffectNameLen = BitConverter.ToUInt16(segment.Array, segment.Offset + count);
+		count += sizeof(ushort);
+		this.attackEffectName = Encoding.Unicode.GetString(segment.Array, segment.Offset + count, attackEffectNameLen);
+		count += attackEffectNameLen;
 		
     }
     public ArraySegment<byte> Write()
@@ -578,14 +566,215 @@ public class S_BroadcastAttack : IPacket
         count += sizeof(ushort);
         Array.Copy(BitConverter.GetBytes((ushort)PacketID.S_BroadcastAttack), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
         count += sizeof(ushort);
-        Array.Copy(BitConverter.GetBytes(playerId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+        Array.Copy(BitConverter.GetBytes(attackerId), 0,segment.Array ,segment.Offset + count, sizeof(int));
 		count += sizeof(int);
 		
-		Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		Array.Copy(BitConverter.GetBytes(attackPointX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(attackPointY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		ushort attackEffectNameLen = (ushort)Encoding.Unicode.GetBytes(this.attackEffectName,0,attackEffectName.Length,segment.Array, segment.Offset + count + sizeof(ushort));
+		Array.Copy(BitConverter.GetBytes(attackEffectNameLen), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+		count += sizeof(ushort);
+		count += attackEffectNameLen;
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class C_Damage : IPacket
+{
+    public int characterId;
+	public float directionX;
+	public float directionY;
+	public float power;
+	public float stagger;
+
+    public ushort Protocol { get { return (ushort)PacketID.C_Damage; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
 		count += sizeof(int);
 		
-		Array.Copy(BitConverter.GetBytes(damage), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		this.directionX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.directionY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.stagger = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.C_Damage), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
 		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(directionX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(directionY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(stagger), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class S_BroadcastDamage : IPacket
+{
+    public int characterId;
+	public float directionX;
+	public float directionY;
+	public float power;
+	public float stagger;
+
+    public ushort Protocol { get { return (ushort)PacketID.S_BroadcastDamage; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.directionX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.directionY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.stagger = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.S_BroadcastDamage), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(directionX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(directionY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(stagger), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class C_Hit : IPacket
+{
+    public int attackerId;
+	public int hitedCharacterId;
+	public string hitEffectName;
+	public float attackDirectionX;
+	public float attackDirectionY;
+	public int damage;
+	public float power;
+	public float stagger;
+
+    public ushort Protocol { get { return (ushort)PacketID.C_Hit; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.attackerId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.hitedCharacterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		ushort hitEffectNameLen = BitConverter.ToUInt16(segment.Array, segment.Offset + count);
+		count += sizeof(ushort);
+		this.hitEffectName = Encoding.Unicode.GetString(segment.Array, segment.Offset + count, hitEffectNameLen);
+		count += hitEffectNameLen;
+		
+		this.attackDirectionX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.attackDirectionY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.damage = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.stagger = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.C_Hit), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(attackerId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(hitedCharacterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		ushort hitEffectNameLen = (ushort)Encoding.Unicode.GetBytes(this.hitEffectName,0,hitEffectName.Length,segment.Array, segment.Offset + count + sizeof(ushort));
+		Array.Copy(BitConverter.GetBytes(hitEffectNameLen), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+		count += sizeof(ushort);
+		count += hitEffectNameLen;
 		
 		Array.Copy(BitConverter.GetBytes(attackDirectionX), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
@@ -593,10 +782,100 @@ public class S_BroadcastAttack : IPacket
 		Array.Copy(BitConverter.GetBytes(attackDirectionY), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
+		Array.Copy(BitConverter.GetBytes(damage), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
 		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
-		Array.Copy(BitConverter.GetBytes(staggerTime), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		Array.Copy(BitConverter.GetBytes(stagger), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class S_BroadcastHit : IPacket
+{
+    public int attackerId;
+	public int hitedCharacterId;
+	public string hitEffectName;
+	public float attackDirectionX;
+	public float attackDirectionY;
+	public int damage;
+	public float power;
+	public float stagger;
+
+    public ushort Protocol { get { return (ushort)PacketID.S_BroadcastHit; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.attackerId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.hitedCharacterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		ushort hitEffectNameLen = BitConverter.ToUInt16(segment.Array, segment.Offset + count);
+		count += sizeof(ushort);
+		this.hitEffectName = Encoding.Unicode.GetString(segment.Array, segment.Offset + count, hitEffectNameLen);
+		count += hitEffectNameLen;
+		
+		this.attackDirectionX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.attackDirectionY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.damage = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.stagger = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.S_BroadcastHit), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(attackerId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(hitedCharacterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		ushort hitEffectNameLen = (ushort)Encoding.Unicode.GetBytes(this.hitEffectName,0,hitEffectName.Length,segment.Array, segment.Offset + count + sizeof(ushort));
+		Array.Copy(BitConverter.GetBytes(hitEffectNameLen), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+		count += sizeof(ushort);
+		count += hitEffectNameLen;
+		
+		Array.Copy(BitConverter.GetBytes(attackDirectionX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(attackDirectionY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(damage), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(stagger), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
 
@@ -612,7 +891,7 @@ public class S_BroadcastMove : IPacket
 	public float posX;
 	public float posY;
 	public float posZ;
-	public float currentSpeed;
+	public float xSpeed;
 	public float ySpeed;
 	public int characterState;
 	public float characterMoveDirection;
@@ -642,7 +921,7 @@ public class S_BroadcastMove : IPacket
 		this.posZ = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
-		this.currentSpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		this.xSpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
 		count += sizeof(float);
 		
 		this.ySpeed = BitConverter.ToSingle(segment.Array, segment.Offset + count);
@@ -690,7 +969,7 @@ public class S_BroadcastMove : IPacket
 		Array.Copy(BitConverter.GetBytes(posZ), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
-		Array.Copy(BitConverter.GetBytes(currentSpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		Array.Copy(BitConverter.GetBytes(xSpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
 		count += sizeof(float);
 		
 		Array.Copy(BitConverter.GetBytes(ySpeed), 0,segment.Array ,segment.Offset + count, sizeof(float));
@@ -944,6 +1223,198 @@ public class S_CharacterList : IPacket
 		count += sizeof(ushort);
 		foreach (CharacterList characterList in characterLists)
 		    characterList.Write(segment,ref count);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class C_RemoveCharacter : IPacket
+{
+    public int characterId;
+
+    public ushort Protocol { get { return (ushort)PacketID.C_RemoveCharacter; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.C_RemoveCharacter), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class S_BroadcastRemoveCharacter : IPacket
+{
+    public int characterId;
+
+    public ushort Protocol { get { return (ushort)PacketID.S_BroadcastRemoveCharacter; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.S_BroadcastRemoveCharacter), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class C_AddForce : IPacket
+{
+    public int characterId;
+	public float forceX;
+	public float forceY;
+	public float power;
+	public int constraints;
+
+    public ushort Protocol { get { return (ushort)PacketID.C_AddForce; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.forceX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.forceY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.constraints = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.C_AddForce), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(forceX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(forceY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(constraints), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+
+        Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
+
+        return SendBufferHelper.Close(count);
+    }
+}
+
+public class S_BroadcastAddForce : IPacket
+{
+    public int characterId;
+	public float forceX;
+	public float forceY;
+	public float power;
+	public int constraints;
+
+    public ushort Protocol { get { return (ushort)PacketID.S_BroadcastAddForce; } }
+
+    public void Read(ArraySegment<byte> segment)
+    {
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        count += sizeof(ushort);
+        this.characterId = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.forceX = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.forceY = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.power = BitConverter.ToSingle(segment.Array, segment.Offset + count);
+		count += sizeof(float);
+		
+		this.constraints = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+    }
+    public ArraySegment<byte> Write()
+    {
+        ArraySegment<byte> segment = SendBufferHelper.Open(4096);
+        ushort count = 0;
+
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes((ushort)PacketID.S_BroadcastAddForce), 0,segment.Array ,segment.Offset + count, sizeof(ushort));
+        count += sizeof(ushort);
+        Array.Copy(BitConverter.GetBytes(characterId), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(forceX), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(forceY), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(power), 0,segment.Array ,segment.Offset + count, sizeof(float));
+		count += sizeof(float);
+		
+		Array.Copy(BitConverter.GetBytes(constraints), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
 		
 
         Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));

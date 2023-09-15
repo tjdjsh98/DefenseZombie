@@ -44,10 +44,7 @@ public class GameRoom : IJobQueue
         answer.permission = true;
 
         session.Send(answer.Write());
-
-    
     }
-
     public void SuccessEnter(ClientSession session)
     {
         // 새로운 플레이어에게 모든 플레이어의 정보를 보낸다.
@@ -124,7 +121,7 @@ public class GameRoom : IJobQueue
         move.posX = packet.posX;
         move.posY = packet.posY;
         move.posZ = packet.posZ;
-        move.currentSpeed = packet.currentSpeed;
+        move.xSpeed = packet.xSpeed;
         move.ySpeed = packet.ySpeed;
         move.characterState = packet.characterState;
         move.characterMoveDirection = packet.characterMoveDirection;
@@ -148,8 +145,71 @@ public class GameRoom : IJobQueue
         gen.posZ = packet.posZ;
 
         EnemyData data = new EnemyData() { enemyId = packet.characterId, enemyName = packet.characterName, position = new Vector3(packet.posX, packet.posY, packet.posZ) };
-
+        _enemys.Add(data);
         Broadcast(gen.Write());
+    }
+
+    public void RemoveCharacter(C_RemoveCharacter packet)
+    {
+        foreach(var data in _enemys)
+        {
+            if(data.enemyId == packet.characterId)
+            {
+                _enemys.Remove(data);
+                break;
+            }
+        }
+
+        S_BroadcastRemoveCharacter sendPacket = new S_BroadcastRemoveCharacter();
+        sendPacket.characterId = packet.characterId;
+
+        Broadcast(sendPacket.Write());
+    }
+
+    public void Attack(C_Attack packet)
+    {
+        S_BroadcastAttack sendPacket = new S_BroadcastAttack();
+
+        sendPacket.attackerId = packet.attackerId;
+        sendPacket.attackPointX = packet.attackPointX;
+        sendPacket.attackPointY = packet.attackPointY;
+        sendPacket.attackEffectName = packet.attackEffectName;
+        
+        Broadcast(sendPacket.Write());
+    }
+
+    public void Hit(C_Hit packet)
+    {
+        S_BroadcastHit sendPacket = new S_BroadcastHit();
+
+        sendPacket.attackerId = packet.attackerId;
+        sendPacket.hitedCharacterId = packet.hitedCharacterId;
+        sendPacket.power = packet.power;
+        sendPacket.hitEffectName = packet.hitEffectName;
+        sendPacket.attackDirectionX = packet.attackDirectionX;
+        sendPacket.attackDirectionY = packet.attackDirectionY;
+        sendPacket.stagger =packet.stagger;
+    }
+
+    public void Damage(C_Damage packet)
+    {
+        S_BroadcastDamage sendPacket = new S_BroadcastDamage();
+
+        sendPacket.characterId = packet.characterId;
+        sendPacket.directionX = packet.directionX;
+        sendPacket.directionY = packet.directionY;
+        sendPacket.characterId = packet.characterId;
+        sendPacket.power = packet.power;
+        sendPacket.stagger = packet.stagger;
+
+        foreach(var s in _sessions)
+        {
+            if(s.SessionId == sendPacket.characterId)
+            {
+                s.Send(sendPacket.Write());
+                return;
+            }
+        }
     }
 }
 
