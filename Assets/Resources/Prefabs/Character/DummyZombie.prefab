@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 7571822726241482621}
   m_Layer: 6
   m_Name: DummyZombie
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -137,6 +137,7 @@ MonoBehaviour:
     center: {x: 0, y: 0.55, z: 0}
     size: {x: 0.54, y: 1.2, z: 0}
   _maxHp: 111111
+  _standing: 0
   _accelSpeed: 20
   _groundBreakSpeed: 0
   _airBreakSpeed: 0
@@ -146,9 +147,9 @@ MonoBehaviour:
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
   _attack:
-    attackEffect: {fileID: 0}
+    attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
-    hitEffect: {fileID: 0}
+    hitEffectName: 
     attackRange:
       center: {x: 0, y: 0, z: 0}
       size: {x: 0, y: 0, z: 0}

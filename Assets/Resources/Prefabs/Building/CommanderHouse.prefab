@@ -78,7 +78,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 6, y: 5}
+  m_Size: {x: 1.92, y: 1.6}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -152,7 +152,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -1.2693868, y: 0.9959415}
+  m_Offset: {x: 0.018409729, y: 1.3360286}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -163,7 +163,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.131032, y: 2.1273515}
+  m_Size: {x: 4.4140053, y: 2.8075256}
   m_EdgeRadius: 0
 --- !u!50 &7715304793495419924
 Rigidbody2D:
@@ -219,8 +219,8 @@ MonoBehaviour:
   <HP>k__BackingField: 0
   _size:
     isShow: 1
-    width: 3
+    width: 5
     height: 4
     pivotX: 0
     pivotY: 0
-    isPlace: 010101010101010101010101
+    isPlace: 0101010101010101010101010101010101010101

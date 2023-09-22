@@ -1,10 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using UnityEngine.U2D.IK;
 
 public class EnemyCharacter : Character
 {
@@ -65,7 +59,19 @@ public class EnemyCharacter : Character
                 SetAnimatorBool("Walk", false);
             }
         }
+        if(CharacterState == CharacterState.Damage && !IsStagger) 
+        {
+            IsStagger = true;
+            SetAnimatorTrigger("Hit");
+            SetAnimatorBool("Stagger", IsStagger);
 
+        }
+        if (CharacterState != CharacterState.Damage && IsStagger)
+        {
+            IsStagger = false;
+            SetAnimatorBool("Stagger", IsStagger);
+
+        }
         SetAnimatorBool("Attack", IsAttacking);
     }
 
@@ -89,10 +95,20 @@ public class EnemyCharacter : Character
                 else if (building != null)
                 {
                     building?.Damage(1);
-                    
                 }
 
-             
+                if (character != null || building != null)
+                {
+                    Vector3 point = hit.point;
+
+                    GameObject hitEffect = Manager.Data.GetEffect(_attack.hitEffectName);
+                    if (hitEffect)
+                    {
+                        GameObject g = Instantiate(hitEffect);
+                        g.transform.position = point;
+                    }
+                }
+
             }
         }
         else

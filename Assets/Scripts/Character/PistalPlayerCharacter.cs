@@ -85,8 +85,8 @@ public class PistalPlayerCharacter : PlayerCharacter
     {
         if (!IsAttacking)
         {
-            if (TurnHandler != null)
-            TurnHandler(direction);
+            if (TurnedHandler != null)
+            TurnedHandler(direction);
         
             Vector3 scale = Vector3.one;
             scale.x = direction > 0 ? 1 : -1;

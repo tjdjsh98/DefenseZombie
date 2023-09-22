@@ -5,47 +5,52 @@ using UnityEngine;
 
 public class Hammer : Weapon
 {
-    protected override void Update()
+    bool _connectCombo;
+
+    protected override void Awake()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            _attackType = 0;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        base.Awake();
+    }
+    protected override void OnAttackKeyDown()
+    {
+        if (!_character.IsAttacking)
         {
             _attackType = 1;
-        }
-        if (Input.GetKeyDown(KeyCode.A))
-        {
             _character.CharacterState = CharacterState.Attack;
             _character.AttackType = _attackType;
-            _isPress = true;
             _character.IsAttacking = true;
+            _connectCombo = false;
             _animatorHandler.ConnectComboHandler = OnConnectCombo;
-
         }
-        if (Input.GetKeyUp(KeyCode.A))
+        else
         {
-            _isPress = false;
+            if (!_connectCombo)
+            {
+                _connectCombo = true;
+            }
         }
+    }
+    protected override void OnAttackKeyUp()
+    {
     }
 
     protected void OnConnectCombo()
     {
-        if(_isPress)
-            _character.IsConncetCombo= true;
+        if (_connectCombo)
+        {
+            _character.IsConncetCombo = true;
+            _attackType = 2;
+            _connectCombo = false;
+        }
     }
 
     protected override void OnAttackEnd()
     {
-        if (!_isPress)
+        _animatorHandler.ConnectComboHandler = null;
+        if (_character.CharacterState == CharacterState.Attack)
         {
-            _animatorHandler.ConnectComboHandler = null;
-            if (_character.CharacterState == CharacterState.Attack)
-            {
-                _character.CharacterState = CharacterState.Idle;
-            }
+            _character.CharacterState = CharacterState.Idle;
+            
         }
-
     }
 }

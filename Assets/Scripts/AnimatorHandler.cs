@@ -7,14 +7,21 @@ public class AnimatorHandler : MonoBehaviour
 {
     Character _character;
 
+    public Action AttackStartedHandler;
     public Action AttackHandler;
     public Action AttackEndHandler;
     public Action ConnectComboHandler;
     public Action DestroyHandler;
+    public Action DodgeEndHandler;
+    
 
     private void Awake()
     {
         _character = GetComponent<Character>();
+    }
+    public void AttackStarted()
+    {
+        AttackStartedHandler?.Invoke();
     }
     public void Attack()
     {
@@ -35,5 +42,15 @@ public class AnimatorHandler : MonoBehaviour
     {
         DestroyHandler?.Invoke();
         Destroy(gameObject);
+    }
+
+    public void DodgeEnd()
+    {
+        DodgeEndHandler?.Invoke();
+    }
+
+    public void SetAttackType(int type)
+    {
+        _character.AttackType = type;
     }
 }

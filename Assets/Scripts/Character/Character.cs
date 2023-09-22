@@ -1,12 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.IO.Compression;
-using System.Runtime.CompilerServices;
-using TMPro;
-using Unity.VisualScripting;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
@@ -25,8 +20,13 @@ public class Character : MonoBehaviour
 
     // 캐릭터 상태
     [SerializeField] protected int _maxHp;
+    public int MaxHp => _maxHp;
     int _hp;
     public int Hp { get { return _hp; } set { _hp = value; if (_hp <= 0) Dead(); } }
+    public bool _isSuperArmerWhenAttack;
+
+    [Range(0,100)][SerializeField] protected int _standing;
+
     public int AttackType { get; set; } = 0;
     // 속도
     protected float _currentSpeed;
@@ -43,7 +43,7 @@ public class Character : MonoBehaviour
     [SerializeField] protected float _jumpPower = 10.0f;
     protected int _jumpCount = 0;
 
-    public Action<float> TurnHandler;
+    public Action<float> TurnedHandler;
 
     protected float _ySpeed;
     public float YSpeed=>_ySpeed;
@@ -53,11 +53,15 @@ public class Character : MonoBehaviour
     public bool IsJumping { set; get; }
     public bool IsContactGround { set; get; }
     public bool IsConncetCombo { set; get; }
+    public bool IsDodge { set; get; }
+    public bool IsStagger { set; get; }
 
     public int CharacterId { set; get; } = -1;
     public bool IsDummy { set; get; }
 
+    // 행동 핸들러
     public Action RegisterAttackHandler;
+    public Action DeadHandler;
 
     public Vector2 GetVelocity => _rigidBody.velocity;
 
@@ -100,7 +104,6 @@ public class Character : MonoBehaviour
 
     protected virtual void ControlAnimation()
     {
-
     }
 
 
@@ -209,7 +212,7 @@ public class Character : MonoBehaviour
             _rigidBody.constraints = (RigidbodyConstraints2D)constraints;
         
         if(power != 0)
-            _rigidBody.AddForce(direction.normalized * power, ForceMode2D.Impulse);
+            _rigidBody.AddForce(direction.normalized * (power * (1-_standing/100f)), ForceMode2D.Impulse);
     }
     public void Jump()
     {
@@ -221,8 +224,9 @@ public class Character : MonoBehaviour
 
     protected virtual void Turn(float direction)
     {
-        if (TurnHandler != null)
-            TurnHandler(direction);
+        if (direction == 0) return;
+        if (TurnedHandler != null)
+            TurnedHandler(direction);
 
         Vector3 scale = Vector3.one;
         scale.x = direction > 0 ? 1 : -1;
@@ -231,9 +235,10 @@ public class Character : MonoBehaviour
 
     public void Damage(int dmg, Vector2 attackDirection, float power, float staggerTime)
     {
+        if (IsDodge) return;
+
         _rigidBody.velocity = Vector2.zero;
         AddForce(attackDirection, power);
-        CharacterState = CharacterState.Damage;
 
         if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
         _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
@@ -252,17 +257,22 @@ public class Character : MonoBehaviour
 
     protected void Dead()
     {
-       Manager.Character.RemoveCharacter(CharacterId);
+        DeadHandler?.Invoke();
+        Manager.Character.RemoveCharacter(CharacterId);
     }
 
     IEnumerator CorTurnToIdle(float time)
     {
-        yield return new WaitForSeconds(time);
+        if (CharacterState != CharacterState.Attack || !_isSuperArmerWhenAttack)
+        {
+            CharacterState = CharacterState.Damage;
+            yield return new WaitForSeconds(time);
 
-        CharacterState = CharacterState.Idle;
-        Client.Instance.SendMove(this);
+            CharacterState = CharacterState.Idle;
+            Client.Instance.SendMove(this);
 
-        _damageCoroutine = null;
+            _damageCoroutine = null;
+        }
     }
 
     public GameObject GetOverrapGameObject(int layerMask = -1)
@@ -305,6 +315,11 @@ public class Character : MonoBehaviour
     {
         _currentSpeed = speed;
     }
+    public void Dodge()
+    {
+        if(CharacterState == CharacterState.Idle)
+            CharacterState = CharacterState.Dodge;
+    }
 
     public void SetAnimatorBool(string name, bool value) => _animator.SetBool(name, value);
     public void SetAnimatorInteger(string name, int value) => _animator.SetInteger(name, value);
@@ -334,4 +349,5 @@ public enum CharacterState
     Idle,
     Attack,
     Damage,
+    Dodge,
 }

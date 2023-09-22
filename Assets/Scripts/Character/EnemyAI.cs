@@ -4,6 +4,7 @@ using UnityEngine;
 public class EnemyAI : MonoBehaviour
 {
     EnemyCharacter _character;
+    AnimatorHandler _animatorHandler;
 
     [SerializeField]Range _searchRange;
     [SerializeField]Range _attackRange;
@@ -33,7 +34,12 @@ public class EnemyAI : MonoBehaviour
     private void Awake()
     {
         _character = GetComponent<EnemyCharacter>();
-        StartCoroutine(CorSendMovePacket());
+        _animatorHandler = GetComponent<AnimatorHandler>();
+        if (Client.Instance.ClientId != -1)
+        {
+            StartCoroutine(CorSendMovePacket());
+        }
+        _animatorHandler.AttackEndHandler += () => { _character.CharacterState = CharacterState.Idle; };
     }
 
     protected void OnDrawGizmosSelected()

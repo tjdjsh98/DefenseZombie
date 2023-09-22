@@ -12,11 +12,22 @@ public class CharacterManager : MonoBehaviour
     public PlayerCharacter MainCharacter
     {
         get 
-        { 
-            if(_main == null)
+        {
+            if (_main == null)
             {
-                PlayerCharacter p = _playerList.Find((c) => { return c.CharacterId == Client.Instance.ClientId; });
-                _main = p;
+                // 싱글 이때
+                if (Client.Instance.ClientId == -1)
+                {
+                    _main = Manager.Character.GenerateCharacter("HammerCharacter", Vector3.zero) as PlayerCharacter;
+                }
+                else
+                {
+                    // 멀티일 떄
+                    {
+                        PlayerCharacter p = _playerList.Find((c) => { return c.CharacterId == Client.Instance.ClientId; });
+                        _main = p;
+                    }
+                }
             }
            return _main;
         }
@@ -56,6 +67,7 @@ public class CharacterManager : MonoBehaviour
         if (character is EnemyCharacter)
         {
             _enemyList.Add(character as EnemyCharacter);
+            character.CharacterId = ++_characterId;
         }
         return character;
     }

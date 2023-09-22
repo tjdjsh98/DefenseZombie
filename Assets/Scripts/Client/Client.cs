@@ -11,7 +11,18 @@ using UnityEngine.TextCore.Text;
 public class Client : MonoBehaviour
 {
     static Client _clinet;
-    public static Client Instance { get { return _clinet; } }
+    public static Client Instance { get 
+        {
+            if(_clinet == null )
+            {
+                GameObject g = new GameObject("Clinet");
+                _clinet = g.AddComponent<Client>();
+                DontDestroyOnLoad(g);
+                
+            }
+            return _clinet; 
+        
+        } }
     public bool IsEnterStart { get; private set; }
 
     static ServerSession _session = new ServerSession();
@@ -22,7 +33,7 @@ public class Client : MonoBehaviour
     bool _recvAnswer = false;
     bool _isEnableEnterGame = false;
     bool _successEnterGame = false;
-
+    public bool IsSingle { get; set; } = false;
     [field:SerializeField]public float Delay = 0;
 
     public static float SendPacketInterval = 0.1f;
@@ -34,6 +45,8 @@ public class Client : MonoBehaviour
 
     public void Init(string ipAddress)
     {
+        if (SceneManager.GetActiveScene().name == "InGame") return;
+
         _clinet = this;
         IPAddress ipAddr = IPAddress.Parse(ipAddress);
         IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
@@ -45,7 +58,6 @@ public class Client : MonoBehaviour
 
     void Update()
     {
-        
         List<IPacket> packets = PacketQueue.Instance.PopAll();
         foreach (IPacket packet in packets)
         {
@@ -83,6 +95,8 @@ public class Client : MonoBehaviour
 
     public void SendDamage(int characterId,Vector2 attackDirection, float power, float staggerTime)
     {
+        if (ClientId == -1) return;
+
         C_Damage sendPacket = new C_Damage();
         sendPacket.characterId = characterId;
         sendPacket.directionX = attackDirection.x;
@@ -95,6 +109,7 @@ public class Client : MonoBehaviour
 
     public void SendMove(Character character,bool syncController = false)
     {
+        if (ClientId == -1) return;
         C_Move packet = new C_Move();
         packet.characterId = character.CharacterId;
         packet.posX = character.transform.position.x;
@@ -115,6 +130,7 @@ public class Client : MonoBehaviour
 
     public void SendAddForce(Character character, Vector2 direction, float power,int constraint = -1)
     {
+        if (ClientId == -1) return;
         C_AddForce packet = new C_AddForce();
         packet.characterId = character.CharacterId;
         packet.power = power;  
@@ -127,6 +143,7 @@ public class Client : MonoBehaviour
 
     public void SendGenreateCharacter(string name,int characterId, Vector3 position)
     {
+        if (ClientId == -1) return;
         C_RequestGenerateCharacter pkt = new C_RequestGenerateCharacter();
         pkt.characterId = characterId;
         pkt.characterName = name;
@@ -138,6 +155,7 @@ public class Client : MonoBehaviour
     }
     public void SendAttack(Character attacker, Attack attack)
     {
+        if (ClientId == -1) return;
         C_Attack packet = new C_Attack();
 
         packet.attackerId = attacker.CharacterId;
@@ -149,6 +167,7 @@ public class Client : MonoBehaviour
 
     public void SendHit(Character attacker, Character hitedCharacter, Attack attack)
     {
+        if (ClientId == -1) return;
         C_Hit packet = new C_Hit();
 
         Vector3 attackDirection = attack.AttackDirection;
@@ -167,6 +186,7 @@ public class Client : MonoBehaviour
     }
     public void SendRemoveCharacter(int id)
     {
+        if (ClientId == -1) return;
         C_RemoveCharacter pkt = new C_RemoveCharacter();
         pkt.characterId = id;
 

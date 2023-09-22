@@ -23,7 +23,7 @@ public class Server : MonoBehaviour
     {
         string host = Dns.GetHostName();
         IPHostEntry entry = Dns.GetHostEntry(host);
-        IPAddress ipAddress = IPAddress.Parse("172.25.2.137");
+        IPAddress ipAddress = IPAddress.Parse("192.168.1.41");
         
 
         IPEndPoint endPoint = new IPEndPoint(ipAddress, _port);

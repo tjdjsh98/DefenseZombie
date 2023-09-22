@@ -10,4 +10,12 @@ public static class Define
         Circle,
         Raycast
     }
+
+    public enum ItemType
+    { 
+        Stone,
+        Wood,
+        Steel,
+
+    }
 }

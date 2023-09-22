@@ -60,4 +60,23 @@ public static class Util
                 break;
         }
     }
+
+    public static bool GetIsInRange(GameObject me, GameObject you, Range range)
+    {
+        if(you.transform.position.x < me.transform.position.x + range.center.x + range.size.x/2)
+        {
+            if (you.transform.position.x > me.transform.position.x + range.center.x - range.size.x / 2)
+            {
+                if (you.transform.position.y < me.transform.position.y + range.center.y + range.size.y / 2)
+                {
+                    if (you.transform.position.y > me.transform.position.y + range.center.y - range.size.y / 2)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }

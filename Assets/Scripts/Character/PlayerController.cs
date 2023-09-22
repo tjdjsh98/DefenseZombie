@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -22,13 +23,18 @@ public class PlayerController : MonoBehaviour
 
     float _movePacketDelay = 0.25f;
 
+    public Action AttackKeyDown;
+    public Action AttackKeyUp;
+
     public bool IsControllerable { get {
-            if (Client == null) return false;
-            return Client.ClientId == _character.CharacterId; } }
+            return Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId; } }
     private void Awake()
     {
         _character = GetComponent<PlayerCharacter>();
-        StartCoroutine(CorSendMovePacket());
+        if (Client.Instance.ClientId != -1)
+        {
+            StartCoroutine(CorSendMovePacket());
+        }
     }
 
     private void Update()
@@ -39,6 +45,11 @@ public class PlayerController : MonoBehaviour
     void Control()
     {
         if (!IsControllerable) return;
+
+        if (Input.GetKeyDown(KeyCode.A))
+            AttackKeyDown?.Invoke();
+        if (Input.GetKeyUp(KeyCode.A))
+            AttackKeyUp?.Invoke();
 
         Vector2 moveDirection = Vector2.zero;
         if (Input.GetKey(KeyCode.RightArrow))
@@ -93,6 +104,11 @@ public class PlayerController : MonoBehaviour
 
         _character.SetCharacterDirection(moveDirection);
 
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            _character.Dodge();
+        }
+
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) ||
             Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Space))
         {
@@ -104,7 +120,7 @@ public class PlayerController : MonoBehaviour
     {
         while (true)
         {
-            if (IsControllerable )
+            if (IsControllerable)
             {
                 Client.Instance.SendMove(_character);
                 yield return new WaitForSeconds(Client.SendPacketInterval);

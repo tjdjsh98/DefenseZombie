@@ -4,6 +4,7 @@ public abstract class Weapon : MonoBehaviour
 {
     protected Character _character;
     protected PlayerController _playerController;
+    protected HelperAI _helperAi;
     protected AnimatorHandler _animatorHandler;
 
     [SerializeField] protected int _attackType;
@@ -11,16 +12,25 @@ public abstract class Weapon : MonoBehaviour
 
     [SerializeField] protected string _enableAttackLayer = "Character";
     
-    protected bool _isPress;
-
     public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
     protected virtual void Awake()
     {
         _character = GetComponentInParent<Character>();
         _playerController = GetComponentInParent<PlayerController>();
+        _helperAi = GetComponentInParent<HelperAI>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
 
-        if (Client.Instance.IsMain)
+        if(_playerController != null)
+        {
+            _playerController.AttackKeyDown += OnAttackKeyDown;
+            _playerController.AttackKeyUp += OnAttackKeyUp;
+        }
+        else if(_helperAi != null)
+        {
+            _helperAi.AttackHanlder += OnAttackKeyDown;
+        }
+
+        if (Client.Instance.ClientId == -1  || Client.Instance.IsMain)
         {
             _animatorHandler.AttackHandler += Attack;
         }
@@ -58,38 +68,30 @@ public abstract class Weapon : MonoBehaviour
 
     }
 
-    protected virtual void Update()
+    protected virtual void OnAttackKeyDown()
     {
-        if (!Controllable) return;
+        _character.IsAttacking = true;
+        _character.AttackType = _attackType;
+        GameObject attackEffect = Manager.Data.GetEffect(_attacks[_attackType].attackEffectName);
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (attackEffect != null)
         {
-            _isPress = true;
-            _character.IsAttacking = true;
-            _character.AttackType = _attackType;
-            GameObject attackEffect = Manager.Data.GetEffect(_attacks[_attackType].attackEffectName);
+            GameObject effect = Instantiate(attackEffect);
 
-            if (attackEffect != null)
-            {
-                GameObject effect = Instantiate(attackEffect);
-                
-                Vector3 point = _attacks[_attackType].attackEffectPoint;
-                point.x *= _character.transform.localScale.x > 0 ? 1 : -1;
+            Vector3 point = _attacks[_attackType].attackEffectPoint;
+            point.x *= _character.transform.localScale.x > 0 ? 1 : -1;
 
-                effect.transform.position = transform.position + point;
-                Vector3 scale = Vector3.one;
-                scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
-                effect.transform.localScale = scale;
-            }
-            Client.Instance.SendMove(_character);
-            Client.Instance.SendAttack(_character, _attacks[_attackType]);
+            effect.transform.position = transform.position + point;
+            Vector3 scale = Vector3.one;
+            scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
+            effect.transform.localScale = scale;
         }
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            _isPress = false;
-        }
+        Client.Instance.SendMove(_character);
+        Client.Instance.SendAttack(_character, _attacks[_attackType]);
     }
-
+    protected virtual void OnAttackKeyUp()
+    {
+    }
 
     public virtual void Attack()
     {
@@ -124,7 +126,7 @@ public abstract class Weapon : MonoBehaviour
                 {
                     Camera.main.GetComponent<CameraMove>().ShakeCamera(_attacks[_attackType].power, 0.4f);
 
-                    if (Client.Instance.IsMain)
+                    if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
                     {
                         Vector3 attackDirection = _attacks[_attackType].AttackDirection;
                         attackDirection.x = _character.transform.localScale.x > 0 ? attackDirection.x : -attackDirection.x;
@@ -149,10 +151,7 @@ public abstract class Weapon : MonoBehaviour
 
     protected virtual void OnAttackEnd()
     {
-        if (!_isPress)
-        {
-            Client.Instance.SendMove(_character);
-        }
+        Client.Instance.SendMove(_character);
     }
 }
 

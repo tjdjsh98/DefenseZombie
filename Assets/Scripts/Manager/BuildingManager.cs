@@ -16,6 +16,9 @@ public class BuildingManager : MonoBehaviour
     public void Init()
     {
         _blankBox = Resources.Load<GameObject>("BlankBox");
+
+        GenerateBuilding("CommanderHouse", new Vector2Int(0, -3));
+        
     }
 
     private void Update()
@@ -66,6 +69,61 @@ public class BuildingManager : MonoBehaviour
             }
 
         }
+    }
+
+    public Building GenerateBuilding(string name, Vector2Int cellPos)
+    {
+        Building buildingOrigin = Manager.Data.GetBuilding(name);
+        if (buildingOrigin == null) return null;
+
+        // 겹치는 곳이 있는지 확인
+        for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+        {
+            if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+            Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width , i / buildingOrigin.BuildingSize.width);
+
+            if (_buildingCoordiate.ContainsKey(pos.x))
+            {
+                if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
+                {
+                    if (_buildingCoordiate[pos.x][pos.y] != null)
+                        return null;
+                }
+            }
+        }
+
+        Building building = Instantiate(buildingOrigin);
+        Vector3 buildingPos = new Vector3(cellPos.x + (buildingOrigin.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
+
+
+        building.transform.position = buildingPos;
+
+
+        // 겹치는 부분에 좌표 설정
+        for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+        {
+            if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+            Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width , i / buildingOrigin.BuildingSize.width);
+
+
+            if (!_buildingCoordiate.ContainsKey(pos.x))
+            {
+                _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
+            }
+            if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
+            {
+                _buildingCoordiate[pos.x].Add(pos.y, building);
+            }
+            else
+            {
+                _buildingCoordiate[pos.x][pos.y] = building;
+            }
+            building.AddCoordinate(pos);
+        }
+
+        return building;
     }
 
     public Building GenreateBuilding()
