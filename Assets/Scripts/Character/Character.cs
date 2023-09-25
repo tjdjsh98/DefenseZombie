@@ -3,7 +3,7 @@ using System.Collections;
 using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 
-public class Character : MonoBehaviour
+public class Character : MonoBehaviour,IHp
 {
     protected Rigidbody2D _rigidBody;
     public Rigidbody2D RigidBody => _rigidBody;

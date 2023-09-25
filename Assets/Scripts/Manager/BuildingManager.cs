@@ -95,8 +95,12 @@ public class BuildingManager : MonoBehaviour
 
         Building building = Instantiate(buildingOrigin);
         Vector3 buildingPos = new Vector3(cellPos.x + (buildingOrigin.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
-
-
+        Vector3 scale = Vector3.one;
+        if (_builder != null)
+        {
+            scale.x = _builder.transform.localScale.x > 0 ? 1 : -1;
+            building.transform.localScale = scale;
+        }
         building.transform.position = buildingPos;
 
 

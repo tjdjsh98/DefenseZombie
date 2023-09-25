@@ -2,13 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Building : MonoBehaviour
+public class Building : MonoBehaviour, IHp
 {
-    [field: SerializeField] public int HP { set; get; } 
+    SpriteRenderer _spriteRenderer;
+    BoxCollider2D _boxCollider;
+
+    CircleSlider _circleSlider;
+    [field: SerializeField] public int MaxHp { set; get; } 
+    [field: SerializeField] public int Hp { set; get; } 
     [SerializeField] BuildingSize _size;
     public BuildingSize BuildingSize => _size;
 
+    [SerializeField] float _buildingTime;
+    float _time;
+
     List<Vector2Int> _coordinate = new List<Vector2Int>();
+
+    bool _done;
+
+    private void Awake()
+    {
+        _spriteRenderer = transform.Find("Model").GetComponent<SpriteRenderer>();
+        _boxCollider = GetComponent<BoxCollider2D>();
+        
+        _circleSlider = GetComponentInChildren<CircleSlider>();
+        Hp = MaxHp;
+
+        gameObject.tag = "Untagged";
+        _boxCollider.enabled = false;
+        _time = 0;
+        Color color = new Color(1, 1, 1, 0.2f);
+        _spriteRenderer.color = color;
+    }
+
     private void OnDrawGizmosSelected()
     {
         if (_size.isShow)
@@ -32,10 +58,30 @@ public class Building : MonoBehaviour
         }
     }
 
+    public void Update()
+    {
+        if(_done) return;
+
+        if(_time > _buildingTime)
+        {
+            _spriteRenderer.color = Color.white;
+            gameObject.tag = "Building";
+            _boxCollider.enabled = true;
+            _circleSlider.Hide();
+            _done = true;   
+        }
+        else
+        {
+            _time += Time.deltaTime;
+            _circleSlider.SetRatio(_time / _buildingTime);
+        }
+
+    }
+
     public void Damage(int dmg)
     {
-        HP -= dmg;
-        if(HP <=0)
+        Hp -= dmg;
+        if(Hp <=0)
         {
             Manager.Building.RemoveBuilding(this);
             Destroy(gameObject);
