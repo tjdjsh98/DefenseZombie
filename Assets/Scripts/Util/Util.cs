@@ -79,4 +79,24 @@ public static class Util
 
         return false;
     }
+
+    public static GameObject Raycast(Vector3 position,string tag , int layerMask = -1)
+    {
+        RaycastHit2D[] hits;
+
+        if(layerMask != -1)
+            hits = Physics2D.RaycastAll(position, Vector2.zero, 0, layerMask);
+        else
+            hits = Physics2D.RaycastAll(position, Vector2.zero, 0);
+
+        foreach (var hit in hits)
+        {
+            if(hit.collider.gameObject.tag == tag)
+            {
+                return hit.collider.gameObject;
+            }
+        }
+
+        return null;
+    }
 }

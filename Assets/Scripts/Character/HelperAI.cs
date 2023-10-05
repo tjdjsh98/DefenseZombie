@@ -43,7 +43,9 @@ public class HelperAI : MonoBehaviour
     Vector3 _movePoint;
 
     public Action AttackHanlder;
-    
+
+    bool _mainPointAlter;
+
     protected void Awake()
     {
         _character = GetComponent<Character>();
@@ -66,6 +68,12 @@ public class HelperAI : MonoBehaviour
         AI();
     }
 
+    public void SetMainPos(float x)
+    {
+        _mainPoint.x = x;
+        _mainPointAlter = true;
+    }
+
     void AI()
     {
         if (_target != null && !_target.gameObject.activeSelf) _target = null;
@@ -78,6 +86,11 @@ public class HelperAI : MonoBehaviour
         }
         if (_character.CharacterState == CharacterState.Idle)
         {
+            if(_mainPointAlter)
+            {
+                _movePoint = _mainPoint;
+                _mainPointAlter = false;
+            }
             if (_target == null)
             {
                 if(Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)

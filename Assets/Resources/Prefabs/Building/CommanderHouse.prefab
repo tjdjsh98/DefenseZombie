@@ -227,7 +227,7 @@ MonoBehaviour:
     pivotX: 0
     pivotY: 0
     isPlace: 0101010101010101010101010101010101010101
-  _buildingTime: 20
+  _buildingTime: 0
 --- !u!1001 &4716049519630612162
 PrefabInstance:
   m_ObjectHideFlags: 0

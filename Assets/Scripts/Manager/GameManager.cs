@@ -21,6 +21,8 @@ public class GameManager : MonoBehaviour
     public bool IsStartLevel { get; private set; }
     public int SummonCount { private set; get; }
 
+    public UI_Commander Commander;
+
     public void Init()
     {
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);

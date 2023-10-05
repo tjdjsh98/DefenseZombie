@@ -78,11 +78,13 @@ public class PlayerController : MonoBehaviour
                 if (house != null)
                 {
                     house.EnterCharacter(_character);
+                    Manager.Game.Commander.Open();
                     _inHouse = house;
                 }
             }
             else
             {
+                Manager.Game.Commander.Close();
                 _inHouse.LeaveCharacter();
                 _inHouse = null;
             }
