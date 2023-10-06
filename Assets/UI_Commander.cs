@@ -11,11 +11,17 @@ public class UI_Commander : MonoBehaviour
 
     Rect startSize;
 
+    // 사각형 영역 표시 변수
     bool _showSelection;
     Vector3 _mouseCur;
     Vector3 _beginCur;
     Vector2 _posMin;
     Vector2 _posMax;
+
+    // 화면 이동 변수
+    Vector3 _startMidleCur;
+    Vector3 _cameraInitPos;
+
 
     List<HelperAI> _list = new List<HelperAI>();
     private void Awake()
@@ -67,9 +73,6 @@ public class UI_Commander : MonoBehaviour
 
             _list.Clear();
         }
-
-
-
         if (Input.GetMouseButton(0))
         {
             _mouseCur = Input.mousePosition;
@@ -107,6 +110,28 @@ public class UI_Commander : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             _showSelection = false;
+        }
+
+        if(Input.GetMouseButtonDown(2))
+        {
+            _cameraInitPos = Camera.main.transform.position;
+            _startMidleCur = Input.mousePosition;
+
+        }
+        if (Input.GetMouseButton(2))
+        {
+            Vector3 distance = Input.mousePosition - _startMidleCur;
+
+            distance = Camera.main.ScreenToWorldPoint(distance);
+
+            distance = distance-Camera.main.ScreenToWorldPoint(Vector3.zero) ;
+
+            Camera.main.transform.position = _cameraInitPos - distance;
+
+        }
+        if (Input.GetMouseButtonUp(2))
+        {
+
         }
 
         if (Input.GetMouseButtonDown(1))

@@ -12,10 +12,16 @@ public class CameraMove : MonoBehaviour
 
     void Move()
     {
+        if (Manager.Game.Commander.gameObject.activeSelf) return;
         if (Manager.Character.MainCharacter == null || _shakeEffect != null) return;
 
+        
         Vector3 lerpPosition = Vector3.Lerp(transform.position, Manager.Character.MainCharacter.transform.position
             + Vector3.up *2, 0.05f);
+
+        if (lerpPosition.x <= 0)
+            lerpPosition.x = 0;
+
         lerpPosition.z = -10;
         transform.position = lerpPosition;
             
@@ -38,7 +44,7 @@ public class CameraMove : MonoBehaviour
                 lerpPosition = Manager.Character.MainCharacter.transform.position + Vector3.up * 2;
             else
                 lerpPosition = transform.position;
-            
+
             lerpPosition.z = -10;
 
             lerpPosition += (Vector3)Random.insideUnitCircle * Mathf.Log(power, 10000);

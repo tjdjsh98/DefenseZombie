@@ -68,7 +68,7 @@ public class Building : MonoBehaviour, IHp
             gameObject.tag = "Building";
             _boxCollider.enabled = true;
             _circleSlider.Hide();
-            _done = true;   
+            _done = true;
         }
         else
         {

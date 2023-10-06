@@ -8,6 +8,7 @@ public class CharacterManager : MonoBehaviour
 {
     PlayerCharacter _main;
 
+    public static int _helperId = 100;
     public static int _characterId = 1000;
     public PlayerCharacter MainCharacter
     {
@@ -62,6 +63,10 @@ public class CharacterManager : MonoBehaviour
         if (character is PlayerCharacter)
         {
             _playerList.Add(character as PlayerCharacter);
+            if(character.GetComponent<HelperAI>() != null)
+            {
+                character.CharacterId = ++_helperId;
+            }
         }
    
         if (character is EnemyCharacter)

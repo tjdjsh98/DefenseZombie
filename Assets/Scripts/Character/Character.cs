@@ -56,6 +56,8 @@ public class Character : MonoBehaviour,IHp
     public bool IsDodge { set; get; }
     public bool IsStagger { set; get; }
 
+    public bool IsHide { set; get; }
+
     public int CharacterId { set; get; } = -1;
     public bool IsDummy { set; get; }
 
@@ -109,6 +111,7 @@ public class Character : MonoBehaviour,IHp
 
     protected virtual void MoveCharacter()
     {
+        if (IsHide) return;
         _currentSpeed = _rigidBody.velocity.x;
         if (CharacterState != CharacterState.Idle)
         {
@@ -296,9 +299,11 @@ public class Character : MonoBehaviour,IHp
     // 캐릭터의 모습만을 숨깁니다.
     public virtual void HideCharacter()
     {
+        _rigidBody.velocity = Vector2.zero;
         _rigidBody.isKinematic = true;
         _capsuleCollider.enabled = false;
         _spriteRenderer.enabled = false;
+        IsHide = true;
     }
 
     public virtual void ShowCharacter()
@@ -306,6 +311,7 @@ public class Character : MonoBehaviour,IHp
         _rigidBody.isKinematic = false;
         _capsuleCollider.enabled = true;
         _spriteRenderer.enabled = true;
+        IsHide = false;
     }
     public void SetVelocity(Vector2 velocity)
     {

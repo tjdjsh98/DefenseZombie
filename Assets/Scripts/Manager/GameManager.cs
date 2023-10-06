@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
                         IsStartLevel = true;
                         time = _levels[_level].nextInterval;
 
-                        Vector3 genPosition = Random.Range(0, 2) == 0 ? new Vector3(20, -4f, -3.88f) : new Vector3(-20, -4f, 0);
+                        Vector3 genPosition = new Vector3(-20, -4f, 0);
                         for (int i = 0; i < _levels[_level].count; i++)
                         {
                             string enemyName = _levels[_level].enemyName;
