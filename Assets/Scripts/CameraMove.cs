@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Properties;
 using UnityEngine;
 
 public class CameraMove : MonoBehaviour
@@ -44,6 +45,9 @@ public class CameraMove : MonoBehaviour
                 lerpPosition = Manager.Character.MainCharacter.transform.position + Vector3.up * 2;
             else
                 lerpPosition = transform.position;
+
+            if (lerpPosition.x <= 0)
+                lerpPosition.x = 0;
 
             lerpPosition.z = -10;
 

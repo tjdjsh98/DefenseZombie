@@ -1,16 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.TextCore.Text;
 
 public class Client : MonoBehaviour
 {
     static Client _clinet;
+
+    public string ip;
     public static Client Instance { get 
         {
             if(_clinet == null )
@@ -51,6 +49,8 @@ public class Client : MonoBehaviour
         IPAddress ipAddr = IPAddress.Parse(ipAddress);
         IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
         Connector connecter = new Connector();
+
+        ip = ipAddress;
 
         connecter.Connect(endPoint, () => { return _session; },EnterGame);
 

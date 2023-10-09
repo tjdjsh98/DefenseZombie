@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,7 +11,6 @@ public class Login : MonoBehaviour
     [SerializeField]GameObject _loginPage;
     [SerializeField]TextMeshProUGUI _inputField;
 
-    string _ip = "192.168.1.41";
     private void Start()
     {
         _loginPage.SetActive(false);
@@ -28,7 +28,12 @@ public class Login : MonoBehaviour
             temp = new GameObject(clientName);
             DontDestroyOnLoad(temp);
             Client client = temp.AddComponent<Client>();
-            client.Init(_ip);
+
+            string strHostName = string.Empty;
+            IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress[] addr = ipEntry.AddressList;
+
+            client.Init(addr[1].ToString());
         }
     }
 

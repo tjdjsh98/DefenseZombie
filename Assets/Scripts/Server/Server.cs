@@ -9,6 +9,8 @@ public class Server : MonoBehaviour
     static Listener _listener = new Listener();
     int _port = 7777;
 
+    public string ip;
+
     public static GameRoom Room = new();
     private bool _initDone;
 
@@ -23,11 +25,14 @@ public class Server : MonoBehaviour
     {
         string host = Dns.GetHostName();
         IPHostEntry entry = Dns.GetHostEntry(host);
-        IPAddress ipAddress = IPAddress.Parse("192.168.1.41");
+        string strHostName = string.Empty;
+        IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+        IPAddress[] addr = ipEntry.AddressList;
+
+        ip = addr[1].ToString();
+
+        IPEndPoint endPoint = new IPEndPoint(addr[1], _port);
         
-
-        IPEndPoint endPoint = new IPEndPoint(ipAddress, _port);
-
         _listener.Init(endPoint, () => { return SessionManager.Instance.Generate(); });
         JobTimer.Instance.Push(FlushRoom);
 

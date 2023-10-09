@@ -38,8 +38,8 @@ public class GameManager : MonoBehaviour
     {
         while (true)
         {
-            // 싱글일 때
-            if (Client.Instance.ClientId == -1)
+            // 싱글일 때, 혹은 멀티인데 메인 클라이언트라면
+            if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
             {
                 if (!IsStartLevel)
                 {
@@ -51,7 +51,7 @@ public class GameManager : MonoBehaviour
                         IsStartLevel = true;
                         time = _levels[_level].nextInterval;
 
-                        Vector3 genPosition = new Vector3(-20, -4f, 0);
+                        Vector3 genPosition = new Vector3(20, -4f, 0);
                         for (int i = 0; i < _levels[_level].count; i++)
                         {
                             string enemyName = _levels[_level].enemyName;
@@ -76,22 +76,7 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
-            // 멀티이고, 메인 클라이언트일 때
-            else if (Client.Instance.IsMain)
-            {
-                if (time > 50)
-                {
-                    time = 0;
-
-                    Vector3 genPosition = Random.Range(0, 2) == 0 ? new Vector3(20, -3.88f, -3.88f) : new Vector3(-20, -3.88f, 0);
-                    for (int i = 0; i < Random.Range(1, 2); i++)
-                    {
-                        string enemyName = "";
-                        enemyName = "Zombie";
-                        Manager.Character.GenerateAndSendPacket(enemyName, genPosition);
-                    }
-                }
-            }
+            
             yield return new WaitForFixedUpdate();
         }
     }
