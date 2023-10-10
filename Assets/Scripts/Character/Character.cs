@@ -272,7 +272,7 @@ public class Character : MonoBehaviour,IHp
             yield return new WaitForSeconds(time);
 
             CharacterState = CharacterState.Idle;
-            Client.Instance.SendMove(this);
+            Client.Instance.SendCharacterInfo(this);
 
             _damageCoroutine = null;
         }
@@ -338,7 +338,7 @@ public class Character : MonoBehaviour,IHp
     {
         RegisterAttackHandler?.Invoke();
     }
-    public void SetMovePacket(S_BroadcastMove packet)
+    public void SetMovePacket(S_BroadcastCharacterInfo packet)
     {
         SetCharacterDirection(new Vector2(packet.characterMoveDirection, 0));
         SetCurrentSpeed(packet.xSpeed);

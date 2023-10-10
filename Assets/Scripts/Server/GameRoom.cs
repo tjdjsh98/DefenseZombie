@@ -1,10 +1,9 @@
-using ServerCore;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
+using System.Diagnostics;
 using Unity.VisualScripting;
-using UnityEngine;
+using static System.Collections.Specialized.BitVector32;
+using CharacterInfo = S_EnterSyncInfos.CharacterInfo;
 
 public class GameRoom : IJobQueue
 {
@@ -12,7 +11,9 @@ public class GameRoom : IJobQueue
     JobQueue _jobQueue = new JobQueue();
     List<ArraySegment<byte>> _pendingList = new List<ArraySegment<byte>>();
 
-    List<EnemyData> _enemys = new List<EnemyData>();
+    Dictionary<int, CharacterInfo> _characterDictionary = new Dictionary<int, CharacterInfo>();
+
+    static int _characterId = 1000;
 
     public void Push(Action job)
     {
@@ -37,45 +38,37 @@ public class GameRoom : IJobQueue
         // 플레이어 추가
         _sessions.Add(session);
         session.Room = this;
-        
-        // 입장 클라이언트에게 접속 성공을 알림
-        S_AnswerEnterGame answer = new S_AnswerEnterGame();
-        answer.playerId = session.SessionId;
-        answer.permission = true;
-
-        session.Send(answer.Write());
     }
+
     public void SuccessEnter(ClientSession session)
     {
-        // 새로운 플레이어에게 모든 플레이어의 정보를 보낸다.
-        S_PlayerList players = new S_PlayerList();
-        foreach (var s in _sessions)
+        // 새로운 플레이어에게 모든 캐릭터의 정보를 보낸다.
+        S_EnterSyncInfos packet = new S_EnterSyncInfos();
+
+        foreach (var c in _characterDictionary.Values)
         {
-            players.players.Add(new S_PlayerList.Player()
+            UnityEngine.Debug.Log($" {c.characterId} 패킹");
+
+            packet.characterInfos.Add(new CharacterInfo()
             {
-                isSelf = (s == session),
-                playerId = s.SessionId,
-                posX = s.PosX,
-                posY = s.PosY,
-                posZ = s.PosZ,
+                characterId = c.characterId,
+                characterName = c.characterName,
+                posX = c.posX,
+                posY = c.posY,
+                posZ = c.posZ,
+                xSpeed = c.xSpeed,
+                ySpeed = c.ySpeed,
+                characterState = c.characterState,
+                characterMoveDirection = c.characterMoveDirection,
+                attackType = c.attackType,
+                isAttacking = c.isAttacking,
+                isJumping = c.isJumping,
+                isContactGround = c.isContactGround,
+                isConnectCombo = c.isConnectCombo,
             });
         }
-        session.Send(players.Write());
-
-        // 새로운 플레이어에게 모든 적들의 정보를 보낸다.
-        foreach(var e in _enemys)
-        {
-            S_BroadcastGenerateCharacter pkt = e.GeneratePacket();
-            session.Send(pkt.Write());
-        }
-
-        // 신입생 입장을 모두에게 알린다.
-        S_BroadcastEnterGame enter = new S_BroadcastEnterGame();
-        enter.playerId = session.SessionId;
-        enter.posX = 0;
-        enter.posY = 0;
-        enter.posZ = 0;
-        Broadcast(enter.Write());
+      
+        session.Send(packet.Write());
     }
 
     public void Leave(ClientSession session)
@@ -89,106 +82,93 @@ public class GameRoom : IJobQueue
         Broadcast(leave.Write());
     }
 
-    public void Move(ClientSession session, C_Move packet)
+    public void SyncCharacterInfo(ClientSession session, C_CharacterInfo packet)
     {
-        // 좌표를 바꿔주고
-        for(int i = 0; i < _sessions.Count; i++) 
+        // 캐릭터의 정보를 갱신해줍니다.
+        CharacterInfo info = null;
+
+        _characterDictionary.TryGetValue(packet.characterId, out info);
+
+        if(info != null)
         {
-            if (_sessions[i].SessionId == packet.characterId)
-            {
-                _sessions[i].PosX = packet.posX;
-                _sessions[i].PosY = packet.posY;
-                _sessions[i].PosZ = packet.posZ;
-                break;
-            }
+            info.characterId = packet.characterId;
+            info.posX = packet.posX;
+            info.posY = packet.posY;
+            info.posZ = packet.posZ;
+            info.xSpeed = packet.xSpeed;
+            info.ySpeed = packet.ySpeed;
+            info.characterState = packet.characterState;
+            info.characterMoveDirection = packet.characterMoveDirection;
+            info.attackType = packet.attackType;
+            info.isAttacking = packet.isAttacking;
+            info.isJumping = packet.isJumping;
+            info.isContactGround = packet.isContactGround;
+            info.isConnectCombo = packet.isConnectCombo;
+
+            // 모두에게 알린다
+            S_BroadcastCharacterInfo pkt = new S_BroadcastCharacterInfo();
+            pkt.characterId = packet.characterId;
+            pkt.posX = packet.posX;
+            pkt.posY = packet.posY;
+            pkt.posZ = packet.posZ;
+            pkt.xSpeed = packet.xSpeed;
+            pkt.ySpeed = packet.ySpeed;
+            pkt.characterState = packet.characterState;
+            pkt.characterMoveDirection = packet.characterMoveDirection;
+            pkt.attackType = packet.attackType;
+            pkt.isAttacking = packet.isAttacking;
+            pkt.isJumping = packet.isJumping;
+            pkt.isContactGround = packet.isContactGround;
+            pkt.isConnectCombo = packet.isConnectCombo;
+
+            Broadcast(pkt.Write());
         }
 
-        for(int i = 0; i < _enemys.Count; i++)
-        {
-            if (_enemys[i].enemyId== packet.characterId)
-            {
-                _enemys[i].position.x = packet.posX;
-                _enemys[i].position.y = packet.posY;
-                _enemys[i].position.z = packet.posZ;
-                break;
-            }
-        }
-        
-
-        // 모두에게 알린다
-        S_BroadcastMove move = new S_BroadcastMove();
-        move.playerId = packet.characterId;
-        move.posX = packet.posX;
-        move.posY = packet.posY;
-        move.posZ = packet.posZ;
-        move.xSpeed = packet.xSpeed;
-        move.ySpeed = packet.ySpeed;
-        move.characterState = packet.characterState;
-        move.characterMoveDirection = packet.characterMoveDirection;
-        move.attackType = packet.attackType;
-        move.isAttacking = packet.isAttacking;
-        move.isJumping = packet.isJumping;
-        move.isContactGround = packet.isContactGround;
-        move.isConnectCombo = packet.isConnectCombo;
-
-        Broadcast(move.Write());
+     
     }
 
-    public void GenerateEnemy(C_RequestGenerateCharacter packet)
+    public void GenerateCharacter(ClientSession clientSession, C_GenerateCharacter packet)
     {
         S_BroadcastGenerateCharacter gen = new S_BroadcastGenerateCharacter();
 
-        gen.characterId = packet.characterId;
+        if(packet.isPlayerCharacter)
+            gen.characterId = clientSession.SessionId;
+        else
+            gen.characterId = ++_characterId;
+        gen.isPlayerCharacter = packet.isPlayerCharacter;
         gen.characterName = packet.characterName;
         gen.posX = packet.posX;
         gen.posY = packet.posY;
         gen.posZ = packet.posZ;
 
-        EnemyData data = new EnemyData() { enemyId = packet.characterId, enemyName = packet.characterName, position = new Vector3(packet.posX, packet.posY, packet.posZ) };
-        _enemys.Add(data);
+        CharacterInfo info = new CharacterInfo()
+        {
+            characterId = gen.characterId,
+            characterName = gen.characterName,
+            posX = packet.posX,
+            posY = packet.posY,
+            posZ = packet.posZ,
+        };
+        _characterDictionary.Add(info.characterId,info);
+
+        UnityEngine.Debug.Log($"캐릭생성 {gen.characterId}");
+
         Broadcast(gen.Write());
     }
 
     public void RemoveCharacter(C_RemoveCharacter packet)
     {
-        foreach(var data in _enemys)
-        {
-            if(data.enemyId == packet.characterId)
-            {
-                _enemys.Remove(data);
-                break;
-            }
-        }
+        CharacterInfo info = null;
+        _characterDictionary.TryGetValue(packet.characterId, out info);
+
+        if (info == null) return;
+
+        _characterDictionary.Remove(packet.characterId);
 
         S_BroadcastRemoveCharacter sendPacket = new S_BroadcastRemoveCharacter();
         sendPacket.characterId = packet.characterId;
 
         Broadcast(sendPacket.Write());
-    }
-
-    public void Attack(C_Attack packet)
-    {
-        S_BroadcastAttack sendPacket = new S_BroadcastAttack();
-
-        sendPacket.attackerId = packet.attackerId;
-        sendPacket.attackPointX = packet.attackPointX;
-        sendPacket.attackPointY = packet.attackPointY;
-        sendPacket.attackEffectName = packet.attackEffectName;
-        
-        Broadcast(sendPacket.Write());
-    }
-
-    public void Hit(C_Hit packet)
-    {
-        S_BroadcastHit sendPacket = new S_BroadcastHit();
-
-        sendPacket.attackerId = packet.attackerId;
-        sendPacket.hitedCharacterId = packet.hitedCharacterId;
-        sendPacket.power = packet.power;
-        sendPacket.hitEffectName = packet.hitEffectName;
-        sendPacket.attackDirectionX = packet.attackDirectionX;
-        sendPacket.attackDirectionY = packet.attackDirectionY;
-        sendPacket.stagger =packet.stagger;
     }
 
     public void Damage(C_Damage packet)
@@ -210,23 +190,5 @@ public class GameRoom : IJobQueue
                 return;
             }
         }
-    }
-}
-
-public class EnemyData{
-    public int enemyId;
-    public string enemyName;
-    public Vector3 position;
-
-    public S_BroadcastGenerateCharacter GeneratePacket()
-    {
-        S_BroadcastGenerateCharacter pkt = new S_BroadcastGenerateCharacter();
-        pkt.characterId = enemyId;
-        pkt.characterName = enemyName;
-        pkt.posX = position.x;
-        pkt.posY = position.y;
-        pkt.posZ = position.z;
-
-        return pkt;
     }
 }

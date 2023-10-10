@@ -114,7 +114,7 @@ public class HelperAI : MonoBehaviour
                 {
                     _character.SetCharacterDirection(Vector3.zero);
                     AttackHanlder?.Invoke();
-                    Client.Instance.SendMove(_character);
+                    Client.Instance.SendCharacterInfo(_character);
                 }
                 else
                 {
@@ -155,7 +155,7 @@ public class HelperAI : MonoBehaviour
     {
         while (true)
         {
-            Client.Instance.SendMove(_character);
+            Client.Instance.SendCharacterInfo(_character);
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
     }

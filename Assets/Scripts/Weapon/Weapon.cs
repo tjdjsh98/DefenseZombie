@@ -86,8 +86,7 @@ public abstract class Weapon : MonoBehaviour
             scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
             effect.transform.localScale = scale;
         }
-        Client.Instance.SendMove(_character);
-        Client.Instance.SendAttack(_character, _attacks[_attackType]);
+        Client.Instance.SendCharacterInfo(_character);
     }
     protected virtual void OnAttackKeyUp()
     {
@@ -151,7 +150,7 @@ public abstract class Weapon : MonoBehaviour
 
     protected virtual void OnAttackEnd()
     {
-        Client.Instance.SendMove(_character);
+        Client.Instance.SendCharacterInfo(_character);
     }
 }
 

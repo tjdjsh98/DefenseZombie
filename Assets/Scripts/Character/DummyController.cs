@@ -8,8 +8,7 @@ public class DummyController : MonoBehaviour
     Vector3 _nextMove;
 
     Vector3 _prePos;
-    S_BroadcastMove _prePacket;
-    S_BroadcastMove _currentPacket;
+    S_BroadcastCharacterInfo _currentPacket;
 
     float _time = 0;
     float _interval = 0.02f;
@@ -39,7 +38,7 @@ public class DummyController : MonoBehaviour
         }
     }
 
-    public void SetMovePacket(S_BroadcastMove packet)
+    public void SetCharacterInfoPacket(S_BroadcastCharacterInfo packet)
     {
         _interval = _time;
         _time = 0;

@@ -68,7 +68,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Space))
         {
-            Client.Instance.SendMove(_character);
+            Client.Instance.SendCharacterInfo(_character);
         }
         if (Input.GetKeyDown(KeyCode.S))
         {
@@ -114,7 +114,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.LeftArrow) ||
             Input.GetKeyUp(KeyCode.RightArrow) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.Space))
         {
-            Client.Instance.SendMove(_character);
+            Client.Instance.SendCharacterInfo(_character);
         }
     }
 
@@ -124,7 +124,7 @@ public class PlayerController : MonoBehaviour
         {
             if (IsControllerable)
             {
-                Client.Instance.SendMove(_character);
+                Client.Instance.SendCharacterInfo(_character);
                 yield return new WaitForSeconds(Client.SendPacketInterval);
             }
             else

@@ -1,16 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.Rendering;
 
 public class CharacterManager : MonoBehaviour
 {
-    PlayerCharacter _main;
+    Character _main;
 
-    public static int _helperId = 100;
-    public static int _characterId = 1000;
-    public PlayerCharacter MainCharacter
+    public static int _singleCharacterId = 1000;
+    public Character MainCharacter
     {
         get 
         {
@@ -25,7 +23,8 @@ public class CharacterManager : MonoBehaviour
                 {
                     // 멀티일 떄
                     {
-                        PlayerCharacter p = _playerList.Find((c) => { return c.CharacterId == Client.Instance.ClientId; });
+                        Character p = null;
+                        _characterDictionary.TryGetValue(Client.Instance.ClientId, out p);
                         _main = p;
                     }
                 }
@@ -34,12 +33,7 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
-    List<PlayerCharacter> _playerList = new List<PlayerCharacter>();
-    public List<PlayerCharacter> PlayerList => _playerList;
-
-    List<EnemyCharacter> _enemyList = new List<EnemyCharacter>();
-    public List<EnemyCharacter> EnemyList => _enemyList;
-
+    Dictionary<int, Character> _characterDictionary = new Dictionary<int, Character>();
 
     public void Init()
     {
@@ -53,77 +47,37 @@ public class CharacterManager : MonoBehaviour
 
         if (characterOrigin == null) return null;
 
-        C_RequestGenerateCharacter pkt = new C_RequestGenerateCharacter();
+        C_GenerateCharacter pkt = new C_GenerateCharacter();
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
         
         character.IsDummy = isDummy;
-     
-        if (character is PlayerCharacter)
-        {
-            _playerList.Add(character as PlayerCharacter);
-            if(character.GetComponent<HelperAI>() != null)
-            {
-                character.CharacterId = ++_helperId;
-            }
-        }
-   
-        if (character is EnemyCharacter)
-        {
-            _enemyList.Add(character as EnemyCharacter);
-            character.CharacterId = ++_characterId;
-        }
+
+
+        character.CharacterId = ++_singleCharacterId;
+
+        _characterDictionary.Add(character.CharacterId, character);
+
         return character;
     }
 
     public Character GetCharacter(int id)
     {
-        foreach (var dummy in _playerList)
-        {
-            if (dummy.CharacterId == id)
-            {
-                return dummy;
-            }
-        }
-        foreach (var dummy in _enemyList)
-        {
-            if (dummy.CharacterId == id)
-            {
-                return dummy;
-            }
-        }
+        Character character = null;
 
-        return null;
+        _characterDictionary.TryGetValue(id, out character);
+
+        return character;
     }
 
     public void RemoveCharacter(int id)
     {
-        int removeId = -1;
-        foreach(var dummy in _playerList)
-        {
-            if(dummy.CharacterId == id)
-            {
-                Destroy(dummy.gameObject);
-                _playerList.Remove(dummy);
-                removeId = id;
-                break;
-            }
-        }
-        if (removeId == -1)
-        {
-            foreach (var dummy in _enemyList)
-            {
-                if (dummy.CharacterId == id)
-                {
-                    Destroy(dummy.gameObject);
-                    _enemyList.Remove(dummy);
-                    removeId = id;
-                    break;
-                }
-            }
-        }
-        if(removeId != -1 && Client.Instance.IsMain)
+        Character character = null;
+
+        _characterDictionary.TryGetValue(id, out character);
+
+        if(character != null && Client.Instance.IsMain)
         {
             Client.Instance.SendRemoveCharacter(id);
         }
@@ -138,26 +92,35 @@ public class CharacterManager : MonoBehaviour
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
-        character.CharacterId = ++_characterId;
+        character.CharacterId = ++_singleCharacterId;
         character.IsDummy = isDummy;
             
-        if (character is PlayerCharacter)
-        {
-            _playerList.Add(character as PlayerCharacter);
-        }
-        if(character is EnemyCharacter)
-        {
-            _enemyList.Add(character as EnemyCharacter);
-        }
+        _characterDictionary.Add(_singleCharacterId, character);
 
-        Client.Instance.SendGenreateCharacter(name, _characterId, position);
+        Client.Instance.SendGenreateCharacter(name, _singleCharacterId, position);
 
         return character;
     }
 
-    public Character GenerateDummyCharacter(S_BroadcastGenerateCharacter packet)
+    // 패킷으로 받은 정보로 더미 캐릭터를 만듭니다.
+    // 자신의 캐릭터의 ID와 맞는 캐릭터와 맞으면 조작 가능 캐릭터가 나옵니다.
+    public Character GeneratePacketCharacter(S_BroadcastGenerateCharacter packet)
     {
-        string newName = "Dummy" + packet.characterName;
+        string newName = packet.characterName;
+
+        bool isDummy = false;
+        if (packet.characterId == Client.Instance.ClientId)
+            isDummy = false;
+        else
+            if (Client.Instance.IsMain && packet.characterId > 100)
+                isDummy = false;
+            else
+                isDummy = true;
+
+        if (isDummy)
+        {
+            newName = "Dummy" + packet.characterName;
+        }
 
         Character characterOrigin = Manager.Data.GetCharacter(newName);
         if (characterOrigin == null) return null;
@@ -166,19 +129,53 @@ public class CharacterManager : MonoBehaviour
 
         character.CharacterId = packet.characterId;
         character.transform.position = new Vector3(packet.posX,packet.posY, packet.posZ);
-        character.IsDummy = true;
+      
+        character.IsDummy = isDummy;
+    
 
-        if (character is PlayerCharacter)
-        {
-            _playerList.Add(character as PlayerCharacter);
-        }
-        if (character is EnemyCharacter)
-        {
-            _enemyList.Add(character as EnemyCharacter);
-        }
+        _characterDictionary.Add(packet.characterId, character);
 
         return character;
     }
 
+    public void GeneratePacketCharacter(S_EnterSyncInfos packet)
+    {
+        foreach (var player in packet.characterInfos)
+        {
 
+            bool isDummy = false;
+            if (player.characterId == Client.Instance.ClientId)
+            {
+                isDummy = false;
+            }
+            else
+            {
+                if (Client.Instance.IsMain && player.characterId > 100)
+                {
+                    isDummy = false;
+                }
+                else
+                {
+                    isDummy = true;
+                }
+            }
+            string newName = player.characterName;
+
+            if (isDummy)
+            {
+                newName = "Dummy" + player.characterName;
+            }
+            Character characterOrigin = Manager.Data.GetCharacter(newName);
+            if (characterOrigin == null) continue;
+
+            Character character = Instantiate(characterOrigin);
+
+            character.CharacterId = player.characterId;
+            character.transform.position = new Vector3(player.posX, player.posY, player.posZ);
+            character.IsDummy = isDummy;
+           
+
+            _characterDictionary.Add(player.characterId, character);
+        }
+    }
 }

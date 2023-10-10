@@ -62,16 +62,14 @@ public class Spanner : Weapon
 
             _character.CharacterState = CharacterState.Attack;
 
-            Client.Instance.SendMove(_character);
-            Client.Instance.SendAddForce(_character, _character.transform.localScale.x > 0 ? Vector2.right : Vector2.left, _dashPower, (int)_character.RigidBody.constraints);
-            Client.Instance.SendAttack(_character, _attacks[_attackType]);
+            Client.Instance.SendCharacterInfo(_character);
 
             _coolElapsed = 0;
         }
         else if (_attackType == 1)
         {
             _character.CharacterState = CharacterState.Attack;
-            Client.Instance.SendMove(_character);
+            Client.Instance.SendCharacterInfo(_character);
         }
     }
     protected override void OnAttackKeyUp()
@@ -83,12 +81,11 @@ public class Spanner : Weapon
         if (_attackType == 0)
         {
             _character.RigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
-            Client.Instance.SendAddForce(_character, Vector2.zero, 0, (int)_character.RigidBody.constraints);
         }
         if (_character.CharacterState == CharacterState.Attack)
         {
             _character.CharacterState = CharacterState.Idle;
         }
-        Client.Instance.SendMove(_character);
+        Client.Instance.SendCharacterInfo(_character);
     }
 }

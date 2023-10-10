@@ -78,7 +78,7 @@ public class EnemyAI : MonoBehaviour
                     _character.SetCharacterDirection(Vector2.zero);
                     _character.IsAttacking = true;
                     _character.CharacterState = CharacterState.Attack;
-                    Client.Instance.SendMove(_character);
+                    Client.Instance.SendCharacterInfo(_character);
                 }
                 else
                 {
@@ -119,7 +119,7 @@ public class EnemyAI : MonoBehaviour
     {
         while (true)
         {
-            Client.Instance.SendMove(_character);
+            Client.Instance.SendCharacterInfo(_character);
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
     }

@@ -47,7 +47,7 @@ public class Connector
             session.Start(args.ConnectSocket);
             session.OnConnected(args.RemoteEndPoint);
 
-            _successConnectHandler.Invoke();
+            _successConnectHandler?.Invoke();
         }
         else
         {

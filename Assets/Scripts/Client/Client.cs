@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -27,10 +28,10 @@ public class Client : MonoBehaviour
 
     public int ClientId = -1;
 
-    bool _sendRequest = false;
     bool _recvAnswer = false;
     bool _isEnableEnterGame = false;
     bool _successEnterGame = false;
+    bool _isRequestAllInfo = false;
     public bool IsSingle { get; set; } = false;
     [field:SerializeField]public float Delay = 0;
 
@@ -58,12 +59,6 @@ public class Client : MonoBehaviour
 
     void Update()
     {
-        List<IPacket> packets = PacketQueue.Instance.PopAll();
-        foreach (IPacket packet in packets)
-        {
-            PacketManager.Instance.HandlePacket(_session, packet);
-        }
-       
         if (IsEnterStart && !_successEnterGame)
         {
             if(_recvAnswer)
@@ -72,12 +67,36 @@ public class Client : MonoBehaviour
                 {
                     SceneManager.LoadScene("InGame");
                     _successEnterGame = true;
+                    return;
                 }
                 else
                 {
                     Destroy(this.gameObject);
                 }
             }
+        }
+
+        if(_successEnterGame && !_isRequestAllInfo)
+        {
+            _isRequestAllInfo = true;
+            C_SuccessToEnterServer packet = new C_SuccessToEnterServer();
+            Send(packet.Write());
+
+            C_GenerateCharacter genPacket = new C_GenerateCharacter();
+            genPacket.isPlayerCharacter = true;
+            genPacket.posX = 0;
+            genPacket.posY = 0;
+            genPacket.posZ = 0;
+            genPacket.characterName = "SpannerCharacter";
+            Send(genPacket.Write());
+
+            return;
+        }
+
+        List<IPacket> packets = PacketQueue.Instance.PopAll();
+        foreach (IPacket packet in packets)
+        {
+            PacketManager.Instance.HandlePacket(_session, packet);
         }
     }
 
@@ -90,7 +109,9 @@ public class Client : MonoBehaviour
 
     public void EnterGame()
     {
-        IsEnterStart = true;    
+        IsEnterStart = true;
+        C_RequestEnterGame packet = new C_RequestEnterGame();
+        Send(packet.Write());
     }
 
     public void SendDamage(int characterId,Vector2 attackDirection, float power, float staggerTime)
@@ -107,10 +128,10 @@ public class Client : MonoBehaviour
         Send(sendPacket.Write());
     }
 
-    public void SendMove(Character character,bool syncController = false)
+    public void SendCharacterInfo(Character character,bool syncController = false)
     {
         if (ClientId == -1) return;
-        C_Move packet = new C_Move();
+        C_CharacterInfo packet = new C_CharacterInfo();
         packet.characterId = character.CharacterId;
         packet.posX = character.transform.position.x;
         packet.posY = character.transform.position.y;
@@ -128,61 +149,17 @@ public class Client : MonoBehaviour
         Send(packet.Write());
     }
 
-    public void SendAddForce(Character character, Vector2 direction, float power,int constraint = -1)
-    {
-        if (ClientId == -1) return;
-        C_AddForce packet = new C_AddForce();
-        packet.characterId = character.CharacterId;
-        packet.power = power;  
-        packet.forceX = direction.x;
-        packet.forceY = direction.y;
-        packet.constraints = constraint;
-
-        Send(packet.Write());
-    }
-
     public void SendGenreateCharacter(string name,int characterId, Vector3 position)
     {
         if (ClientId == -1) return;
-        C_RequestGenerateCharacter pkt = new C_RequestGenerateCharacter();
-        pkt.characterId = characterId;
+        C_GenerateCharacter pkt = new C_GenerateCharacter();
+        pkt.isPlayerCharacter = (characterId == Client.Instance.ClientId);
         pkt.characterName = name;
         pkt.posX = position.x;
         pkt.posY = position.y;
         pkt.posZ = position.z;
 
         Send(pkt.Write());
-    }
-    public void SendAttack(Character attacker, Attack attack)
-    {
-        if (ClientId == -1) return;
-        C_Attack packet = new C_Attack();
-
-        packet.attackerId = attacker.CharacterId;
-        packet.attackPointX = attack.attackEffectPoint.x;
-        packet.attackPointY = attack.attackEffectPoint.y;
-        packet.attackEffectName = attack.attackEffectName;
-        Send(packet.Write());
-    }
-
-    public void SendHit(Character attacker, Character hitedCharacter, Attack attack)
-    {
-        if (ClientId == -1) return;
-        C_Hit packet = new C_Hit();
-
-        Vector3 attackDirection = attack.AttackDirection;
-        attackDirection.x = attack.AttackDirection.x * (transform.localScale.x > 0 ? 1 : -1);
-
-        packet.attackerId = attacker.CharacterId;
-        packet.hitedCharacterId = hitedCharacter.CharacterId;
-        packet.attackDirectionX = attackDirection.x;
-        packet.attackDirectionY = attackDirection.y;
-        packet.power = attack.power;
-        packet.damage = attack.damage;
-        packet.hitEffectName = attack.hitEffectName;
-        packet.stagger = attack.stagger;
-
-        Send(packet.Write());
     }
     public void SendRemoveCharacter(int id)
     {
