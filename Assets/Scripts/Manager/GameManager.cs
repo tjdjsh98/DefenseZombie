@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Rendering;
+using static Define;
 using static UnityEngine.Rendering.DebugUI.Table;
 
 public class GameManager : MonoBehaviour
@@ -23,17 +24,14 @@ public class GameManager : MonoBehaviour
 
     public UI_Commander Commander;
 
+    List<int> _generateRequestList = new List<int>();
+
     public void Init()
     {
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);
+        Manager.Character.ReciveGenPacket += SetDiscountSummonCount;
         StartCoroutine(CorStartLevel());
     }
-
-    private void Update()
-    {
-      
-    }
-
     IEnumerator CorStartLevel()
     {
         while (true)
@@ -54,23 +52,11 @@ public class GameManager : MonoBehaviour
                         Vector3 genPosition = new Vector3(20, -4f, 0);
                         for (int i = 0; i < _levels[_level].count; i++)
                         {
-                            string enemyName = _levels[_level].enemyName;
-                            Character character = Manager.Character.GenerateCharacter(enemyName, genPosition);
+                            CharacterName enemyName = _levels[_level].enemyName;
 
-                            if (character != null)
-                            {
-                                SummonCount++;
-                                character.DeadHandler += () =>
-                                {
-                                    SummonCount--;
-                                    if (SummonCount == 0)
-                                    {
-                                        IsStartLevel = false;
-                                        _level++;
-                                    }
+                            _generateRequestList.Add(Manager.Character.RequestGenerateCharacter(enemyName, genPosition));
 
-                                };
-                            }
+                            
                             yield return new WaitForSeconds(_levels[_level].genInterval);
                         }
                     }
@@ -80,6 +66,28 @@ public class GameManager : MonoBehaviour
             yield return new WaitForFixedUpdate();
         }
     }
+
+    void SetDiscountSummonCount(int requsetNumber,Character character)
+    {
+        if (_generateRequestList.Contains(requsetNumber))
+        {
+            _generateRequestList.Remove(requsetNumber);
+            if (character != null)
+            {
+                SummonCount++;
+                character.DeadHandler += () =>
+                {
+                    SummonCount--;
+                    if (SummonCount == 0)
+                    {
+                        IsStartLevel = false;
+                        _level++;
+                    }
+
+                };
+            }
+        }
+    }
 }
 
 [System.Serializable]
@@ -87,7 +95,7 @@ public class Level
 {
     public string levelName;
     public float genInterval;
-    public string enemyName;
+    public CharacterName enemyName;
     public int count;
     public float nextInterval;
 }

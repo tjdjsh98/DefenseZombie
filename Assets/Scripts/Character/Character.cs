@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
-using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
+using static Define;
 
 public class Character : MonoBehaviour,IHp
 {
+    [field:SerializeField]public int CharacterId { set; get; } = -1;
     protected Rigidbody2D _rigidBody;
+    [field: SerializeField]public CharacterName CharacterName {private set; get; }
     public Rigidbody2D RigidBody => _rigidBody;
     protected SpriteRenderer _spriteRenderer;
     protected CapsuleCollider2D _capsuleCollider;
@@ -22,7 +24,7 @@ public class Character : MonoBehaviour,IHp
     [SerializeField] protected int _maxHp;
     public int MaxHp => _maxHp;
     int _hp;
-    public int Hp { get { return _hp; } set { _hp = value; if (_hp <= 0) Dead(); } }
+    public int Hp { get { return _hp; } set { _hp = value; } }
     public bool _isSuperArmerWhenAttack;
 
     [Range(0,100)][SerializeField] protected int _standing;
@@ -58,9 +60,6 @@ public class Character : MonoBehaviour,IHp
 
     public bool IsHide { set; get; }
 
-    public int CharacterId { set; get; } = -1;
-    public bool IsDummy { set; get; }
-
     // 행동 핸들러
     public Action RegisterAttackHandler;
     public Action DeadHandler;
@@ -68,16 +67,13 @@ public class Character : MonoBehaviour,IHp
     public Vector2 GetVelocity => _rigidBody.velocity;
 
     Coroutine _damageCoroutine;
-    DummyController _dummyController;
-    public DummyController DummyController
-    {
-        get
-        {
-            if (_dummyController == null)
-                _dummyController = GetComponent<DummyController>();
-            return _dummyController;
-        }
-    }
+ 
+    //캐릭터가 더미라면 필요한 변수
+    Vector3 _prePos;
+    S_BroadcastCharacterInfo _currentPacket;
+
+    float _time = 0;
+    float _interval = 0.02f;
 
     protected virtual void Awake()
     {
@@ -103,7 +99,27 @@ public class Character : MonoBehaviour,IHp
         CheckGround();
         ControlAnimation();
     }
+    private void FixedUpdate()
+    {
+        if (Client.Instance.ClientId == CharacterId) return;
 
+        _time += Time.fixedDeltaTime;
+
+        if (_currentPacket != null)
+        {
+            if (_interval > _time)
+            {
+                Vector3 currentPos = new Vector3(_currentPacket.posX, _currentPacket.posY, _currentPacket.posZ);
+                Vector3 distanceInterval = new Vector3(currentPos.x - _prePos.x, currentPos.y - _prePos.y, 0);
+                distanceInterval /= _interval * 60;
+                transform.position += distanceInterval;
+            }
+            else
+            {
+                _currentPacket = null;
+            }
+        }
+    }
     protected virtual void ControlAnimation()
     {
     }
@@ -248,20 +264,24 @@ public class Character : MonoBehaviour,IHp
 
         Hp -= dmg;
 
+        if (Hp < 0) Hp = 0;
+
         // 메인 클라가 아니고 다른 클라라면 데미지 패킷을 보냅니다.
         if (Client.Instance.IsMain)
-        {
-            if (CharacterId < 100 && Client.Instance.ClientId != CharacterId)
-            {
-                Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
-            }
+        { 
+            Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
         }
+        if (Hp <= 0)
+            Dead();
     }
 
     protected void Dead()
     {
-        DeadHandler?.Invoke();
-        Manager.Character.RemoveCharacter(CharacterId);
+        if (Client.Instance.IsMain)
+        {
+            DeadHandler?.Invoke();
+            Manager.Character.RequestRemoveCharacter(CharacterId);
+        }
     }
 
     IEnumerator CorTurnToIdle(float time)
@@ -338,16 +358,34 @@ public class Character : MonoBehaviour,IHp
     {
         RegisterAttackHandler?.Invoke();
     }
-    public void SetMovePacket(S_BroadcastCharacterInfo packet)
+    public void SetCharacterInfoPacket(S_BroadcastCharacterInfo packet)
     {
+        if (packet.characterId == Client.Instance.ClientId) return;
+        if (packet.characterId > 100 && Client.Instance.IsMain) return;
+
+        _interval = _time;
+        _time = 0;
+
         SetCharacterDirection(new Vector2(packet.characterMoveDirection, 0));
         SetCurrentSpeed(packet.xSpeed);
         SetVelocity(new Vector2(packet.xSpeed, packet.ySpeed));
+        Hp = packet.hp;
         AttackType = packet.attackType;
         IsJumping = packet.isJumping;
         IsAttacking = packet.isAttacking;
         IsConncetCombo = packet.isConnectCombo;
         CharacterState = (CharacterState)packet.characterState;
+
+        if (_interval == 0)
+        {
+            Vector3 currentPos = new Vector3(packet.posX, packet.posY, packet.posZ);
+            transform.position = currentPos;
+        }
+        else
+        {
+            _prePos = transform.position;
+            _currentPacket = packet;
+        }
     }
 }
 public enum CharacterState

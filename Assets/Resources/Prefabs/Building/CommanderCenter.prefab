@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 4871240490897745323}
   - component: {fileID: 8583667906555671318}
   m_Layer: 6
-  m_Name: CommanderHouse
+  m_Name: CommanderCenter
   m_TagString: Building
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

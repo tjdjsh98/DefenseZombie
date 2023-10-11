@@ -403,17 +403,17 @@ MonoBehaviour:
   _levels:
   - levelName: 
     genInterval: 1
-    enemyName: Bear
+    enemyName: 3
     count: 1
-    nextInterval: 11111
+    nextInterval: 10
   - levelName: 
     genInterval: 1
-    enemyName: MiniBear
+    enemyName: 3
     count: 5
     nextInterval: 20
   - levelName: 
     genInterval: 1
-    enemyName: BigBear
+    enemyName: 3
     count: 1
     nextInterval: 20
   Commander: {fileID: 1525292547}

@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using TMPro;
+using UnityEditor;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using static Define;
 
 public class Client : MonoBehaviour
 {
@@ -37,6 +40,8 @@ public class Client : MonoBehaviour
 
     public static float SendPacketInterval = 0.1f;
     public bool IsMain => ClientId == 1;
+
+    List<int> _clientList = new List<int>();
     public void Send(ArraySegment<byte> segment)
     {
         _session.Send(segment);
@@ -82,14 +87,6 @@ public class Client : MonoBehaviour
             C_SuccessToEnterServer packet = new C_SuccessToEnterServer();
             Send(packet.Write());
 
-            C_GenerateCharacter genPacket = new C_GenerateCharacter();
-            genPacket.isPlayerCharacter = true;
-            genPacket.posX = 0;
-            genPacket.posY = 0;
-            genPacket.posZ = 0;
-            genPacket.characterName = "SpannerCharacter";
-            Send(genPacket.Write());
-
             return;
         }
 
@@ -99,21 +96,27 @@ public class Client : MonoBehaviour
             PacketManager.Instance.HandlePacket(_session, packet);
         }
     }
-
+    
+    public void EnterNewOtherClinet(int clientId)
+    {
+        _clientList.Add(clientId);
+    }
+    public void LeaveClient(int clientId)
+    {
+        _clientList.Remove(clientId);
+    }
     public void AnswerRequest(bool enable)
     {
         _recvAnswer = true;
         _isEnableEnterGame = enable;
         Delay = Time.time - Delay;
     }
-
     public void EnterGame()
     {
         IsEnterStart = true;
         C_RequestEnterGame packet = new C_RequestEnterGame();
         Send(packet.Write());
     }
-
     public void SendDamage(int characterId,Vector2 attackDirection, float power, float staggerTime)
     {
         if (ClientId == -1) return;
@@ -128,11 +131,12 @@ public class Client : MonoBehaviour
         Send(sendPacket.Write());
     }
 
-    public void SendCharacterInfo(Character character,bool syncController = false)
+    public void SendCharacterInfo(Character character)
     {
         if (ClientId == -1) return;
         C_CharacterInfo packet = new C_CharacterInfo();
         packet.characterId = character.CharacterId;
+        packet.hp = character.Hp;
         packet.posX = character.transform.position.x;
         packet.posY = character.transform.position.y;
         packet.posZ = character.transform.position.z;
@@ -149,24 +153,51 @@ public class Client : MonoBehaviour
         Send(packet.Write());
     }
 
-    public void SendGenreateCharacter(string name,int characterId, Vector3 position)
+    public void SendRequestGenreateCharacter(CharacterName name ,Vector3 position ,int requestNumber ,bool isPlayerCharacter)
     {
         if (ClientId == -1) return;
-        C_GenerateCharacter pkt = new C_GenerateCharacter();
-        pkt.isPlayerCharacter = (characterId == Client.Instance.ClientId);
-        pkt.characterName = name;
-        pkt.posX = position.x;
-        pkt.posY = position.y;
-        pkt.posZ = position.z;
 
-        Send(pkt.Write());
+        C_RequestGenerateCharacter packet = new C_RequestGenerateCharacter();
+
+
+        packet.requestNumber = requestNumber;
+        packet.isPlayerableChracter = isPlayerCharacter;
+        packet.characterName = (int)name;
+        packet.posX = position.x;
+        packet.posY = position.y;
+        packet.posZ = position.z;
+
+        Send(packet.Write());
+    }
+    public void SendRequestRemoveCharacter(int id)
+    {
+        if (ClientId == -1) return;
+
+        C_RequestRemoveCharacter packet = new C_RequestRemoveCharacter();
+
+        packet.characterId = id;
+
+
+        Send(packet.Write());
     }
     public void SendRemoveCharacter(int id)
     {
         if (ClientId == -1) return;
-        C_RemoveCharacter pkt = new C_RemoveCharacter();
+        C_RequestRemoveCharacter pkt = new C_RequestRemoveCharacter();
         pkt.characterId = id;
 
         Send(pkt.Write());
+    }
+
+    public void SendRequestGeneratingBuilding(BuildingName name, Vector2Int cellPos, int requestNumber)
+    {
+        C_RequestGenerateBuilding packet = new C_RequestGenerateBuilding();
+
+        packet.buildingName = (int)name;
+        packet.requestNumber = requestNumber;
+        packet.posX = cellPos.x;
+        packet.posY = cellPos.y;
+
+        Send(packet.Write());
     }
 }

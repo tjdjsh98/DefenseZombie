@@ -293,10 +293,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4cbf80e7da827aa4ead5ff74df6e04e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <CharacterId>k__BackingField: -1
+  <CharacterName>k__BackingField: 2
   _characterSize:
     center: {x: 0, y: 0.61, z: 0}
     size: {x: 0.51, y: 1.05, z: 0}
   _maxHp: 11
+  _isSuperArmerWhenAttack: 0
   _standing: 0
   _accelSpeed: 40
   _groundBreakSpeed: 40

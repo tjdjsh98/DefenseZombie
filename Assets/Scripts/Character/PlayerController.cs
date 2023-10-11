@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        if (Client.Instance.ClientId != _character.CharacterId) return;
         Control();
     }
 
@@ -93,9 +94,9 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.D))
         {
             if (!Manager.Building.IsDrawing)
-                Manager.Building.StartBuildingDraw(this.gameObject, "Barricade");
+                Manager.Building.StartBuildingDraw(this.gameObject, Define.BuildingName.Barricade);
             else
-                Manager.Building.GenreateBuilding();
+                Manager.Building.PlayerRequestBuilding();
 
         }
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -125,12 +126,9 @@ public class PlayerController : MonoBehaviour
             if (IsControllerable)
             {
                 Client.Instance.SendCharacterInfo(_character);
-                yield return new WaitForSeconds(Client.SendPacketInterval);
             }
-            else
-            {
-                yield return new WaitForSeconds(0.1f);
-            }
+            yield return new WaitForSeconds(Client.SendPacketInterval);
+           
         }
     }
 

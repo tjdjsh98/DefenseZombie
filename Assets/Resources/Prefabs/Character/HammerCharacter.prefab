@@ -432,6 +432,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e60a2da7c489f8499881888012b4e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <CharacterId>k__BackingField: -1
+  <CharacterName>k__BackingField: 1
   _characterSize:
     center: {x: -0.06, y: 0.51, z: 0}
     size: {x: 0.56, y: 1.03, z: 0}

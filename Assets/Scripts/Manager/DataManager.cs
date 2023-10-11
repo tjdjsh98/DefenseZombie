@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Define;
 
 public class DataManager : MonoBehaviour
 {
-    Dictionary<string, Character> _characterDictionary = new Dictionary<string, Character>();
-    Dictionary<string, Building> _buildingDictionary = new Dictionary<string, Building>();
+    Dictionary<CharacterName, Character> _characterDictionary = new Dictionary<CharacterName, Character>();
+    Dictionary<BuildingName, Building> _buildingDictionary = new Dictionary<BuildingName, Building>();
     Dictionary<string, GameObject> _effectDictionary = new Dictionary<string, GameObject>();
     Dictionary<string, ParabolaProjectile> _projectileDictionary = new Dictionary<string, ParabolaProjectile>();
     public void Init()
@@ -21,10 +22,10 @@ public class DataManager : MonoBehaviour
 
         foreach (Building building in buildings)
         {
-            _buildingDictionary.Add(building.name, building);
+            _buildingDictionary.Add(building.BuildingName, building);
         }
     }
-    public Building GetBuilding(string name)
+    public Building GetBuilding(BuildingName name)
     {
         Building building = null;
         _buildingDictionary.TryGetValue(name, out building);
@@ -36,11 +37,11 @@ public class DataManager : MonoBehaviour
 
         foreach (Character character in characters)
         {
-            _characterDictionary.Add(character.name, character);
+            _characterDictionary.Add(character.CharacterName, character);
         }
     }
 
-    public Character GetCharacter(string name)
+    public Character GetCharacter(CharacterName name)
     {
         Character character = null;
         _characterDictionary.TryGetValue(name, out character);

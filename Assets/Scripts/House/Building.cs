@@ -8,6 +8,9 @@ public class Building : MonoBehaviour, IHp
     BoxCollider2D _boxCollider;
 
     CircleSlider _circleSlider;
+
+    [field: SerializeField] public Define.BuildingName BuildingName { private set; get; }
+    public int BuildingId { set; get; }
     [field: SerializeField] public int MaxHp { set; get; } 
     [field: SerializeField] public int Hp { set; get; } 
     [SerializeField] BuildingSize _size;

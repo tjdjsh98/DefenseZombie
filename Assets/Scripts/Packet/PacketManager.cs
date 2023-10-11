@@ -24,6 +24,8 @@ public class PacketManager
         _handler.Add((ushort)PacketID.S_AnswerEnterGame, PacketHandler.S_AnswerEnterGameHandler);
       _makeFunc.Add((ushort)PacketID.C_SuccessToEnterServer, MakePacket<C_SuccessToEnterServer>);
         _handler.Add((ushort)PacketID.C_SuccessToEnterServer, PacketHandler.C_SuccessToEnterServerHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastNewClient, MakePacket<S_BroadcastNewClient>);
+        _handler.Add((ushort)PacketID.S_BroadcastNewClient, PacketHandler.S_BroadcastNewClientHandler);
       _makeFunc.Add((ushort)PacketID.C_LeaveGame, MakePacket<C_LeaveGame>);
         _handler.Add((ushort)PacketID.C_LeaveGame, PacketHandler.C_LeaveGameHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastLeaveGame, MakePacket<S_BroadcastLeaveGame>);
@@ -38,14 +40,18 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_Damage, PacketHandler.C_DamageHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastDamage, MakePacket<S_BroadcastDamage>);
         _handler.Add((ushort)PacketID.S_BroadcastDamage, PacketHandler.S_BroadcastDamageHandler);
-      _makeFunc.Add((ushort)PacketID.C_GenerateCharacter, MakePacket<C_GenerateCharacter>);
-        _handler.Add((ushort)PacketID.C_GenerateCharacter, PacketHandler.C_GenerateCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestGenerateCharacter, MakePacket<C_RequestGenerateCharacter>);
+        _handler.Add((ushort)PacketID.C_RequestGenerateCharacter, PacketHandler.C_RequestGenerateCharacterHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateCharacter, MakePacket<S_BroadcastGenerateCharacter>);
         _handler.Add((ushort)PacketID.S_BroadcastGenerateCharacter, PacketHandler.S_BroadcastGenerateCharacterHandler);
-      _makeFunc.Add((ushort)PacketID.C_RemoveCharacter, MakePacket<C_RemoveCharacter>);
-        _handler.Add((ushort)PacketID.C_RemoveCharacter, PacketHandler.C_RemoveCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestRemoveCharacter, MakePacket<C_RequestRemoveCharacter>);
+        _handler.Add((ushort)PacketID.C_RequestRemoveCharacter, PacketHandler.C_RequestRemoveCharacterHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveCharacter, MakePacket<S_BroadcastRemoveCharacter>);
         _handler.Add((ushort)PacketID.S_BroadcastRemoveCharacter, PacketHandler.S_BroadcastRemoveCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestGenerateBuilding, MakePacket<C_RequestGenerateBuilding>);
+        _handler.Add((ushort)PacketID.C_RequestGenerateBuilding, PacketHandler.C_RequestGenerateBuildingHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateBuilding, MakePacket<S_BroadcastGenerateBuilding>);
+        _handler.Add((ushort)PacketID.S_BroadcastGenerateBuilding, PacketHandler.S_BroadcastGenerateBuildingHandler);
 
     }
 

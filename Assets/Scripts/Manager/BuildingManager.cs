@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using static Define;
 
 public class BuildingManager : MonoBehaviour
 {
-    Building _drawingBuilding;
+    BuildingName _drawingBuildingName;
     GameObject _blankBox;
     List<SpriteRenderer> _blankBoxList = new List<SpriteRenderer>();
     GameObject _builder;
@@ -11,27 +14,34 @@ public class BuildingManager : MonoBehaviour
     bool _isDrawing = false;
     public bool IsDrawing => _isDrawing;
 
+    static int _buildingId;
+
+    Dictionary<int, Building> _buildingDictionary = new Dictionary<int, Building>();
+
     Dictionary<int,Dictionary<int,Building>> _buildingCoordiate = new Dictionary<int, Dictionary<int, Building>>();
+
+    public Action<int, Building> ReciveGenPacket;
 
     public void Init()
     {
         _blankBox = Resources.Load<GameObject>("BlankBox");
 
-        GenerateBuilding("CommanderHouse", new Vector2Int(0, -3));
+        GenerateBuilding(BuildingName.CommandCenter, new Vector2Int(0, -3));
         
     }
 
     private void Update()
     {
-        if(_drawingBuilding)
+        if(IsDrawing)
         {
+            Building darwBuilding = Manager.Data.GetBuilding(_drawingBuildingName);
             int drawCount = 0;
             Vector3Int fixedPos = Vector3Int.zero;
             fixedPos.x = Mathf.RoundToInt(_builder.transform.position.x) +  (_builder.transform.localScale.x > 0 ? 1 : -1);
             fixedPos.y = Mathf.CeilToInt(_builder.transform.position.y);
-            for (int i =0; i < _drawingBuilding.BuildingSize.width * _drawingBuilding.BuildingSize.height;i++)
+            for (int i =0; i < darwBuilding.BuildingSize.width * darwBuilding.BuildingSize.height;i++)
             {
-                if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
+                if (!darwBuilding.BuildingSize.isPlace[i]) continue;
 
                 SpriteRenderer sr = null;
                 if(_blankBoxList.Count <= drawCount)
@@ -46,7 +56,7 @@ public class BuildingManager : MonoBehaviour
                 color.g = 1;
                 color.a = 0.2f;
 
-                Vector3Int pos = fixedPos + new Vector3Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width, 0);
+                Vector3Int pos = fixedPos + new Vector3Int(i % darwBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / darwBuilding.BuildingSize.width, 0);
                 if (_buildingCoordiate.ContainsKey(pos.x))
                 {
                     if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
@@ -70,8 +80,7 @@ public class BuildingManager : MonoBehaviour
 
         }
     }
-
-    public Building GenerateBuilding(string name, Vector2Int cellPos)
+    public Building GenerateBuilding(BuildingName name, Vector2Int cellPos)
     {
         Building buildingOrigin = Manager.Data.GetBuilding(name);
         if (buildingOrigin == null) return null;
@@ -94,6 +103,7 @@ public class BuildingManager : MonoBehaviour
         }
 
         Building building = Instantiate(buildingOrigin);
+        building.BuildingId = ++_buildingId;
         Vector3 buildingPos = new Vector3(cellPos.x + (buildingOrigin.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
         Vector3 scale = Vector3.one;
         if (_builder != null)
@@ -130,72 +140,83 @@ public class BuildingManager : MonoBehaviour
         return building;
     }
 
-    public Building GenreateBuilding()
+    public Building GenreateBuildingAndSendPacket(BuildingName name, Vector2Int cellPos)
     {
-        if (_drawingBuilding == null) return null;
+        return null;
+    }
+    public int PlayerRequestBuilding()
+    {
+        if (!IsDrawing) return -1;
 
-        Vector2Int startPos = Vector2Int.zero;
-        startPos.x = Mathf.RoundToInt(_builder.transform.position.x + (_builder.transform.localScale.x > 0 ? 1 : -1));
-        startPos.y = Mathf.CeilToInt(_builder.transform.position.y);
-
-        // 겹치는 곳이 있는지 확인
-        for (int i = 0; i < _drawingBuilding.BuildingSize.width * _drawingBuilding.BuildingSize.height; i++)
-        {
-            if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
-           
-            Vector2Int pos = startPos + new Vector2Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width);
-
-            if (_buildingCoordiate.ContainsKey(pos.x))
-            {
-                if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
-                {
-                    if (_buildingCoordiate[pos.x][pos.y] != null)
-                        return null;
-                }
-            }
-        }
-
-        Building building = Instantiate(_drawingBuilding);
-        Vector3 buildingPos = new Vector3(startPos.x + (_drawingBuilding.BuildingSize.width-1)/2f*(_builder.transform.localScale.x > 0 ? 1 : -1) - 0.5f, startPos.y-1f);
-
-        
-        building.transform.position = buildingPos;
+        Vector2Int cellPos = Vector2Int.zero;
+        cellPos.x = Mathf.RoundToInt(_builder.transform.position.x + (_builder.transform.localScale.x > 0 ? 1 : -1));
+        cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
 
-        // 겹치는 부분에 좌표 설정
-        for (int i = 0; i < _drawingBuilding.BuildingSize.width * _drawingBuilding.BuildingSize.height; i++)
-        {
-            if (!_drawingBuilding.BuildingSize.isPlace[i]) continue;
-
-            Vector2Int pos = startPos + new Vector2Int(i % _drawingBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / _drawingBuilding.BuildingSize.width);
-
-            
-            if (!_buildingCoordiate.ContainsKey(pos.x))
-            {
-                _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
-            }
-            if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
-            {
-                _buildingCoordiate[pos.x].Add(pos.y, building);
-            }
-            else
-            {
-                _buildingCoordiate[pos.x][pos.y] = building;
-            }
-            building.AddCoordinate(pos);
-        }
-      
-        return building;
-
+        return RequestGeneratingBuilding(_drawingBuildingName, cellPos);
     }
 
-    public bool StartBuildingDraw(GameObject builder, string name)
+    public int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos)
+    {
+        int requestNumber = UnityEngine.Random.Range(100, 1000);
+
+        Client.Instance.SendRequestGeneratingBuilding(name, cellPos, requestNumber);
+
+        return requestNumber;
+    }
+
+    // 서버에서 받은 패킷으로 빌딩 설치
+    public bool GenerateBuilding(S_BroadcastGenerateBuilding packet)
+    {
+        bool isSucess = packet.isSuccess;
+
+        Building building = null;
+        if (isSucess)
+        {
+            BuildingName name = (BuildingName)packet.buildingName;
+            Vector2Int cellPos = new Vector2Int(packet.posX, packet.posY);
+
+            Building buildingOrigin = Manager.Data.GetBuilding(name);
+            if (buildingOrigin == null)
+                isSucess = false;
+
+            building = Instantiate(buildingOrigin);
+            building.BuildingId = packet.buildingId;
+            Vector3 buildingPos = new Vector3(cellPos.x + (buildingOrigin.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
+            building.transform.position = buildingPos;
+
+            // 겹치는 부분에 좌표 설정
+            for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+            {
+                if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+                Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width, i / buildingOrigin.BuildingSize.width);
+
+
+                if (!_buildingCoordiate.ContainsKey(pos.x))
+                {
+                    _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
+                }
+                if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
+                {
+                    _buildingCoordiate[pos.x].Add(pos.y, building);
+                }
+                else
+                {
+                    _buildingCoordiate[pos.x][pos.y] = building;
+                }
+                building.AddCoordinate(pos);
+            }
+        }
+
+        ReciveGenPacket?.Invoke(packet.requestNumber, building);
+        return isSucess;
+    }
+
+    public bool StartBuildingDraw(GameObject builder, BuildingName name)
     {
         _builder = builder;
-        _drawingBuilding = Manager.Data.GetBuilding(name);
-
-        if(_drawingBuilding == null) return false;
-
+        _drawingBuildingName =name;
         _isDrawing = true;
 
         return true;
@@ -204,7 +225,7 @@ public class BuildingManager : MonoBehaviour
     public void StopBuildingDrawing()
     {
         _builder = null;
-        _drawingBuilding = null;
+      
         _isDrawing = false;
 
         foreach(var blankBox in _blankBoxList)

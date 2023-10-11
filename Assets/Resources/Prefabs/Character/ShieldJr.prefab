@@ -133,10 +133,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d5c221f7ef9ad14a8569b9736954000, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <CharacterId>k__BackingField: -1
+  <CharacterName>k__BackingField: 8
   _characterSize:
     center: {x: 0, y: 0.38, z: 0}
     size: {x: 0.48, y: 0.74, z: 0}
   _maxHp: 2
+  _isSuperArmerWhenAttack: 0
+  _standing: 0
   _accelSpeed: 20
   _groundBreakSpeed: 40
   _airBreakSpeed: 10
@@ -146,9 +150,9 @@ MonoBehaviour:
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
   _attack:
-    attackEffect: {fileID: 0}
+    attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
-    hitEffect: {fileID: 718218832349118837, guid: a7e25ab3d44881d489ae40a6286454c2, type: 3}
+    hitEffectName: 
     attackRange:
       center: {x: 0.54, y: 0.52, z: 0}
       size: {x: 1.07, y: 1.32, z: 0}

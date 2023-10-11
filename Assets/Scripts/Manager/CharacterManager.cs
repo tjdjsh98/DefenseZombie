@@ -1,23 +1,23 @@
+using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
+using static Define;
 
 public class CharacterManager : MonoBehaviour
 {
     Character _main;
 
-    public static int _singleCharacterId = 1000;
+    public static int _characterId = 100;
     public Character MainCharacter
     {
-        get 
+        get
         {
             if (_main == null)
             {
                 // 싱글 이때
                 if (Client.Instance.ClientId == -1)
                 {
-                    _main = Manager.Character.GenerateCharacter("HammerCharacter", Vector3.zero) as PlayerCharacter;
+                    _main = Manager.Character.GenerateCharacter(CharacterName.HammerCharacter, Vector3.zero) as PlayerCharacter;
                 }
                 else
                 {
@@ -35,27 +35,23 @@ public class CharacterManager : MonoBehaviour
 
     Dictionary<int, Character> _characterDictionary = new Dictionary<int, Character>();
 
+    public Action<int,Character> ReciveGenPacket;
+
     public void Init()
     {
-
+        
     }
-    public Character GenerateCharacter(string name,Vector3 position,bool isDummy = false)
+    public Character GenerateCharacter(CharacterName name,Vector3 position)
     {
-        string newName = (isDummy?"Dummy":"") + name;
-
-        Character characterOrigin = Manager.Data.GetCharacter(newName);
+        Character characterOrigin = Manager.Data.GetCharacter(name);
 
         if (characterOrigin == null) return null;
 
-        C_GenerateCharacter pkt = new C_GenerateCharacter();
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
         
-        character.IsDummy = isDummy;
-
-
-        character.CharacterId = ++_singleCharacterId;
+        character.CharacterId = ++_characterId;
 
         _characterDictionary.Add(character.CharacterId, character);
 
@@ -71,111 +67,97 @@ public class CharacterManager : MonoBehaviour
         return character;
     }
 
+    public void RequestRemoveCharacter(int id)
+    {
+        Client.Instance.SendRequestRemoveCharacter(id);
+    }
+
     public void RemoveCharacter(int id)
     {
         Character character = null;
 
         _characterDictionary.TryGetValue(id, out character);
 
-        if(character != null && Client.Instance.IsMain)
+        if (character != null)
         {
-            Client.Instance.SendRemoveCharacter(id);
+            Destroy(character.gameObject);
         }
     }
-    public Character GenerateAndSendPacket(string name, Vector3 position, bool isDummy = false)
-    {
-        string newName = (isDummy ? "Dummy" : "") + name;
 
-        Character characterOrigin = Manager.Data.GetCharacter(newName);
+
+    public Character GenerateAndSendPacket(CharacterName name, Vector3 position, bool isPlayerCharacter = false)
+    {
+        Character characterOrigin = Manager.Data.GetCharacter(name);
 
         if (characterOrigin == null) return null;
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
-        character.CharacterId = ++_singleCharacterId;
-        character.IsDummy = isDummy;
+        if (Client.Instance.ClientId == -1)
+            character.CharacterId = ++_characterId;
             
-        _characterDictionary.Add(_singleCharacterId, character);
+        _characterDictionary.Add(character.CharacterId, character);
 
-        Client.Instance.SendGenreateCharacter(name, _singleCharacterId, position);
 
         return character;
+    }
+
+    // 캐릭터 만드는 것을 서버에게 요청합니다.
+    public int RequestGenerateCharacter(CharacterName name, Vector3 position, bool isPlayerCharacter = false)
+    {
+        int requestNumber = UnityEngine.Random.Range(3000, 99999);
+
+        Client.Instance.SendRequestGenreateCharacter(name, position, requestNumber, isPlayerCharacter);
+
+        return requestNumber;
     }
 
     // 패킷으로 받은 정보로 더미 캐릭터를 만듭니다.
     // 자신의 캐릭터의 ID와 맞는 캐릭터와 맞으면 조작 가능 캐릭터가 나옵니다.
-    public Character GeneratePacketCharacter(S_BroadcastGenerateCharacter packet)
+    public bool GeneratePacketCharacter(S_BroadcastGenerateCharacter packet)
     {
-        string newName = packet.characterName;
+        bool isSuccess = true;
+        if (!packet.isSuccess)
+            isSuccess = false;
 
-        bool isDummy = false;
-        if (packet.characterId == Client.Instance.ClientId)
-            isDummy = false;
-        else
-            if (Client.Instance.IsMain && packet.characterId > 100)
-                isDummy = false;
-            else
-                isDummy = true;
+        if (_characterDictionary.ContainsKey(packet.characterId))
+            isSuccess = false;
+                
+        Character characterOrigin = Manager.Data.GetCharacter((CharacterName)packet.characterName);
+        if (characterOrigin == null) isSuccess = false;
 
-        if (isDummy)
+        Character character = null;
+        if (isSuccess)
         {
-            newName = "Dummy" + packet.characterName;
+            character = Instantiate(characterOrigin);
+
+            character.CharacterId = packet.characterId;
+            character.transform.position = new Vector3(packet.posX, packet.posY, packet.posZ);
+
+            _characterDictionary.Add(packet.characterId, character);
         }
 
-        Character characterOrigin = Manager.Data.GetCharacter(newName);
-        if (characterOrigin == null) return null;
-
-        Character character = Instantiate(characterOrigin);
-
-        character.CharacterId = packet.characterId;
-        character.transform.position = new Vector3(packet.posX,packet.posY, packet.posZ);
-      
-        character.IsDummy = isDummy;
-    
-
-        _characterDictionary.Add(packet.characterId, character);
-
-        return character;
+        ReciveGenPacket?.Invoke(packet.requestNumber, character);
+        return isSuccess;
     }
 
     public void GeneratePacketCharacter(S_EnterSyncInfos packet)
     {
-        foreach (var player in packet.characterInfos)
+        foreach (var pkt in packet.characterInfos)
         {
-
-            bool isDummy = false;
-            if (player.characterId == Client.Instance.ClientId)
-            {
-                isDummy = false;
-            }
-            else
-            {
-                if (Client.Instance.IsMain && player.characterId > 100)
-                {
-                    isDummy = false;
-                }
-                else
-                {
-                    isDummy = true;
-                }
-            }
-            string newName = player.characterName;
-
-            if (isDummy)
-            {
-                newName = "Dummy" + player.characterName;
-            }
-            Character characterOrigin = Manager.Data.GetCharacter(newName);
+            Character characterOrigin = Manager.Data.GetCharacter((CharacterName)pkt.characterName);
             if (characterOrigin == null) continue;
 
             Character character = Instantiate(characterOrigin);
 
-            character.CharacterId = player.characterId;
-            character.transform.position = new Vector3(player.posX, player.posY, player.posZ);
-            character.IsDummy = isDummy;
-           
+            character.Hp = pkt.hp;
 
-            _characterDictionary.Add(player.characterId, character);
+            character.CharacterId = pkt.characterId;
+            character.transform.position = new Vector3(pkt.posX, pkt.posY, pkt.posZ);
+
+            _characterDictionary.Add(pkt.characterId, character);
         }
     }
+
+   
 }

@@ -11,11 +11,22 @@ public static class Define
         Raycast
     }
 
-    public enum ItemType
+    public enum BuildingName
     { 
-        Stone,
-        Wood,
-        Steel,
-
+        CommandCenter,
+        Barricade
+    }
+    public enum CharacterName
+    {
+        PistalCharacter,
+        HammerCharacter,
+        Helper,
+        MiniBear,
+        Bear,
+        BigBear,
+        SpannerCharacter,
+        Zombie,
+        ShieldJr,
+        Horriy
     }
 }

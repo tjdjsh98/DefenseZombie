@@ -65,6 +65,7 @@ public class HelperAI : MonoBehaviour
     }
     private void Update()
     {
+        if (!Client.Instance.IsMain) return;
         AI();
     }
 
@@ -155,7 +156,11 @@ public class HelperAI : MonoBehaviour
     {
         while (true)
         {
-            Client.Instance.SendCharacterInfo(_character);
+            if (Client.Instance.IsMain)
+            {
+                Client.Instance.SendCharacterInfo(_character);
+
+            }
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
     }

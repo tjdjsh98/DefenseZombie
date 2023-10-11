@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UI_Commander : MonoBehaviour
 {
@@ -58,7 +55,7 @@ public class UI_Commander : MonoBehaviour
 
     public void Summon()
     {
-        Manager.Character.GenerateCharacter("Helper", Vector3.zero);
+        Manager.Character.RequestGenerateCharacter(Define.CharacterName.Helper, Vector3.zero);
     }
 
     void Control()
