@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Runtime.CompilerServices;
 using Unity.VisualScripting;
@@ -54,9 +55,29 @@ public class GameManager : MonoBehaviour
                         {
                             CharacterName enemyName = _levels[_level].enemyName;
 
-                            _generateRequestList.Add(Manager.Character.RequestGenerateCharacter(enemyName, genPosition));
+                            if (Client.Instance.ClientId == -1)
+                            {
+                                Character character = Manager.Character.GenerateCharacter(enemyName, genPosition);
 
-                            
+                                if (character != null) {
+                                    SummonCount++;
+                                    character.DeadHandler += () =>
+                                    {
+                                        SummonCount--;
+                                        if (SummonCount <= 0)
+                                        {
+                                            IsStartLevel = false;
+                                            _level++;
+                                            SummonCount = 0;
+                                        }
+                                    };
+                                }
+                            }
+                            else
+                            {
+                                _generateRequestList.Add(Manager.Character.RequestGenerateCharacter(enemyName, genPosition));
+                            }
+
                             yield return new WaitForSeconds(_levels[_level].genInterval);
                         }
                     }

@@ -98,8 +98,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.0985508, y: 1.1100248}
-  m_Size: {x: 1.3478374, y: 2.2878315}
+  m_Offset: {x: -0.031600475, y: 0.64002776}
+  m_Size: {x: 0.7404661, y: 1.3478374}
   m_Direction: 0
 --- !u!95 &3357414734694569056
 Animator:
@@ -111,7 +111,7 @@ Animator:
   m_GameObject: {fileID: 6320919963363865342}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b95931e297baef844924eca4efe687a8, type: 2}
+  m_Controller: {fileID: 22100000, guid: 3c05900c7e298974180c2ce6827d2012, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -137,8 +137,8 @@ MonoBehaviour:
   <CharacterId>k__BackingField: -1
   <CharacterName>k__BackingField: 5
   _characterSize:
-    center: {x: 0, y: 1.16, z: 0}
-    size: {x: 1.63, y: 1.18, z: 0}
+    center: {x: 0, y: 0.58, z: 0}
+    size: {x: 0.87, y: 1.18, z: 0}
   _maxHp: 10
   _isSuperArmerWhenAttack: 1
   _standing: 100
@@ -155,8 +155,8 @@ MonoBehaviour:
     attackEffectPoint: {x: 0, y: 0, z: 0}
     hitEffectName: Effect
     attackRange:
-      center: {x: 1.01, y: 1.39, z: 0}
-      size: {x: 2.93, y: 2.76, z: 0}
+      center: {x: 1.89, y: 0.88, z: 0}
+      size: {x: 4.19, y: 1.74, z: 0}
     AttackDirection: {x: 2, y: 0.8, z: 0}
     attacKShape: 0
     damage: 2
@@ -181,8 +181,8 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 129.2, y: 10, z: 0}
   _attackRange:
-    center: {x: 1.01, y: 1.39, z: 0}
-    size: {x: 2.48, y: 2.76, z: 0}
+    center: {x: 1.85, y: 0.88, z: 0}
+    size: {x: 3.1, y: 1.74, z: 0}
 --- !u!114 &283819561722909353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,7 +268,7 @@ SpriteRenderer:
   m_SortingLayerID: 872912963
   m_SortingLayer: 1
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: b74d351233174bc40b2429f91ce7dffd, type: 3}
+  m_Sprite: {fileID: -392306089, guid: 54158e5d4a99c6147ba69b0f1a8d21d8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

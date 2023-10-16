@@ -26,7 +26,7 @@ public static class Define
         BigBear,
         SpannerCharacter,
         Zombie,
-        ShieldJr,
+        ShieldMiniBear,
         Horriy
     }
 }

@@ -82,6 +82,7 @@ public class CharacterManager : MonoBehaviour
         {
             Destroy(character.gameObject);
         }
+        _characterDictionary.Remove(id);
     }
 
 

@@ -53,12 +53,12 @@ public class EnemyAI : MonoBehaviour
 
     private void Update()
     {
-        if(!Client.Instance.IsMain) return;
         AI();
     }
 
     void AI()
     {
+        if (!Client.Instance.IsMain && Client.Instance.ClientId != -1) return;
         if (_character.Target != null && !_character.Target.gameObject.activeSelf) _character.Target = null;
         if (_character.IsAttacking) return;
 
@@ -76,6 +76,7 @@ public class EnemyAI : MonoBehaviour
               
                 if (character != null || building != null)
                 {
+                    _character.StopMove();
                     _character.SetCharacterDirection(Vector2.zero);
                     _character.IsAttacking = true;
                     _character.CharacterState = CharacterState.Attack;

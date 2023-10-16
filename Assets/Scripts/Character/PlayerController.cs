@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
     public Action AttackKeyUp;
 
     public bool IsControllerable { get {
-            return Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId; } }
+            return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
     private void Awake()
     {
         _character = GetComponent<PlayerCharacter>();
@@ -39,7 +39,6 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        if (Client.Instance.ClientId != _character.CharacterId) return;
         Control();
     }
 

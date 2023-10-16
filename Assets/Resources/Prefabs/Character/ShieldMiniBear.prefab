@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 4374804656642252848}
   - component: {fileID: 1581080097962567980}
   m_Layer: 6
-  m_Name: ShieldJr
+  m_Name: ShieldMiniBear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -141,9 +141,9 @@ MonoBehaviour:
   _maxHp: 2
   _isSuperArmerWhenAttack: 0
   _standing: 0
-  _accelSpeed: 20
+  _accelSpeed: 40
   _groundBreakSpeed: 40
-  _airBreakSpeed: 10
+  _airBreakSpeed: 20
   _speed: 5
   _groundCheckRange:
     center: {x: 0, y: 0, z: 0}
@@ -267,12 +267,12 @@ SpriteRenderer:
   m_SortingLayerID: 872912963
   m_SortingLayer: 1
   m_SortingOrder: 1
-  m_Sprite: {fileID: 8526089930863142193, guid: 7d2e53d658bbef94c8cf976384287a1d, type: 3}
+  m_Sprite: {fileID: -1623747091, guid: 1447817c0a3fadb47a24024301ded651, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 4, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

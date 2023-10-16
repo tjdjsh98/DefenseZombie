@@ -39,7 +39,7 @@ public class Client : MonoBehaviour
     [field:SerializeField]public float Delay = 0;
 
     public static float SendPacketInterval = 0.1f;
-    public bool IsMain => ClientId == 1;
+    public bool IsMain => (ClientId == 1);
 
     List<int> _clientList = new List<int>();
     public void Send(ArraySegment<byte> segment)

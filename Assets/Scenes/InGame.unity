@@ -403,7 +403,7 @@ MonoBehaviour:
   _levels:
   - levelName: 
     genInterval: 1
-    enemyName: 3
+    enemyName: 8
     count: 1
     nextInterval: 10
   - levelName: 

@@ -240,7 +240,10 @@ public class Character : MonoBehaviour,IHp
             IsJumping = true;
         }
     }
-
+    public void StopMove()
+    {
+        _rigidBody.velocity = new Vector2(0, _rigidBody.velocity.y);
+    }
     protected virtual void Turn(float direction)
     {
         if (direction == 0) return;
@@ -281,6 +284,14 @@ public class Character : MonoBehaviour,IHp
         {
             DeadHandler?.Invoke();
             Manager.Character.RequestRemoveCharacter(CharacterId);
+        }
+        else
+        {
+            if (Client.Instance.ClientId == -1)
+            {
+                DeadHandler?.Invoke();
+                Manager.Character.RemoveCharacter(CharacterId);
+            }
         }
     }
 
@@ -343,6 +354,8 @@ public class Character : MonoBehaviour,IHp
     }
     public void Dodge()
     {
+        if (!IsContactGround) return;
+
         if(CharacterState == CharacterState.Idle)
             CharacterState = CharacterState.Dodge;
     }
