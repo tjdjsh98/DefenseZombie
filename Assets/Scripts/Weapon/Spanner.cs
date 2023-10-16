@@ -37,7 +37,7 @@ public class Spanner : Weapon
         //}
         //else
         {
-            _attackType = 1;
+            _attackType = 0;
         }
         _character.IsAttacking = true;
         _character.AttackType = _attackType;

@@ -27,6 +27,7 @@ public static class Define
         SpannerCharacter,
         Zombie,
         ShieldMiniBear,
-        Horriy
+        Horriy,
+        MiniCharacter
     }
 }

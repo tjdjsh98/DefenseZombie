@@ -25,7 +25,7 @@ public class SpannerPlayerCharacter : PlayerCharacter
             {
                 SetAnimatorBool("Walk", false);
             }
-        }
+        }   
 
         if(CharacterState == CharacterState.Dodge && !IsDodge) 
         {

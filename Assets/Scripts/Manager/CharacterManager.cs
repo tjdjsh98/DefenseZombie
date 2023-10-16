@@ -17,7 +17,7 @@ public class CharacterManager : MonoBehaviour
                 // ΩÃ±€ ¿Ã∂ß
                 if (Client.Instance.ClientId == -1)
                 {
-                    _main = Manager.Character.GenerateCharacter(CharacterName.HammerCharacter, Vector3.zero) as PlayerCharacter;
+                    _main = Manager.Character.GenerateCharacter(CharacterName.MiniCharacter, Vector3.zero) as PlayerCharacter;
                 }
                 else
                 {
