@@ -140,10 +140,6 @@ public class BuildingManager : MonoBehaviour
         return building;
     }
 
-    public Building GenreateBuildingAndSendPacket(BuildingName name, Vector2Int cellPos)
-    {
-        return null;
-    }
     public int PlayerRequestBuilding()
     {
         if (!IsDrawing) return -1;
@@ -152,10 +148,65 @@ public class BuildingManager : MonoBehaviour
         cellPos.x = Mathf.RoundToInt(_builder.transform.position.x + (_builder.transform.localScale.x > 0 ? 1 : -1));
         cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
+        if (Client.Instance.ClientId != -1)
+            return RequestGeneratingBuilding(_drawingBuildingName, cellPos);
+        else
+            GenerateBuilding(_drawingBuildingName, cellPos);
 
-        return RequestGeneratingBuilding(_drawingBuildingName, cellPos);
+        return -1;
     }
 
+    public bool SetBuilding(Vector3 initPos, Building building)
+    {
+        if(building== null) return false;   
+        Vector2Int cellPos = Vector2Int.zero;
+        cellPos.x = Mathf.RoundToInt(initPos.x);
+        cellPos.y = Mathf.CeilToInt(initPos.y);
+
+        // 겹치는 곳이 있는지 확인
+        for (int i = 0; i < building.BuildingSize.width * building.BuildingSize.height; i++)
+        {
+            if (!building.BuildingSize.isPlace[i]) continue;
+
+            Vector2Int pos = cellPos + new Vector2Int(i % building.BuildingSize.width, i / building.BuildingSize.width);
+
+            if (_buildingCoordiate.ContainsKey(pos.x))
+            {
+                if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
+                {
+                    if (_buildingCoordiate[pos.x][pos.y] != null)
+                        return false;
+                }
+            }
+        }
+
+        // 겹치는 부분에 좌표 설정
+        for (int i = 0; i < building.BuildingSize.width * building.BuildingSize.height; i++)
+        {
+            if (!building.BuildingSize.isPlace[i]) continue;
+
+            Vector2Int pos = cellPos + new Vector2Int(i % building.BuildingSize.width, i / building.BuildingSize.width);
+
+            if (!_buildingCoordiate.ContainsKey(pos.x))
+            {
+                _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
+            }
+            if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
+            {
+                _buildingCoordiate[pos.x].Add(pos.y, building);
+            }
+            else
+            {
+                _buildingCoordiate[pos.x][pos.y] = building;
+            }
+            building.AddCoordinate(pos);
+
+        }
+
+        building.transform.parent = transform.parent;
+        building.transform.position = new Vector3(cellPos.x + (building.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
+        return true;
+    }
     public int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos)
     {
         int requestNumber = UnityEngine.Random.Range(100, 1000);
@@ -244,5 +295,6 @@ public class BuildingManager : MonoBehaviour
                 _buildingCoordiate[pos.x][pos.y] = null;
             }
         }
+        building.ClearCoordinate();
     }
 }

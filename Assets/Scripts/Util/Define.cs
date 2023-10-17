@@ -14,7 +14,8 @@ public static class Define
     public enum BuildingName
     { 
         CommandCenter,
-        Barricade
+        Barricade,
+        Rock
     }
     public enum CharacterName
     {
@@ -42,6 +43,13 @@ public static class Define
     {
         Wood,
         Stone,
-        Iron
+        Iron,
+        Gun,
+        Sword,
+    }
+    public enum ItemType
+    {
+        Etc,
+        Equipment
     }
 }

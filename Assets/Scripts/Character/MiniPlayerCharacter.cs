@@ -1,8 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Unity.VisualScripting;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static Define;
 
 public class MiniPlayerCharacter : PlayerCharacter
@@ -15,19 +19,22 @@ public class MiniPlayerCharacter : PlayerCharacter
     [SerializeField] Sprite _grabFrontHand;
     [SerializeField] Sprite _grabBehindHand;
 
-    [SerializeField] Sprite _leftStuffFrontHand;
-    [SerializeField] Sprite _leftStuffBehindHand;
+    [SerializeField] Sprite _liftStuffFrontHand;
+    [SerializeField] Sprite _liftStuffBehindHand;
 
     [SerializeField]WeaponName _equipWeaponName;
     [SerializeField] bool _equipButton;
     bool _equipWeapon;
 
-    [SerializeField] SpriteRenderer _leftStuffSpriteRenderer;
     [SerializeField] SpriteRenderer _frontHandSpriteRenderer;
     [SerializeField] SpriteRenderer _behindHandSpriteRenderer;
     [SerializeField] SpriteRenderer _weaponSpriteRenderer;
 
     [SerializeField] AnimationClip _defaultAttackAnimationClip;
+
+    Building _liftBuilding;
+    Item _liftItem;
+    [SerializeField] GameObject _liftPos;
 
 
     protected override void Awake()
@@ -48,40 +55,43 @@ public class MiniPlayerCharacter : PlayerCharacter
             _frontHandSpriteRenderer.sprite = _grabFrontHand;
             _weaponSpriteRenderer.sprite = data.EquipSprite;
             _equipWeapon = true;
+            RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
+            AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
+            myOverrideController["UpperAttack"] = data.AttackAnimationClip;
         }
     }
 
-    protected override void Update()
+    public bool EquipWeapon(WeaponName name)
     {
-        base.Update();
-        if(_equipButton)
-        {
-            _equipButton = false;
-            if(_equipWeapon || _equipWeaponName == WeaponName.None)
-            {
-                _weaponSpriteRenderer.sprite = null;
-                _equipWeapon = false;
-                _frontHandSpriteRenderer.sprite = _emptyFrontHand;
-                RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
+        
+        WeaponData data = Manager.Data.GetWeaponData(name);
 
-                AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
+        if (data == null) return false;
 
-                myOverrideController["UpperAttack"] = _defaultAttackAnimationClip;
-            }
-            else
-            {
-                WeaponData data = Manager.Data.GetWeaponData(_equipWeaponName);
+        _frontHandSpriteRenderer.sprite = _grabFrontHand;
+        _weaponSpriteRenderer.sprite = data.EquipSprite;
+        _equipWeapon = true;
+        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
 
-                _frontHandSpriteRenderer.sprite = _grabFrontHand;
-                _weaponSpriteRenderer.sprite = data.EquipSprite;
-                _equipWeapon = true;
-                RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
+        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
 
-                AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
+        myOverrideController["UpperAttack"] = data.AttackAnimationClip;
 
-                myOverrideController["UpperAttack"] = data.AttackAnimationClip;
-            }
-        }
+        return true;
+    }
+
+    public bool TakeOffWeapon()
+    {
+        _weaponSpriteRenderer.sprite = null;
+        _equipWeapon = false;
+        _frontHandSpriteRenderer.sprite = _emptyFrontHand;
+        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
+
+        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
+
+        myOverrideController["UpperAttack"] = _defaultAttackAnimationClip;
+
+        return true;
     }
 
     protected override void MoveCharacter()
@@ -204,6 +214,104 @@ public class MiniPlayerCharacter : PlayerCharacter
         {
             SetAnimatorTrigger("ConnectCombo");
             IsConncetCombo = false;
+        }
+    }
+
+    public bool GetIsLiftSomething()
+    {
+        return _equipWeapon || _liftBuilding || _liftItem;
+    }
+
+    public GameObject LiftSomething()
+    {
+        if (_liftItem || _liftBuilding) return null;
+
+        Item item = GetOverrapGameObject<Item>();
+        if (item != null)
+        {
+            if (item.ItemData.ItemType == ItemType.Etc)
+            {
+                _liftItem = item;
+                _liftItem.FreezeRigidBody();
+                _liftItem.transform.parent = _liftPos.transform;
+                _liftItem.transform.localPosition = Vector3.zero;
+
+                _frontHandSpriteRenderer.sprite = _liftStuffFrontHand;
+                _behindHandSpriteRenderer.sprite = _liftStuffBehindHand;
+
+                SetAnimatorBool("IsLift", true);
+            }
+            else if(item.ItemData.ItemType == ItemType.Equipment)
+            {
+                string ItemName = item.ItemData.ItemName.ToString();
+
+                WeaponName weaponName = WeaponName.None;
+                Enum.TryParse(ItemName,true, out weaponName);
+
+                if (EquipWeapon(weaponName))
+                {
+                    item.Hide();
+                    _liftItem = item;
+                }
+            return item.gameObject;
+            }
+        }
+        else
+        {
+            Building building = GetOverrapGameObject<Building>();
+            if (building != null)
+            {
+                if (building.BuildingSize.width == 1)
+                {
+                    Manager.Building.RemoveBuilding(building);
+
+                    _liftBuilding = building;
+                    building.transform.parent = _liftPos.transform;
+                    building.transform.localPosition = Vector3.zero;
+
+                    _frontHandSpriteRenderer.sprite = _liftStuffFrontHand;
+                    _behindHandSpriteRenderer.sprite = _liftStuffBehindHand;
+                    SetAnimatorBool("IsLift", true);
+                }
+                return building.gameObject;
+
+            }
+        }
+        return null;
+    }
+
+    public void Putdown()
+    {
+        if(_liftItem != null)
+        {
+            if (_liftItem.ItemData.ItemType == ItemType.Etc)
+            {
+                _liftItem.ReleaseRigidBody();
+                _liftItem.transform.parent = transform.parent;
+                _liftItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
+                _frontHandSpriteRenderer.sprite = _emptyFrontHand;
+                _behindHandSpriteRenderer.sprite = _emptyBehindHand;
+                SetAnimatorBool("IsLift", false);
+            }
+            else if(_liftItem.ItemData.ItemType == ItemType.Equipment)
+            {
+                if (TakeOffWeapon())
+                {
+                    _liftItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
+                    _liftItem.Show();
+                }
+            }
+
+            _liftItem = null;
+        }
+        if(_liftBuilding != null) {
+            if (Manager.Building.SetBuilding(transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), _liftBuilding))
+            {
+                _frontHandSpriteRenderer.sprite = _emptyFrontHand;
+                _behindHandSpriteRenderer.sprite = _emptyBehindHand;
+                SetAnimatorBool("IsLift", false);
+                _liftBuilding = null;
+            }
         }
     }
 }

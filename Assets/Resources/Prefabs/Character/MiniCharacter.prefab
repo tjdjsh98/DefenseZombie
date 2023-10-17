@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1760237564069235223}
   - component: {fileID: 7782719253983151999}
+  - component: {fileID: 7361313552668532289}
+  - component: {fileID: 112079595693310198}
   m_Layer: 6
   m_Name: FrontHand
   m_TagString: Untagged
@@ -29,7 +31,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8167297892624502579}
   m_Father: {fileID: 1544368848223953580}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7782719253983151999
@@ -73,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 1331659397, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+  m_Sprite: {fileID: 257475259, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -84,6 +87,48 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7361313552668532289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270150092319229456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c29cff538c195c249b69c6f2236de67b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Library:
+  - m_Name: Idle
+    m_Hash: 0
+    m_CategoryList:
+    - m_Name: Entry
+      m_Hash: 0
+      m_Sprite: {fileID: 1331659397, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+  - m_Name: Equip
+    m_Hash: 0
+    m_CategoryList:
+    - m_Name: Entry
+      m_Hash: 0
+      m_Sprite: {fileID: 257475259, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
+  m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: 0ebd33e5a9498564ba959a90e6dc6cc5, type: 3}
+--- !u!114 &112079595693310198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 270150092319229456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8b1ae4e4e52b34ea557c1c11e076fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_CategoryHash: 0
+  m_labelHash: 0
+  m_SpriteKey: 0
+  m_SpriteHash: 702248347
 --- !u!1 &1456970922289170419
 GameObject:
   m_ObjectHideFlags: 0
@@ -252,6 +297,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4739439959996475644
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8167297892624502579}
+  m_Layer: 6
+  m_Name: LiftPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8167297892624502579
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4739439959996475644}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.061, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1760237564069235223}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6434744685825636001
 GameObject:
   m_ObjectHideFlags: 0
@@ -640,8 +716,8 @@ MonoBehaviour:
   <CharacterId>k__BackingField: -1
   <CharacterName>k__BackingField: 10
   _characterSize:
-    center: {x: 0, y: 0, z: 0}
-    size: {x: 0, y: 0, z: 0}
+    center: {x: -0.18, y: 0.51, z: 0}
+    size: {x: 1.03, y: 1.28, z: 0}
   _maxHp: 11
   _isSuperArmerWhenAttack: 0
   _standing: 0
@@ -657,15 +733,15 @@ MonoBehaviour:
   _emptyBehindHand: {fileID: -1516914895, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
   _grabFrontHand: {fileID: 257475259, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
   _grabBehindHand: {fileID: -1516914895, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
-  _leftStuffFrontHand: {fileID: 0}
-  _leftStuffBehindHand: {fileID: 0}
-  _equipWeaponName: 1
+  _liftStuffFrontHand: {fileID: 21300000, guid: e0e7c5f350e98fe4b95f20bad3750813, type: 3}
+  _liftStuffBehindHand: {fileID: 21300000, guid: a40a72f16e1a8e341826531d4a58427b, type: 3}
+  _equipWeaponName: 0
   _equipButton: 0
-  _leftStuffSpriteRenderer: {fileID: 0}
   _frontHandSpriteRenderer: {fileID: 7782719253983151999}
-  _behindHandSpriteRenderer: {fileID: 0}
+  _behindHandSpriteRenderer: {fileID: 7293347984587318059}
   _weaponSpriteRenderer: {fileID: 2009502622153245292}
   _defaultAttackAnimationClip: {fileID: 0}
+  _liftPos: {fileID: 4739439959996475644}
 --- !u!114 &-3789622636814383866
 MonoBehaviour:
   m_ObjectHideFlags: 0

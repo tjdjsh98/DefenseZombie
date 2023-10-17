@@ -98,6 +98,29 @@ public class PlayerController : MonoBehaviour
                 Manager.Building.PlayerRequestBuilding();
 
         }
+
+        if(Input.GetKeyDown(KeyCode.Q))
+        {
+            Manager.Item.GenerateItem(Define.ItemName.Stone, transform.position + Vector3.right);
+        }
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Manager.Item.GenerateItem(Define.ItemName.Gun, transform.position + Vector3.right);
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            MiniPlayerCharacter player = _character as MiniPlayerCharacter;
+            if (player == null) return;
+
+            if(!player.GetIsLiftSomething())
+            {
+                player.LiftSomething();
+            }
+            else
+            {
+                player.Putdown();
+            }
+        }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (Manager.Building.IsDrawing)

@@ -47,6 +47,9 @@ public class GameManager : MonoBehaviour
                     {
                         if (_levels.Count <= _level) _level = 0;
 
+                        for(int i = 0; i < 3; i++)
+                            Manager.Building.GenerateBuilding(BuildingName.Rock, new Vector2Int(Random.Range(-20, 20),-3));
+
                         IsStartLevel = true;
                         time = _levels[_level].nextInterval;
 

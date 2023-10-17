@@ -18,6 +18,9 @@ public class Manager : MonoBehaviour
     static BuildingManager _building;
     public static BuildingManager Building { get { Init(); return _building; } }
 
+    static ItemManager _item;
+    public static ItemManager Item { get { Init(); return _item; } }
+
     static GameManager _game;
     public static GameManager Game { get { Init(); return _game; } }
 
@@ -34,11 +37,13 @@ public class Manager : MonoBehaviour
         _data = GameObject.Find(_managerName).GetOrAddComponent<DataManager>();
         _character = GameObject.Find(_managerName).GetOrAddComponent<CharacterManager>();
         _building = GameObject.Find(_managerName).GetOrAddComponent<BuildingManager>();
+        _item = GameObject.Find(_managerName).GetOrAddComponent<ItemManager>();
         _game = GameObject.Find(_managerName).GetOrAddComponent<GameManager>();
 
         _data.Init();
         _character.Init();
         _building.Init();
+        _item.Init();
         _game.Init();
 
         Application.runInBackground = true;

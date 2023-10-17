@@ -245,6 +245,7 @@ public class GameRoom : IJobQueue
         }
         else
         {
+            // 빌딩이 들어갈 크기가 되는지 검사
             for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
             {
                 if (!buildingOrigin.BuildingSize.isPlace[i]) continue;

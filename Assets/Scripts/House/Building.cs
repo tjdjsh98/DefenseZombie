@@ -100,4 +100,8 @@ public class Building : MonoBehaviour, IHp
     {
         return _coordinate;
     }
+    public void ClearCoordinate()
+    {
+        _coordinate.Clear();
+    }
 }

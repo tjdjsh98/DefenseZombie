@@ -10,12 +10,16 @@ public class DataManager : MonoBehaviour
     Dictionary<string, GameObject> _effectDictionary = new Dictionary<string, GameObject>();
     Dictionary<string, ParabolaProjectile> _projectileDictionary = new Dictionary<string, ParabolaProjectile>();
     Dictionary<WeaponName, WeaponData> _weaponDataDictionary = new Dictionary<WeaponName, WeaponData>();
+    Dictionary<ItemName, ItemData> _itemDataDictionary = new Dictionary<ItemName, ItemData>();
+    Dictionary<string, GameObject> _etcDictionary = new Dictionary<string, GameObject>();
     public void Init()
     {
         LoadCharacter();
         LoadBuilding();
         LoadEffect();
         LoadWeaponData();
+        LoadItemData();
+        LoadEtc();
     }
 
     void LoadBuilding()
@@ -51,7 +55,25 @@ public class DataManager : MonoBehaviour
             _characterDictionary.Add(character.CharacterName, character);
         }
     }
+    void LoadItemData()
+    {
+        ItemData[] itemDatas = Resources.LoadAll<ItemData>("Datas/ItemData");
 
+        foreach (ItemData data in itemDatas)
+        {
+            _itemDataDictionary.Add(data.ItemName, data);
+        }
+    }
+
+    void LoadEtc()
+    {
+        GameObject[] etcs = Resources.LoadAll<GameObject>("Prefabs");
+
+        foreach (GameObject etc in etcs)
+        {
+            _etcDictionary.Add(etc.name, etc);
+        }
+    }
     public Character GetCharacter(CharacterName name)
     {
         Character character = null;
@@ -104,4 +126,20 @@ public class DataManager : MonoBehaviour
         return weaponData;
     }
     
+    public ItemData GetItemData(ItemName itemName)
+    {
+        ItemData itemData = null;
+        _itemDataDictionary.TryGetValue(itemName, out itemData);
+
+        return itemData;
+    }
+
+    public GameObject GetEtc(string name) 
+    { 
+        GameObject find = null;
+
+        _etcDictionary.TryGetValue(name, out find);
+
+        return find;
+    }
 }
