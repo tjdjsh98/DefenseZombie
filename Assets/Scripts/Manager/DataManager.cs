@@ -9,11 +9,13 @@ public class DataManager : MonoBehaviour
     Dictionary<BuildingName, Building> _buildingDictionary = new Dictionary<BuildingName, Building>();
     Dictionary<string, GameObject> _effectDictionary = new Dictionary<string, GameObject>();
     Dictionary<string, ParabolaProjectile> _projectileDictionary = new Dictionary<string, ParabolaProjectile>();
+    Dictionary<WeaponName, WeaponData> _weaponDataDictionary = new Dictionary<WeaponName, WeaponData>();
     public void Init()
     {
         LoadCharacter();
         LoadBuilding();
         LoadEffect();
+        LoadWeaponData();
     }
 
     void LoadBuilding()
@@ -23,6 +25,15 @@ public class DataManager : MonoBehaviour
         foreach (Building building in buildings)
         {
             _buildingDictionary.Add(building.BuildingName, building);
+        }
+    }
+    void LoadWeaponData()
+    {
+        WeaponData[] weaponDatas = Resources.LoadAll<WeaponData>("Datas/WeaponData");
+
+        foreach(WeaponData data in weaponDatas)
+        {
+            _weaponDataDictionary.Add(data.WeaponName, data);
         }
     }
     public Building GetBuilding(BuildingName name)
@@ -84,4 +95,13 @@ public class DataManager : MonoBehaviour
 
         return null ;
     }
+
+    public WeaponData GetWeaponData(WeaponName weaponName)
+    {
+        WeaponData weaponData = null;
+        _weaponDataDictionary.TryGetValue(weaponName, out weaponData);
+
+        return weaponData;
+    }
+    
 }

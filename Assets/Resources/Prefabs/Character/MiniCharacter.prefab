@@ -240,7 +240,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 3
+  m_SortingOrder: -1
   m_Sprite: {fileID: -738100765, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -653,18 +653,19 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
-  _changeClipName: MiniCharacterUpperAttack
-  _changeClip: {fileID: 7400000, guid: f5697f794ad9fec4a9df2d0bd998ee63, type: 2}
-  _changeClip2: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
   _emptyFrontHand: {fileID: 1331659397, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+  _emptyBehindHand: {fileID: -1516914895, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
   _grabFrontHand: {fileID: 257475259, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
-  _grabedWeapon:
-    name: RedSword
-    idleSprite: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
-    animationClip: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
-  _equipButton: 1
+  _grabBehindHand: {fileID: -1516914895, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+  _leftStuffFrontHand: {fileID: 0}
+  _leftStuffBehindHand: {fileID: 0}
+  _equipWeaponName: 1
+  _equipButton: 0
+  _leftStuffSpriteRenderer: {fileID: 0}
   _frontHandSpriteRenderer: {fileID: 7782719253983151999}
+  _behindHandSpriteRenderer: {fileID: 0}
   _weaponSpriteRenderer: {fileID: 2009502622153245292}
+  _defaultAttackAnimationClip: {fileID: 0}
 --- !u!114 &-3789622636814383866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -852,6 +853,6 @@ MonoBehaviour:
     stagger: 1
     penetrationPower: 3
   _enableAttackLayer: Character
-  _dashPower: 1
+  _dashPower: 0
   _coolDuration: 0.5
   _coolElapsed: 0

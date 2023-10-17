@@ -60,8 +60,6 @@ public class Spanner : Weapon
             _character.AddForce(_character.transform.localScale.x > 0 ? Vector2.right : Vector2.left, _dashPower,
                 (int)(RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation));
 
-            _character.CharacterState = CharacterState.Attack;
-
             Client.Instance.SendCharacterInfo(_character);
 
             _coolElapsed = 0;

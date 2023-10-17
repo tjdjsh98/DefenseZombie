@@ -30,4 +30,18 @@ public static class Define
         Horriy,
         MiniCharacter
     }
+
+    public enum WeaponName
+    {
+        None,
+        Gun,
+        Sword
+    }
+
+    public enum ItemName
+    {
+        Wood,
+        Stone,
+        Iron
+    }
 }
