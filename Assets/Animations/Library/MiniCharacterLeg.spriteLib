@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Library:
-  - m_Name: Default
-    m_Hash: 753088835
+  - m_Name: Walk
+    m_Hash: 765711723
     m_CategoryList: []
     m_OverrideEntries:
     - m_Name: MiniCharacterLegs_Run0
@@ -39,6 +39,17 @@ MonoBehaviour:
       m_SpriteOverride: {fileID: -1683840920, guid: c2f95e358d7075144911bb0bc3901d7b, type: 3}
     m_FromMain: 0
     m_EntryOverrideCount: 4
+  - m_Name: Idle
+    m_Hash: 1008081451
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: New Label
+      m_Hash: 259326342
+      m_Sprite: {fileID: -738100765, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -738100765, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 1
   m_PrimaryLibraryGUID: 
-  m_ModificationHash: 638331542744813488
+  m_ModificationHash: 638331835782910495
   m_Version: 1

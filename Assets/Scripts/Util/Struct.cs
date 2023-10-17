@@ -14,6 +14,8 @@ public struct Attack
 {
     public string attackEffectName;
     public Vector3 attackEffectPoint;
+    public Projectile projectile;
+    public Vector3 firePos;
     public string hitEffectName;
     public Range attackRange;
     public Vector3 AttackDirection;
@@ -22,4 +24,5 @@ public struct Attack
     public float power;
     public float stagger;
     public int penetrationPower;
+
 }

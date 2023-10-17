@@ -152,6 +152,8 @@ MonoBehaviour:
   _attack:
     attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
     hitEffectName: 
     attackRange:
       center: {x: 0.54, y: 0.52, z: 0}

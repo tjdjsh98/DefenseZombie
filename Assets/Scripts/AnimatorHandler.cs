@@ -19,37 +19,37 @@ public class AnimatorHandler : MonoBehaviour
     {
         _character = GetComponent<Character>();
     }
-    public void AttackStarted()
+    public void AnimatorAttackStarted()
     {
         AttackStartedHandler?.Invoke();
     }
-    public void Attack()
+    public void AnimatorAttack()
     {
         AttackHandler?.Invoke();
     }
-    public void AttackEnd()
+    public void AnimatorAttackEnd()
     {
         _character.IsAttacking = false;
         AttackEndHandler?.Invoke();
     }
 
-    public void ConnectCombo()
+    public void AnimatorConnectCombo()
     {
         ConnectComboHandler?.Invoke();
     }
 
-    public void Destroy()
+    public void AnimatorDestroy()
     {
         DestroyHandler?.Invoke();
         Destroy(gameObject);
     }
 
-    public void DodgeEnd()
+    public void AnimatorDodgeEnd()
     {
         DodgeEndHandler?.Invoke();
     }
 
-    public void SetAttackType(int type)
+    public void AnimatorSetAttackType(int type)
     {
         _character.AttackType = type;
     }

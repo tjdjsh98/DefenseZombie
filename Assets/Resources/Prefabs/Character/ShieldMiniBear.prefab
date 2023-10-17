@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 1581080097962567980}
   m_Layer: 6
   m_Name: ShieldMiniBear
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -138,7 +138,7 @@ MonoBehaviour:
   _characterSize:
     center: {x: 0, y: 0.38, z: 0}
     size: {x: 0.48, y: 0.74, z: 0}
-  _maxHp: 2
+  _maxHp: 5
   _isSuperArmerWhenAttack: 0
   _standing: 0
   _accelSpeed: 40
@@ -152,6 +152,8 @@ MonoBehaviour:
   _attack:
     attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
     hitEffectName: 
     attackRange:
       center: {x: 0.54, y: 0.52, z: 0}

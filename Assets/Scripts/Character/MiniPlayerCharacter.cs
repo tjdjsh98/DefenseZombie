@@ -1,39 +1,39 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Unity.VisualScripting;
-using UnityEditor.UIElements;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.U2D.Animation;
 using static Define;
 
 public class MiniPlayerCharacter : PlayerCharacter
 {
     AnimatorHandler _animatorHandler;
+    [SerializeField]SpriteLibrary _weaponSpriteLibrary;
 
-    [SerializeField] Sprite _emptyFrontHand;
-    [SerializeField] Sprite _emptyBehindHand;
-
-    [SerializeField] Sprite _grabFrontHand;
-    [SerializeField] Sprite _grabBehindHand;
-
-    [SerializeField] Sprite _liftStuffFrontHand;
-    [SerializeField] Sprite _liftStuffBehindHand;
+    [SerializeField] GameObject _frontHandPos;
+    [SerializeField] GameObject _frontHand;
 
     [SerializeField]WeaponName _equipWeaponName;
     [SerializeField] bool _equipButton;
     bool _equipWeapon;
 
-    [SerializeField] SpriteRenderer _frontHandSpriteRenderer;
-    [SerializeField] SpriteRenderer _behindHandSpriteRenderer;
-    [SerializeField] SpriteRenderer _weaponSpriteRenderer;
-
-    [SerializeField] AnimationClip _defaultAttackAnimationClip;
-
     Building _liftBuilding;
     Item _liftItem;
+    [SerializeField]WeaponData _weaponData;
+    public WeaponData WeaponData => _weaponData;
+
+    public int attackType = 0;
+    public Attack Attack
+    {
+        get
+        {
+            if (_weaponData == null || _weaponData.AttackList.Count <= attackType)
+                return new Attack();
+
+            return _weaponData.AttackList[attackType];
+        }
+    }
+
     [SerializeField] GameObject _liftPos;
 
 
@@ -41,59 +41,31 @@ public class MiniPlayerCharacter : PlayerCharacter
     {
         base.Awake();
         _animatorHandler = GetComponent<AnimatorHandler>();
+
         _animatorHandler.DodgeEndHandler += () => { CharacterState = CharacterState.Idle; };
 
+        _weaponSpriteLibrary.gameObject.SetActive(false);
         if(_equipWeaponName == WeaponName.None)
         {
-            _frontHandSpriteRenderer.sprite = _emptyFrontHand;
-            _weaponSpriteRenderer.sprite = null;
             _equipWeapon = false;
         }
         else
         {
             WeaponData data = Manager.Data.GetWeaponData(_equipWeaponName);
-            _frontHandSpriteRenderer.sprite = _grabFrontHand;
-            _weaponSpriteRenderer.sprite = data.EquipSprite;
             _equipWeapon = true;
             RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
             AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
             myOverrideController["UpperAttack"] = data.AttackAnimationClip;
+
+            _weaponSpriteLibrary.spriteLibraryAsset = data.WeaponSpriteLibrary;
         }
     }
 
-    public bool EquipWeapon(WeaponName name)
+    protected override void Update()
     {
-        
-        WeaponData data = Manager.Data.GetWeaponData(name);
-
-        if (data == null) return false;
-
-        _frontHandSpriteRenderer.sprite = _grabFrontHand;
-        _weaponSpriteRenderer.sprite = data.EquipSprite;
-        _equipWeapon = true;
-        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
-
-        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
-
-        myOverrideController["UpperAttack"] = data.AttackAnimationClip;
-
-        return true;
+        base.Update();
+        RotationGun();
     }
-
-    public bool TakeOffWeapon()
-    {
-        _weaponSpriteRenderer.sprite = null;
-        _equipWeapon = false;
-        _frontHandSpriteRenderer.sprite = _emptyFrontHand;
-        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
-
-        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
-
-        myOverrideController["UpperAttack"] = _defaultAttackAnimationClip;
-
-        return true;
-    }
-
     protected override void MoveCharacter()
     {
         if (IsHide) return;
@@ -138,7 +110,8 @@ public class MiniPlayerCharacter : PlayerCharacter
             }
             else
             {
-                Turn(_currentSpeed);
+                if(!_equipWeapon || _liftItem == null || _liftItem.ItemData.ItemName != ItemName.Gun)
+                    Turn(_currentSpeed);
                 _currentSpeed += _accelSpeed * Time.deltaTime;
             }
 
@@ -153,7 +126,8 @@ public class MiniPlayerCharacter : PlayerCharacter
             }
             else
             {
-                Turn(_currentSpeed);
+                if (!_equipWeapon || _liftItem == null || _liftItem.ItemData.ItemName != ItemName.Gun)
+                    Turn(_currentSpeed);
                 _currentSpeed -= _accelSpeed * Time.deltaTime;
             }
 
@@ -167,6 +141,71 @@ public class MiniPlayerCharacter : PlayerCharacter
             _jumpCount++;
         }
         _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
+    }
+    void RotationGun()
+    {
+        if(_equipWeapon && _liftItem.ItemData.ItemName == ItemName.Gun) 
+        {
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePos.z = 0;
+
+            Turn(mousePos.x - transform.position.x);
+
+            float rotation = Mathf.Atan2((mousePos.y - _frontHandPos.transform.position.y) , Mathf.Abs(mousePos.x - _frontHandPos.transform.position.x));
+            rotation = rotation / Mathf.PI * 180f;
+
+            _frontHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0,0,rotation));
+        }
+    }
+
+    public bool EquipWeapon(WeaponName name)
+    {
+        
+        WeaponData data = Manager.Data.GetWeaponData(name);
+        _weaponData = data;
+        if (data == null) return false;
+
+        _equipWeapon = true;
+
+        _weaponSpriteLibrary.spriteLibraryAsset = data.WeaponSpriteLibrary;
+        _weaponSpriteLibrary.gameObject.SetActive(true);
+        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
+
+        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
+
+        myOverrideController["UpperAttack"] = data.AttackAnimationClip;
+        SetAnimatorBool("IsEquip", true);
+
+        if(_liftItem != null && _liftItem.ItemData.ItemName== ItemName.Gun)
+        {
+            _frontHandPos.transform.localPosition = new Vector3(0.1875f, -0.375f, 0);
+            _frontHand.transform.localPosition = new Vector3(-0.1875f, 0.375f, 0);
+        }
+
+        return true;
+    }
+
+    public bool TakeOffWeapon()
+    {
+        WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
+        _equipWeapon = false;
+        
+        _weaponSpriteLibrary.gameObject.SetActive(false);
+        _weaponSpriteLibrary.spriteLibraryAsset = data.WeaponSpriteLibrary;
+        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
+
+        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
+
+        myOverrideController["UpperAttack"] = data.AttackAnimationClip;
+        SetAnimatorBool("IsEquip", false);
+
+        _frontHandPos.transform.localPosition = Vector3.zero;
+        _frontHand.transform.localPosition = Vector3.zero;
+        _frontHandPos.transform.localRotation = Quaternion.identity;
+
+        _weaponData = null;
+
+        return true;
     }
 
     protected override void ControlAnimation()
@@ -236,9 +275,6 @@ public class MiniPlayerCharacter : PlayerCharacter
                 _liftItem.transform.parent = _liftPos.transform;
                 _liftItem.transform.localPosition = Vector3.zero;
 
-                _frontHandSpriteRenderer.sprite = _liftStuffFrontHand;
-                _behindHandSpriteRenderer.sprite = _liftStuffBehindHand;
-
                 SetAnimatorBool("IsLift", true);
             }
             else if(item.ItemData.ItemType == ItemType.Equipment)
@@ -253,7 +289,9 @@ public class MiniPlayerCharacter : PlayerCharacter
                     item.Hide();
                     _liftItem = item;
                 }
-            return item.gameObject;
+
+                SetAnimatorBool("IsEquip", true);
+                return item.gameObject;
             }
         }
         else
@@ -269,9 +307,6 @@ public class MiniPlayerCharacter : PlayerCharacter
                     building.transform.parent = _liftPos.transform;
                     building.transform.localPosition = Vector3.zero;
 
-                    _frontHandSpriteRenderer.sprite = _liftStuffFrontHand;
-                    _behindHandSpriteRenderer.sprite = _liftStuffBehindHand;
-                    SetAnimatorBool("IsLift", true);
                 }
                 return building.gameObject;
 
@@ -289,8 +324,6 @@ public class MiniPlayerCharacter : PlayerCharacter
                 _liftItem.ReleaseRigidBody();
                 _liftItem.transform.parent = transform.parent;
                 _liftItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
-                _frontHandSpriteRenderer.sprite = _emptyFrontHand;
-                _behindHandSpriteRenderer.sprite = _emptyBehindHand;
                 SetAnimatorBool("IsLift", false);
             }
             else if(_liftItem.ItemData.ItemType == ItemType.Equipment)
@@ -307,8 +340,6 @@ public class MiniPlayerCharacter : PlayerCharacter
         if(_liftBuilding != null) {
             if (Manager.Building.SetBuilding(transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), _liftBuilding))
             {
-                _frontHandSpriteRenderer.sprite = _emptyFrontHand;
-                _behindHandSpriteRenderer.sprite = _emptyBehindHand;
                 SetAnimatorBool("IsLift", false);
                 _liftBuilding = null;
             }
