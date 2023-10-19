@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Building : MonoBehaviour, IHp
 {
-    SpriteRenderer _spriteRenderer;
+    List<SpriteRenderer> _spriteRenderers;
     BoxCollider2D _boxCollider;
 
     CircleSlider _circleSlider;
@@ -25,7 +26,10 @@ public class Building : MonoBehaviour, IHp
 
     private void Awake()
     {
-        _spriteRenderer = transform.Find("Model").GetComponent<SpriteRenderer>();
+        _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
+        SpriteRenderer sr = transform.Find("Model").GetComponent<SpriteRenderer>();
+        if(sr != null)
+            _spriteRenderers.Add(sr);
         _boxCollider = GetComponent<BoxCollider2D>();
         
         _circleSlider = GetComponentInChildren<CircleSlider>();
@@ -35,7 +39,8 @@ public class Building : MonoBehaviour, IHp
         _boxCollider.enabled = false;
         _time = 0;
         Color color = new Color(1, 1, 1, 0.2f);
-        _spriteRenderer.color = color;
+        foreach (var s in _spriteRenderers)
+            s.color = color;
     }
 
     private void OnDrawGizmosSelected()
@@ -67,7 +72,8 @@ public class Building : MonoBehaviour, IHp
 
         if(_time > _buildingTime)
         {
-            _spriteRenderer.color = Color.white;
+            foreach(var s in _spriteRenderers)
+                s.color = Color.white;
             gameObject.tag = "Building";
             _boxCollider.enabled = true;
             _circleSlider.Hide();

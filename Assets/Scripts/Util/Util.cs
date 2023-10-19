@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
+using UnityEngine.UIElements;
 
 public static class Util
 {
@@ -36,6 +37,28 @@ public static class Util
 
             if (result != null)
                 break;
+        }
+
+        return result;
+    }
+    public static List<T> GetGameObjectsByPhysics<T>(Vector3 position, Range range, int layerMask = -1) where T : MonoBehaviour
+    {
+        List<T> result = new List<T>();
+        RaycastHit2D[] hits;
+        if (layerMask != -1)
+            hits = Physics2D.BoxCastAll(position + range.center, range.size, 0, Vector2.zero, 0, layerMask);
+        else
+            hits = Physics2D.BoxCastAll(position + range.center, range.size, 0, Vector2.zero);
+
+        foreach (var hit in hits)
+        {
+            T temp = hit.collider.gameObject.GetComponent<T>();
+
+            if(temp != null)
+            {
+                result.Add(temp);
+            } 
+                
         }
 
         return result;

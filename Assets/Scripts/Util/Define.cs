@@ -15,7 +15,8 @@ public static class Define
     { 
         CommandCenter,
         Barricade,
-        Rock
+        Rock,
+        Cannon
     }
     public enum CharacterName
     {

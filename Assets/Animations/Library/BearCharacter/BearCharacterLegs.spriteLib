@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Library:
+  - m_Name: Walk
+    m_Hash: 765711723
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: MiniCharacterLegs_Run0
+      m_Hash: 400212570
+      m_Sprite: {fileID: 531726439, guid: c2f95e358d7075144911bb0bc3901d7b, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 1999887183, guid: 759068b5b11a72a448686fccc60e419a, type: 3}
+    - m_Name: MiniCharacterLegs_Run1
+      m_Hash: 551416524
+      m_Sprite: {fileID: -1609756315, guid: c2f95e358d7075144911bb0bc3901d7b, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 1738934194, guid: 759068b5b11a72a448686fccc60e419a, type: 3}
+    - m_Name: MiniCharacterLegs_Run2
+      m_Hash: 970236790
+      m_Sprite: {fileID: -507317730, guid: c2f95e358d7075144911bb0bc3901d7b, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: -1601503796, guid: 759068b5b11a72a448686fccc60e419a, type: 3}
+    - m_Name: MiniCharacterLegs_Run3
+      m_Hash: 248746976
+      m_Sprite: {fileID: -1683840920, guid: c2f95e358d7075144911bb0bc3901d7b, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: -398694004, guid: 759068b5b11a72a448686fccc60e419a, type: 3}
+    m_FromMain: 1
+    m_EntryOverrideCount: 4
+  - m_Name: Idle
+    m_Hash: 1008081451
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: New Label
+      m_Hash: 259326342
+      m_Sprite: {fileID: -738100765, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: -231029472, guid: 4d959ff021927cc43a69de6e6373003b, type: 3}
+    m_FromMain: 1
+    m_EntryOverrideCount: 1
+  m_PrimaryLibraryGUID: e7a2f7436b6f06d48827bd6b822bc5bb
+  m_ModificationHash: 638333475203140998
+  m_Version: 1

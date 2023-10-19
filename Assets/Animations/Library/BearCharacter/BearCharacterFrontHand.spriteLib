@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Library:
+  - m_Name: Attack
+    m_Hash: 7088141
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: MiniCharacterAttackHand_0
+      m_Hash: 335804823
+      m_Sprite: {fileID: 257475259, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 1116164859, guid: 4300151ad76d3c94c96c3ba053b434dd, type: 3}
+    - m_Name: MiniCharacterAttackHand_1
+      m_Hash: 587516161
+      m_Sprite: {fileID: -338392824, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: -1416395484, guid: 4300151ad76d3c94c96c3ba053b434dd, type: 3}
+    - m_Name: MiniCharacterAttackHand_2
+      m_Hash: 973969595
+      m_Sprite: {fileID: 1729480853, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 2034207879, guid: 4300151ad76d3c94c96c3ba053b434dd, type: 3}
+    m_FromMain: 1
+    m_EntryOverrideCount: 3
+  - m_Name: Lift
+    m_Hash: 323989810
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: FrontHandLiftStuff
+      m_Hash: 400945232
+      m_Sprite: {fileID: 21300000, guid: e0e7c5f350e98fe4b95f20bad3750813, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 342928642, guid: 4d959ff021927cc43a69de6e6373003b, type: 3}
+    m_FromMain: 1
+    m_EntryOverrideCount: 1
+  - m_Name: Idle
+    m_Hash: 1008081451
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: New Label
+      m_Hash: 259326342
+      m_Sprite: {fileID: 1331659397, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 767728602, guid: 4d959ff021927cc43a69de6e6373003b, type: 3}
+    m_FromMain: 1
+    m_EntryOverrideCount: 1
+  - m_Name: Hold
+    m_Hash: 1073259065
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: New Label
+      m_Hash: 259326342
+      m_Sprite: {fileID: 257475259, guid: 20c002b7a4f23cb42b3f61ae327cd4bb, type: 3}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 767728602, guid: 4d959ff021927cc43a69de6e6373003b, type: 3}
+    m_FromMain: 1
+    m_EntryOverrideCount: 1
+  m_PrimaryLibraryGUID: 0ebd33e5a9498564ba959a90e6dc6cc5
+  m_ModificationHash: 638333474536000571
+  m_Version: 1
