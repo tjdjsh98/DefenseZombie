@@ -93,6 +93,7 @@ public class DataManager : MonoBehaviour
     public GameObject GetEffect(string name)
     {
         GameObject effect = null;
+        if (string.IsNullOrEmpty(name)) return null;
 
         if(_effectDictionary.TryGetValue(name, out effect))
         {
@@ -109,8 +110,9 @@ public class DataManager : MonoBehaviour
     public ParabolaProjectile GetProjectile(string name)
     {
         ParabolaProjectile projectile = null;
+        if (string.IsNullOrEmpty(name)) return null;
 
-        if(_projectileDictionary.TryGetValue(name, out projectile))
+        if (_projectileDictionary.TryGetValue(name, out projectile))
         {
             return projectile;
         }
@@ -137,6 +139,7 @@ public class DataManager : MonoBehaviour
     public GameObject GetEtc(string name) 
     { 
         GameObject find = null;
+        if (string.IsNullOrEmpty(name)) return null;
 
         _etcDictionary.TryGetValue(name, out find);
 

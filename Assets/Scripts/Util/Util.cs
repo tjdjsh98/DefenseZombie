@@ -100,3 +100,31 @@ public static class Util
         return null;
     }
 }
+
+[System.Serializable]
+class SerializeDictionary<T1,T2>
+{
+    [SerializeField]List<SerializeDictionaryData<T1,T2>> _datas;
+    Dictionary<T1,T2> _dictionary = new Dictionary<T1, T2>();
+    int _preCount = 0;
+    public Dictionary<T1,T2> GetDictionary()
+    {
+        if(_dictionary.Count != _preCount)
+        {
+            _dictionary.Clear();
+            foreach (var data in _datas)
+            {
+                _dictionary.Add(data.key, data.value);
+            }
+        }
+
+        return _dictionary;
+    }
+}
+
+[System.Serializable]
+class SerializeDictionaryData<T1,T2>
+{
+    public T1 key;
+    public T2 value;
+}

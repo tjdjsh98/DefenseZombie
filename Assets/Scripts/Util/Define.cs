@@ -52,4 +52,16 @@ public static class Define
         Etc,
         Equipment
     }
+
+    public enum CharacterParts
+    {
+        Head,
+        Eyes,
+        Body,
+        Legs,
+        FrontHand,
+        BehindHand,
+        FrontWeapon,
+        BehindWeapon,
+    }
 }

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Sword
   m_EditorClassIdentifier: 
   <WeaponName>k__BackingField: 2
+  <IsFrontWeapon>k__BackingField: 1
   <ThumbnailSprite>k__BackingField: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: 5508cb133a6137544937384a230d8e0e, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: f5697f794ad9fec4a9df2d0bd998ee63, type: 2}

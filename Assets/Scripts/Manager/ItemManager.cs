@@ -12,7 +12,7 @@ public class ItemManager : MonoBehaviour
 
     public void Init()
     {
-
+        GenerateItem(ItemName.Stone, Vector3.one * 3);
     }
 
     public Item GenerateItem(ItemName itemName, Vector3 position)
@@ -21,12 +21,18 @@ public class ItemManager : MonoBehaviour
 
         if (itemData == null) return null;
 
-        GameObject origin = Manager.Data.GetEtc("Item");
+        GameObject origin = null;
+
+        if (itemData.Origin == null)
+            origin = Manager.Data.GetEtc("Item");
+        else
+            origin = itemData.Origin;
 
         Item item = Instantiate(origin).GetComponent<Item>();
 
         item.Init(itemData, ++itemNumber);
 
+        position.z = 0;
         item.transform.position = position;
 
         _itemDictionary.Add(item.ItemNumber, item);

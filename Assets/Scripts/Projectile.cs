@@ -1,16 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
     bool _isFire = false;
+    Rigidbody2D _rigidbody;
+
+    [SerializeField] bool _autoDestroy;
+    [SerializeField] float _destroyTime;
 
     void Awake()
     {
-        Invoke("Destroy", 3f);
+        _rigidbody= GetComponent<Rigidbody2D>();
+        if(_autoDestroy)
+            Invoke("Destroy", _destroyTime);
     }
-
     void Destroy()
     {
         Destroy(gameObject);
@@ -36,6 +42,10 @@ public class Projectile : MonoBehaviour
         }
     }
 
+    public void Throw(Vector3 direction, float power)
+    {
+        _rigidbody.AddForce(direction.normalized * power,ForceMode2D.Impulse);
+    }
     public void Fire(float direction, Vector3 rotation)
     {
         _isFire= true;

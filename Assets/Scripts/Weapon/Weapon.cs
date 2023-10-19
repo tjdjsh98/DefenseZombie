@@ -10,14 +10,19 @@ public class Weapon : MonoBehaviour
     [SerializeField] protected int _attackType;
     [SerializeField] protected Attack _defaultAttack;
 
-    [SerializeField] GameObject _weapon;
-    [SerializeField] GameObject _firePoint;
+    [SerializeField] GameObject _frontWeapon;
+    [SerializeField] GameObject _frontfirePoint;
+
+    [SerializeField] GameObject _behindWeapon;
+    [SerializeField] GameObject _behindfirePoint;
     protected Attack _attack
     {
         get 
         {
-            if(_character == null)
+            if (_character == null)
+            {
                 return _defaultAttack;
+            }
 
             return _character.Attack;
         }
@@ -35,8 +40,8 @@ public class Weapon : MonoBehaviour
 
         if(_playerController != null)
         {
-            _playerController.AttackKeyDown += OnAttackKeyDown;
-            _playerController.AttackKeyUp += OnAttackKeyUp;
+            _playerController.AttackKeyDownHandler += OnAttackKeyDown;
+            _playerController.AttackKeyUpHandler += OnAttackKeyUp;
         }
         else if(_helperAi != null)
         {
@@ -56,8 +61,10 @@ public class Weapon : MonoBehaviour
 
         Range attackRange = _attack.attackRange;
 
+        Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.lossyScale);
+        Gizmos.matrix = rotationMatrix;
 
-        if(_character != null)
+        if (_character != null)
             attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
 
         Vector3 point = _attack.attackEffectPoint;
@@ -88,8 +95,12 @@ public class Weapon : MonoBehaviour
 
     protected virtual void OnAttackKeyDown()
     {
+        if (_character.IsLift) return;
+        if (_character.IsAttacking) return;
+
         _character.IsAttacking = true;
         _character.AttackType = _attackType;
+
         GameObject attackEffect = Manager.Data.GetEffect(_attack.attackEffectName);
 
         if (attackEffect != null)
@@ -122,13 +133,13 @@ public class Weapon : MonoBehaviour
             switch (_attack.attacKShape)
             {
                 case Define.AttacKShape.Rectagle:
-                    hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, 0, Vector2.zero, 0, layerMask);
+                    hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, _frontWeapon.transform.rotation.z, Vector2.zero, 0, layerMask);
                     break;
                 case Define.AttacKShape.Raycast:
                     hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
                     break;
                 default:
-                    hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, 0, Vector2.zero, 0, layerMask);
+                    hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, _frontWeapon.transform.rotation.z, Vector2.zero, 0, layerMask);
                     break;
             }
 
@@ -167,11 +178,11 @@ public class Weapon : MonoBehaviour
         }
         else
         {
-            _firePoint.transform.localPosition = _attack.firePos;
+            _frontfirePoint.transform.localPosition = _attack.firePos;
 
             Projectile projectile = Instantiate(_attack.projectile);
-            projectile.transform.position = _firePoint.transform.position;
-            projectile.Fire(transform.localScale.x, _firePoint.transform.eulerAngles);
+            projectile.transform.position = _frontfirePoint.transform.position;
+            projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles);
         }
     }
 

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: None
   m_EditorClassIdentifier: 
   <WeaponName>k__BackingField: 0
+  <IsFrontWeapon>k__BackingField: 1
   <ThumbnailSprite>k__BackingField: {fileID: 21300000, guid: cbd85ea427e72684b8185f28f3a9646b, type: 3}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
+  <AttackList>k__BackingField: []

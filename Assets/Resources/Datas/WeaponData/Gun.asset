@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Gun
   m_EditorClassIdentifier: 
   <WeaponName>k__BackingField: 1
+  <IsFrontWeapon>k__BackingField: 1
   <ThumbnailSprite>k__BackingField: {fileID: 21300000, guid: cbd85ea427e72684b8185f28f3a9646b, type: 3}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: 15c8e4ffe4bfd3e4da81aa9af5060938, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
