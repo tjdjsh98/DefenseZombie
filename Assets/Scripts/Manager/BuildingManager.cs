@@ -8,6 +8,7 @@ public class BuildingManager : MonoBehaviour
 {
     BuildingName _drawingBuildingName;
     GameObject _blankBox;
+    List<SpriteRenderer> _previewBuildings = new List<SpriteRenderer>();
     List<SpriteRenderer> _blankBoxList = new List<SpriteRenderer>();
     GameObject _builder;
 
@@ -36,9 +37,10 @@ public class BuildingManager : MonoBehaviour
         {
             Building darwBuilding = Manager.Data.GetBuilding(_drawingBuildingName);
             int drawCount = 0;
-            Vector3Int fixedPos = Vector3Int.zero;
-            fixedPos.x = Mathf.RoundToInt(_builder.transform.position.x) +  (_builder.transform.localScale.x > 0 ? 1 : -1);
-            fixedPos.y = Mathf.CeilToInt(_builder.transform.position.y);
+            Vector3Int cellPos = Vector3Int.zero;
+            cellPos.x = (_builder.transform.localScale.x > 0 ? Mathf.CeilToInt(_builder.transform.position.x + 0.5f) : Mathf.FloorToInt(_builder.transform.position.x - 0.5f));
+            cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
+
             for (int i =0; i < darwBuilding.BuildingSize.width * darwBuilding.BuildingSize.height;i++)
             {
                 if (!darwBuilding.BuildingSize.isPlace[i]) continue;
@@ -54,9 +56,9 @@ public class BuildingManager : MonoBehaviour
                 sr.gameObject.SetActive(true);
                 Color color = new Color();
                 color.g = 1;
-                color.a = 0.2f;
+                color.a = 0.9f;
 
-                Vector3Int pos = fixedPos + new Vector3Int(i % darwBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / darwBuilding.BuildingSize.width, 0);
+                Vector3Int pos = cellPos + new Vector3Int(i % darwBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / darwBuilding.BuildingSize.width, 0);
                 if (_buildingCoordiate.ContainsKey(pos.x))
                 {
                     if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
@@ -71,12 +73,15 @@ public class BuildingManager : MonoBehaviour
 
                 sr.color = color;
                 Vector3 pos2 = pos;
-                pos2.x -= 0.5f;
                 pos2.y -= 0.5f;
                 
                 sr.transform.position = pos2;
                 drawCount++;
             }
+
+            Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
+            buildingPos.x += (darwBuilding.BuildingSize.width) / 2f - 0.5f;
+            SetPreviewBuildingPos(buildingPos);
 
         }
     }
@@ -104,13 +109,8 @@ public class BuildingManager : MonoBehaviour
 
         Building building = Instantiate(buildingOrigin);
         building.BuildingId = ++_buildingId;
-        Vector3 buildingPos = new Vector3(cellPos.x + (buildingOrigin.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
-        Vector3 scale = Vector3.one;
-        if (_builder != null)
-        {
-            scale.x = _builder.transform.localScale.x > 0 ? 1 : -1;
-            building.transform.localScale = scale;
-        }
+        Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
+        buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
         building.transform.position = buildingPos;
 
 
@@ -145,7 +145,7 @@ public class BuildingManager : MonoBehaviour
         if (!IsDrawing) return -1;
 
         Vector2Int cellPos = Vector2Int.zero;
-        cellPos.x = Mathf.RoundToInt(_builder.transform.position.x + (_builder.transform.localScale.x > 0 ? 1 : -1));
+        cellPos.x = (_builder.transform.localScale.x > 0 ? Mathf.CeilToInt(_builder.transform.position.x + 0.5f) : Mathf.FloorToInt(_builder.transform.position.x - 0.5f));
         cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
         if (Client.Instance.ClientId != -1)
@@ -270,6 +270,11 @@ public class BuildingManager : MonoBehaviour
         _drawingBuildingName =name;
         _isDrawing = true;
 
+        ShowPreviewBuilding();
+        foreach (var blankBox in _blankBoxList)
+        {
+            blankBox.gameObject.SetActive(false);
+        }
         return true;
     }
 
@@ -283,6 +288,7 @@ public class BuildingManager : MonoBehaviour
         {
             blankBox.gameObject.SetActive(false);
         }
+        HidePreviewBuilding();
     }
 
     public void RemoveBuilding(Building building)
@@ -296,5 +302,45 @@ public class BuildingManager : MonoBehaviour
             }
         }
         building.ClearCoordinate();
+    }
+
+    void ShowPreviewBuilding()
+    {
+        Building building = Manager.Data.GetBuilding(_drawingBuildingName);
+        if (building == null) return;
+
+        List<SpriteRenderer> spriteRenderers = building.GetSpritesRenderers();
+        int i = 0;
+        for (; i < spriteRenderers.Count; i++)
+        {
+            if(_previewBuildings.Count <= i)
+            {
+                SpriteRenderer sr = Instantiate(Resources.Load<SpriteRenderer>("PreviewSprite"));
+
+                _previewBuildings.Add(sr);
+            }
+            _previewBuildings[i].sprite = spriteRenderers[i].sprite;
+            _previewBuildings[i].color = new Color(1, 1, 1, 0.7f);
+            _previewBuildings[i].gameObject.SetActive(true);
+        }
+
+        for (; i < _previewBuildings.Count; i++)
+        {
+            _previewBuildings[i].gameObject.SetActive(false);
+        }
+    }
+
+    void HidePreviewBuilding()
+    {
+        foreach(var sr in _previewBuildings)
+            sr.gameObject.SetActive(false);
+    }
+
+    void SetPreviewBuildingPos(Vector3 pos)
+    {
+        foreach(var sr in _previewBuildings)
+        {
+            sr.transform.position = pos;
+        }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using static Define;
 
 public class PlayerController : MonoBehaviour
 {
@@ -25,6 +26,8 @@ public class PlayerController : MonoBehaviour
 
     public Action AttackKeyDownHandler;
     public Action AttackKeyUpHandler;
+
+    int _selectBuildingNameIndex;
 
     public bool IsControllerable { get {
             return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
@@ -93,7 +96,29 @@ public class PlayerController : MonoBehaviour
                 Manager.Building.StartBuildingDraw(this.gameObject, Define.BuildingName.Barricade);
             else
                 Manager.Building.PlayerRequestBuilding();
+        }
+        if (Manager.Building.IsDrawing)
+        { 
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                _selectBuildingNameIndex--;
+                if(_selectBuildingNameIndex < 0)
+                {
+                    _selectBuildingNameIndex = Enum.GetValues(typeof(BuildingName)).Length-1;
+                }
+                Manager.Building.StartBuildingDraw(this.gameObject, (BuildingName)_selectBuildingNameIndex);
+            }
 
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                _selectBuildingNameIndex++;
+                if (Enum.GetValues(typeof(BuildingName)).Length <= _selectBuildingNameIndex)
+                {
+                    _selectBuildingNameIndex = 0;
+                }
+
+                Manager.Building.StartBuildingDraw(this.gameObject, (BuildingName)_selectBuildingNameIndex);
+            }
         }
 
         if(Input.GetKeyDown(KeyCode.C))

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Building : MonoBehaviour, IHp
@@ -109,5 +110,9 @@ public class Building : MonoBehaviour, IHp
     public void ClearCoordinate()
     {
         _coordinate.Clear();
+    }
+    public List<SpriteRenderer> GetSpritesRenderers()
+    {
+        return transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
     }
 }

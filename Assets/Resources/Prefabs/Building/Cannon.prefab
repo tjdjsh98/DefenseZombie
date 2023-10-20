@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3491999996630034408}
   - component: {fileID: 3336117517968801134}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cannon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -98,7 +98,7 @@ GameObject:
   - component: {fileID: 8386767408133647290}
   - component: {fileID: 5143180757125264493}
   - component: {fileID: 1076116302970844188}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Cannon
   m_TagString: Building
   m_Icon: {fileID: 0}
@@ -246,7 +246,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 87034635759780421}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: FirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -278,7 +278,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2173776897838464553}
   - component: {fileID: 1141131557969585646}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Behind
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -362,7 +362,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8766113640006730581}
   - component: {fileID: 9092511169548905341}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -445,7 +445,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8652704352643183290}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: CannonPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -477,7 +477,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8556625597810904835}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -510,6 +510,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 8703466672991284263}
     m_Modifications:
+    - target: {fileID: 2278982114719024324, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 2324762365791422773, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -554,6 +558,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: HpBar
       objectReference: {fileID: 0}
+    - target: {fileID: 8879063647248961153, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 8961153112807148571, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -575,6 +587,18 @@ PrefabInstance:
     - target: {fileID: 4046915860122169707, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Name
       value: CircleGauge
+      objectReference: {fileID: 0}
+    - target: {fileID: 4046915860122169707, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 4547197175537827090, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6520141742134201297, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 9106532135111234725, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_LocalPosition.x

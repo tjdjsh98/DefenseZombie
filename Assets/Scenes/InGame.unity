@@ -405,7 +405,7 @@ MonoBehaviour:
     genInterval: 1
     enemyName: 8
     count: 1
-    nextInterval: 10
+    nextInterval: 10000
   - levelName: 
     genInterval: 1
     enemyName: 3

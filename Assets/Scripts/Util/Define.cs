@@ -16,7 +16,8 @@ public static class Define
         CommandCenter,
         Barricade,
         Rock,
-        Cannon
+        Cannon,
+        StepBox
     }
     public enum CharacterName
     {
