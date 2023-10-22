@@ -40,6 +40,8 @@ public class MiniPlayerCharacter : PlayerCharacter
 
     [SerializeField] GameObject _liftPos;
 
+    Vector3 _preLiftBuildingCharacterScale;
+    Vector3 _preLiftBuildingBuildingScale;
 
     protected override void Awake()
     {
@@ -297,6 +299,9 @@ public class MiniPlayerCharacter : PlayerCharacter
                     building.transform.parent = _liftPos.transform;
                     building.transform.localPosition = Vector3.zero;
 
+                    _preLiftBuildingBuildingScale = _liftBuilding.transform.localScale;
+                    _preLiftBuildingCharacterScale = transform.transform.localScale;
+
                 }
                 return building.gameObject;
 
@@ -335,9 +340,40 @@ public class MiniPlayerCharacter : PlayerCharacter
             _liftItem = null;
         }
         if(_liftBuilding != null) {
-            if (Manager.Building.SetBuilding(transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), _liftBuilding))
+            if (Manager.Building.SetBuilding(gameObject,transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), _liftBuilding))
             {
                 _liftBuilding = null;
+            }
+        }
+    }
+
+    protected override void Turn(float direction)
+    {
+        if (direction == 0) return;
+        if (TurnedHandler != null)
+            TurnedHandler(direction);
+
+        Vector3 scale = Vector3.one;
+        scale.x = direction > 0 ? 1 : -1;
+        transform.localScale = scale;
+
+        if(_liftBuilding != null)
+        {
+            if(_preLiftBuildingCharacterScale.x == transform.localScale.x)
+            {
+                if(_liftBuilding.transform.localScale.x != _preLiftBuildingBuildingScale.x)
+                {
+                    _liftBuilding.transform.localScale = _preLiftBuildingBuildingScale;
+                }
+            }
+            else
+            {
+                if (_liftBuilding.transform.localScale.x == _preLiftBuildingBuildingScale.x)
+                {
+                    Vector3 temp = _preLiftBuildingBuildingScale;
+                    temp.x = -_preLiftBuildingBuildingScale.x;
+                    _liftBuilding.transform.localScale = temp;
+                }
             }
         }
     }

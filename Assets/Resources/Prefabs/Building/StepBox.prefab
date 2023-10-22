@@ -215,7 +215,7 @@ MonoBehaviour:
     pivotX: -1
     pivotY: 1
     isPlace: 01
-  _buildingTime: 30
+  _buildingTime: 1
 --- !u!1 &7871963314126549277
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,13 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.IO;
-using System.Runtime.CompilerServices;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
 using static Define;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,12 +15,16 @@ public class GameManager : MonoBehaviour
     int _level = 0;
     [SerializeField] List<Level> _levels;
 
+    [SerializeField] Dictionary<ItemData, int> _inventory = new Dictionary<ItemData, int>();
+
     public bool IsStartLevel { get; private set; }
     public int SummonCount { private set; get; }
 
     public UI_Commander Commander;
 
     List<int> _generateRequestList = new List<int>();
+
+    public Action InventoryChanagedHandler;
 
     public void Init()
     {
@@ -48,7 +47,7 @@ public class GameManager : MonoBehaviour
                         if (_levels.Count <= _level) _level = 0;
 
                         for(int i = 0; i < 3; i++)
-                            Manager.Building.GenerateBuilding(BuildingName.Rock, new Vector2Int(Random.Range(-20, 20),-3));
+                            Manager.Building.GenerateBuilding(BuildingName.Rock, new Vector2Int(UnityEngine.Random.Range(-20, 20),-3));
 
                         IsStartLevel = true;
                         time = _levels[_level].nextInterval;
@@ -111,6 +110,27 @@ public class GameManager : MonoBehaviour
                 };
             }
         }
+    }
+
+    public void AddItem(ItemData data)
+    {
+        if (data == null) return;
+
+        if(_inventory.ContainsKey(data))
+        {
+            _inventory[data]++;
+        }
+        else
+        {
+            _inventory.Add(data, 1);
+        }
+
+        InventoryChanagedHandler?.Invoke();
+    }
+
+    public Dictionary<ItemData,int> GetInventory()
+    {
+        return _inventory;
     }
 }
 

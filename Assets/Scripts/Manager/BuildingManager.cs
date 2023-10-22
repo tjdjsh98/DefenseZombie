@@ -156,12 +156,12 @@ public class BuildingManager : MonoBehaviour
         return -1;
     }
 
-    public bool SetBuilding(Vector3 initPos, Building building)
+    public bool SetBuilding(GameObject builder, Vector3 initPos, Building building)
     {
         if(building== null) return false;   
         Vector2Int cellPos = Vector2Int.zero;
-        cellPos.x = Mathf.RoundToInt(initPos.x);
-        cellPos.y = Mathf.CeilToInt(initPos.y);
+        cellPos.x = (builder.transform.localScale.x > 0 ? Mathf.CeilToInt(builder.transform.position.x + 0.5f) : Mathf.FloorToInt(builder.transform.position.x - 0.5f));
+        cellPos.y = Mathf.CeilToInt(builder.transform.position.y);
 
         // 겹치는 곳이 있는지 확인
         for (int i = 0; i < building.BuildingSize.width * building.BuildingSize.height; i++)
@@ -203,8 +203,13 @@ public class BuildingManager : MonoBehaviour
 
         }
 
+
         building.transform.parent = transform.parent;
-        building.transform.position = new Vector3(cellPos.x + (building.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
+
+        Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
+        buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
+
+        building.transform.position = buildingPos;
         return true;
     }
     public int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos)

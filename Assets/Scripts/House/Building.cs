@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,8 @@ public class Building : MonoBehaviour, IHp
     float _time;
 
     List<Vector2Int> _coordinate = new List<Vector2Int>();
+
+    public Action<float> TurnHandler;
 
     bool _done;
 
@@ -115,4 +118,5 @@ public class Building : MonoBehaviour, IHp
     {
         return transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
     }
+
 }

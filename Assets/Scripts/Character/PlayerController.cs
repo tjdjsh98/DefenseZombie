@@ -153,7 +153,8 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.O))
         {
-            _character.Dodge();
+            int num = UnityEngine.Random.Range(0, 5);
+            Manager.Game.AddItem(Manager.Data.GetItemData((ItemName)num));
         }
 
         if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A) ||
