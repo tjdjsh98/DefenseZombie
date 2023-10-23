@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2568397472024035436}
   - component: {fileID: 3084657816736945440}
   - component: {fileID: 283819561722909353}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: BigBear
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -153,6 +153,8 @@ MonoBehaviour:
   _attack:
     attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
     hitEffectName: Effect
     attackRange:
       center: {x: 1.89, y: 0.88, z: 0}
@@ -205,7 +207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1565977854470206012}
   - component: {fileID: 8476034852327060070}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -287,6 +289,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6199002457914921942}
     m_Modifications:
+    - target: {fileID: 2278982114719024324, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 2324762365791422773, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -330,6 +336,14 @@ PrefabInstance:
     - target: {fileID: 8879063647248961153, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Name
       value: HpBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 8879063647248961153, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8961153112807148571, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

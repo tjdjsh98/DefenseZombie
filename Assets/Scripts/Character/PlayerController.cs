@@ -127,7 +127,7 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            Manager.Item.GenerateItem(Define.ItemName.Sword, transform.position + Vector3.right);
+            Manager.Item.GenerateItem(Define.ItemName.Spear, transform.position + Vector3.right);
         }
         if (Input.GetKeyDown(KeyCode.E))
         {

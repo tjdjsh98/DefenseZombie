@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4343684242413150478}
   - component: {fileID: 1982789171438626382}
   - component: {fileID: 4212606839521366944}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Horriy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,6 +152,8 @@ MonoBehaviour:
   _attack:
     attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
     hitEffectName: 
     attackRange:
       center: {x: 0, y: 0, z: 0}
@@ -204,7 +206,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8427668693288949309}
   - component: {fileID: 2461103956093653974}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 9047471340973909925}
   - component: {fileID: 4374804656642252848}
   - component: {fileID: 1581080097962567980}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: ShieldMiniBear
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -206,7 +206,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8456653089166323811}
   - component: {fileID: 6734192854471885136}
-  m_Layer: 6
+  m_Layer: 7
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}

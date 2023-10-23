@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72baa7c15bd87584ba23783a00ba15a3, type: 3}
+  m_Name: Spear
+  m_EditorClassIdentifier: 
+  <WeaponName>k__BackingField: 3
+  <IsFrontWeapon>k__BackingField: 1
+  <ThumbnailSprite>k__BackingField: {fileID: 1953286635, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
+  <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: e0164a0d55e840d4babd5ccd5dfea5a0, type: 3}
+  <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: d66d6ce1277566e4f85053bd04f5996a, type: 2}
+  <AttackList>k__BackingField:
+  - attackEffectName: 
+    attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
+    hitEffectName: Effect
+    attackRange:
+      center: {x: 0.95, y: 0.56, z: 0}
+      size: {x: 1.96, y: 1.05, z: 0}
+    AttackDirection: {x: 0, y: 0, z: 0}
+    attacKShape: 0
+    damage: 1
+    power: 2
+    stagger: 0.2
+    penetrationPower: 0

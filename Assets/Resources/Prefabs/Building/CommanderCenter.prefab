@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 853718508074277364}
   - component: {fileID: 4926770750868898201}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 7715304793495419924}
   - component: {fileID: 4871240490897745323}
   - component: {fileID: 8583667906555671318}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: CommanderCenter
   m_TagString: Building
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2278982114719024324, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2324762365791422773, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_LocalPosition.x
@@ -287,11 +287,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8879063647248961153, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8961153112807148571, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -317,15 +317,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4046915860122169707, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4547197175537827090, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 6520141742134201297, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 9106532135111234725, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_LocalPosition.x

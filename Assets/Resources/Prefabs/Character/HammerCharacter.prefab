@@ -246,56 +246,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51e5c7e18c4e6704b839c2201c27e8fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _character: {fileID: 0}
   _attackType: 3
-  _attacks:
-  - attackEffectName: 
+  _defaultAttack:
+    attackEffectName: 
     attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
     hitEffectName: 
     attackRange:
-      center: {x: 0.81, y: 0.57, z: 0}
-      size: {x: 1.75, y: 1.16, z: 0}
-    AttackDirection: {x: 0.67, y: -0.21, z: 0}
+      center: {x: 0, y: 0, z: 0}
+      size: {x: 0, y: 0, z: 0}
+    AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
-    damage: 1
-    power: 5
-    stagger: 1
+    damage: 0
+    power: 0
+    stagger: 0
     penetrationPower: 0
-  - attackEffectName: 
-    attackEffectPoint: {x: 0, y: 0, z: 0}
-    hitEffectName: Effect
-    attackRange:
-      center: {x: 0.95, y: 0.51, z: 0}
-      size: {x: 2.39, y: 1.17, z: 0}
-    AttackDirection: {x: 1, y: 1.52, z: 0}
-    attacKShape: 0
-    damage: 1
-    power: 10
-    stagger: 1
-    penetrationPower: 1
-  - attackEffectName: 
-    attackEffectPoint: {x: 0, y: 0, z: 0}
-    hitEffectName: Effect
-    attackRange:
-      center: {x: 0.95, y: 0.51, z: 0}
-      size: {x: 2.39, y: 1.17, z: 0}
-    AttackDirection: {x: 1, y: -0.71, z: 0}
-    attacKShape: 0
-    damage: 1
-    power: 10
-    stagger: 1
-    penetrationPower: 1
-  - attackEffectName: 
-    attackEffectPoint: {x: 0, y: 0, z: 0}
-    hitEffectName: Effect
-    attackRange:
-      center: {x: 0.46, y: 0.31, z: 0}
-      size: {x: 1.42, y: 2.39, z: 0}
-    AttackDirection: {x: 0.21, y: -0.71, z: 0}
-    attacKShape: 0
-    damage: 1
-    power: 4
-    stagger: 1
-    penetrationPower: 1
+  _frontWeapon: {fileID: 0}
+  _frontfirePoint: {fileID: 0}
+  _behindWeapon: {fileID: 0}
+  _behindfirePoint: {fileID: 0}
   _enableAttackLayer: Character
 --- !u!1 &4150402401142959157
 GameObject:

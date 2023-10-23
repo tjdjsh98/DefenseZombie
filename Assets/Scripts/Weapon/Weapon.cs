@@ -28,7 +28,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    [SerializeField] protected string _enableAttackLayer = "Character";
+    [SerializeField] protected string _enableAttackLayer = "Enemy";
     
     public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
     protected virtual void Awake()
@@ -61,7 +61,7 @@ public class Weapon : MonoBehaviour
 
         Range attackRange = _attack.attackRange;
 
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.lossyScale);
+        Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
         Gizmos.matrix = rotationMatrix;
 
         if (_character != null)
@@ -69,20 +69,20 @@ public class Weapon : MonoBehaviour
 
         Vector3 point = _attack.attackEffectPoint;
 
-        Gizmos.DrawWireSphere(transform.position + point, 0.1f);
+        Gizmos.DrawWireSphere( point, 0.1f);
 
         if(_attack.projectile)
         {
-            Gizmos.DrawWireSphere(transform.position + _attack.firePos, 0.1f);
+            Gizmos.DrawWireSphere( _attack.firePos, 0.1f);
         }
 
         switch (_attack.attacKShape)
         {
             case Define.AttacKShape.Rectagle:
-                Gizmos.DrawWireCube(transform.position + attackRange.center, attackRange.size);
+                Gizmos.DrawWireCube( attackRange.center, attackRange.size);
                 break;
             case Define.AttacKShape.Circle:
-                Gizmos.DrawWireSphere(transform.position + attackRange.center, attackRange.size.x);
+                Gizmos.DrawWireSphere(_frontWeapon.transform.position + attackRange.center, attackRange.size.x);
                 break;
             case Define.AttacKShape.Raycast:
                 Gizmos.DrawRay(transform.position + attackRange.center, (_character == null ? Vector3.right : _character.transform.localPosition.x> 0 ? Vector3.right : Vector3.left) * attackRange.size.x );
@@ -130,16 +130,19 @@ public class Weapon : MonoBehaviour
 
             int layerMask = LayerMask.GetMask(_enableAttackLayer);
             RaycastHit2D[] hits;
+            Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
+            Vector3 pos = rotationMatrix.MultiplyVector(attackRange.center);
             switch (_attack.attacKShape)
             {
                 case Define.AttacKShape.Rectagle:
-                    hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, _frontWeapon.transform.rotation.z, Vector2.zero, 0, layerMask);
+                   
+                    hits = Physics2D.BoxCastAll(_frontWeapon.transform.position + pos, attackRange.size, _frontWeapon.transform.eulerAngles.z, Vector2.zero, 0, layerMask);
                     break;
                 case Define.AttacKShape.Raycast:
-                    hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
+                    hits = Physics2D.RaycastAll(_frontWeapon.transform.position + pos, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
                     break;
                 default:
-                    hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, _frontWeapon.transform.rotation.z, Vector2.zero, 0, layerMask);
+                    hits = Physics2D.BoxCastAll(_frontWeapon.transform.position + pos, attackRange.size, _frontWeapon.transform.eulerAngles.z, Vector2.zero, 0, layerMask);
                     break;
             }
 

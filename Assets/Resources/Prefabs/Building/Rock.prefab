@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6639680997814534073}
   - component: {fileID: 5434375680672253228}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 5142839364257611217}
   - component: {fileID: 2613875719234603105}
   - component: {fileID: 2041937164175940518}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Rock
   m_TagString: Building
   m_Icon: {fileID: 0}
@@ -230,15 +230,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4046915860122169707, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4547197175537827090, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 6520141742134201297, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 9106532135111234725, guid: b2dc8efb19a425741ba3588356d195e9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -300,7 +300,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2278982114719024324, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2324762365791422773, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_LocalPosition.x
@@ -348,11 +348,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8879063647248961153, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8961153112807148571, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
-      value: 9
+      value: 8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
