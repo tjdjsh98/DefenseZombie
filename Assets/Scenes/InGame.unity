@@ -368,9 +368,9 @@ MonoBehaviour:
   _levels:
   - levelName: 
     genInterval: 1
-    enemyName: 8
+    enemyName: 11
     count: 1
-    nextInterval: 10000
+    nextInterval: 1
   - levelName: 
     genInterval: 1
     enemyName: 3

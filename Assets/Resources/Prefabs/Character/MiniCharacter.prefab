@@ -317,15 +317,15 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 7
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 1953286635, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 4, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &3474450866307887070
@@ -340,14 +340,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c29cff538c195c249b69c6f2236de67b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Library:
-  - m_Name: Idle
-    m_Hash: 0
-    m_CategoryList:
-    - m_Name: Idle
-      m_Hash: 0
-      m_Sprite: {fileID: 0}
-  m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
+  m_Library: []
+  m_SpriteLibraryAsset: {fileID: 0}
 --- !u!114 &6250625973339575094
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1064,6 +1058,8 @@ MonoBehaviour:
   _characterSize:
     center: {x: -0.18, y: 0.51, z: 0}
     size: {x: 1.03, y: 1.28, z: 0}
+  _isEnableFly: 0
+  _currentYSpeed: 0
   _maxHp: 11
   _isSuperArmerWhenAttack: 0
   _standing: 0

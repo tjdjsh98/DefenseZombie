@@ -4,6 +4,15 @@ using UnityEngine;
 
 public static class Define
 {
+    public static int PlayerLayerMask = LayerMask.GetMask("Player");
+    public static int EnemyLayerMask = LayerMask.GetMask("Enemy");
+    public static int CharacterLayerMask = PlayerLayerMask | EnemyLayerMask;
+    public static int BuildingLayerMask = LayerMask.GetMask("BothPassableBuilding") |
+        LayerMask.GetMask("OnlyPlayerPassableBuilding") |
+        LayerMask.GetMask("OnlyEnemyPassableBuilding") |
+        LayerMask.GetMask("BothUnpassableBuilding");
+
+    public static int GroundLayer = LayerMask.GetMask("Ground");
     public enum AttacKShape
     {
         Rectagle,
@@ -32,7 +41,8 @@ public static class Define
         Zombie,
         ShieldMiniBear,
         Horriy,
-        MiniCharacter
+        MiniCharacter,
+        Bee
     }
 
     public enum WeaponName

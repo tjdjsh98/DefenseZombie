@@ -81,7 +81,7 @@ public class EnemyCharacter : Character
         {
 
             RaycastHit2D[] hits;
-            Util.GetHItsByPhysics(transform, _attack, LayerMask.GetMask("Character"), out hits);
+            Util.GetHItsByPhysics(transform, _attack, Define.PlayerLayerMask | Define.BuildingLayerMask, out hits);
 
             foreach(var hit in hits)
             {

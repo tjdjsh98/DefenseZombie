@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
-    EnemyCharacter _character;
-    AnimatorHandler _animatorHandler;
+    protected EnemyCharacter _character;
+    protected AnimatorHandler _animatorHandler;
 
-    [SerializeField]Range _searchRange;
-    [SerializeField]Range _attackRange;
-    private float _movePacketDelay = 0.25f;
+    [SerializeField] protected Range _searchRange;
+    [SerializeField] protected Range _attackRange;
+    protected float _movePacketDelay = 0.25f;
 
-    Range AttackRange
+    protected Range AttackRange
     {
         get
         {
@@ -20,7 +20,7 @@ public class EnemyAI : MonoBehaviour
             return temp;
         }
     }
-    Range SearchRange
+    protected Range SearchRange
     {
         get
         {
@@ -56,7 +56,7 @@ public class EnemyAI : MonoBehaviour
         AI();
     }
 
-    void AI()
+    protected virtual void AI()
     {
         if (!Client.Instance.IsMain && Client.Instance.ClientId != -1) return;
         if (_character.Target != null && !_character.Target.gameObject.activeSelf) _character.Target = null;
@@ -70,8 +70,8 @@ public class EnemyAI : MonoBehaviour
             }
             else
             {
-                PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, LayerMask.GetMask("Character"));
-                Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, LayerMask.GetMask("Character"));
+                PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, Define.PlayerLayerMask);
+                Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
               
                 if (character != null || building != null)
@@ -96,9 +96,9 @@ public class EnemyAI : MonoBehaviour
     }
 
 
-    void Search()
+    protected void Search()
     {
-        int layerMask = LayerMask.GetMask("Character");
+        int layerMask = LayerMask.GetMask("Player");
         RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + SearchRange.center, SearchRange.size, 0, Vector2.zero,0,layerMask);
         if (hits.Length <= 0) return;
 
@@ -117,7 +117,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    IEnumerator CorSendMovePacket()
+    protected IEnumerator CorSendMovePacket()
     {
         while (true)
         {

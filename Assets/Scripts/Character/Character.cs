@@ -15,6 +15,9 @@ public class Character : MonoBehaviour,IHp
 
     [SerializeField] protected Range _characterSize;
 
+    [SerializeField] bool _isEnableFly;
+    [SerializeField] float _currentYSpeed;
+
     public CharacterState CharacterState { set; get; }
     protected Vector2 _characterMoveDirection;
     public Vector2 CharacterMoveDirection => _characterMoveDirection;
@@ -23,7 +26,7 @@ public class Character : MonoBehaviour,IHp
     // 캐릭터 상태
     [SerializeField] protected int _maxHp;
     public int MaxHp => _maxHp;
-    int _hp;
+    protected int _hp;
     public int Hp { get { return _hp; } set { _hp = value; } }
     public bool _isSuperArmerWhenAttack;
 
@@ -143,6 +146,22 @@ public class Character : MonoBehaviour,IHp
                 if (_currentSpeed < 0)
                     _currentSpeed = 0;
             }
+
+            if (_isEnableFly)
+            {
+                if (_currentYSpeed < 0)
+                {
+                    _currentYSpeed += BreakSpeed * Time.deltaTime;
+                    if (_currentYSpeed > 0)
+                        _currentYSpeed = 0;
+                }
+                if (_currentYSpeed > 0)
+                {
+                    _currentYSpeed -= BreakSpeed * Time.deltaTime;
+                    if (_currentYSpeed < 0)
+                        _currentYSpeed = 0;
+                }
+            }
             return;
         }
 
@@ -191,13 +210,67 @@ public class Character : MonoBehaviour,IHp
             if (_currentSpeed < -_speed)
                 _currentSpeed = -_speed;
         }
-        if (_jumpCount == 0 && IsJumping)
+
+
+        if (_isEnableFly)
+        {
+            if (_characterMoveDirection.y == 0)
+            {
+                if (_currentYSpeed < 0)
+                {
+                    _currentYSpeed += BreakSpeed * Time.deltaTime;
+                    if (_currentYSpeed > 0)
+                        _currentYSpeed = 0;
+                }
+                if (_currentYSpeed > 0)
+                {
+                    _currentYSpeed -= BreakSpeed * Time.deltaTime;
+                    if (_currentYSpeed < 0)
+                        _currentYSpeed = 0;
+                }
+            }
+            else if (_characterMoveDirection.y > 0)
+            {
+                if (_currentYSpeed < 0)
+                {
+                    _currentYSpeed += BreakSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    _currentYSpeed += _accelSpeed * Time.deltaTime;
+                }
+
+                if (_currentYSpeed > _speed)
+                    _currentYSpeed = _speed;
+            }
+            else if (_characterMoveDirection.y < 0)
+            {
+                if (_currentYSpeed > 0)
+                {
+                    _currentYSpeed -= BreakSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    _currentYSpeed -= _accelSpeed * Time.deltaTime;
+                }
+
+                if (_currentYSpeed < -_speed)
+                    _currentYSpeed = -_speed;
+            }
+        }
+        
+
+        if (!_isEnableFly&&_jumpCount == 0 && IsJumping)
         {
             _rigidBody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
             IsJumping = false;
             _jumpCount++;
         }
-        _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
+
+        if(!_isEnableFly)
+            _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
+        else
+            _rigidBody.velocity = new Vector2(_currentSpeed, _currentYSpeed);
     }
 
     protected void CheckGround()
@@ -225,6 +298,7 @@ public class Character : MonoBehaviour,IHp
     {
         _characterMoveDirection = moveDirection;
     }
+
     public void AddForce(Vector2 direction, float power, int constraints = -1)
     {
         if(constraints != -1)
@@ -242,7 +316,7 @@ public class Character : MonoBehaviour,IHp
     }
     public void StopMove()
     {
-        _rigidBody.velocity = new Vector2(0, _rigidBody.velocity.y);
+        _rigidBody.velocity = new Vector2(0, _isEnableFly?0:_rigidBody.velocity.y);
     }
     protected virtual void Turn(float direction)
     {
