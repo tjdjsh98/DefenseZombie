@@ -12,6 +12,7 @@ public class Building : MonoBehaviour, IHp
 
     CircleSlider _circleSlider;
 
+    [field: SerializeField] public bool _isTile;
     [field: SerializeField] public Define.BuildingName BuildingName { private set; get; }
     public int BuildingId { set; get; }
     [field: SerializeField] public int MaxHp { set; get; } 
@@ -80,13 +81,15 @@ public class Building : MonoBehaviour, IHp
                 s.color = Color.white;
             gameObject.tag = "Building";
             _boxCollider.enabled = true;
-            _circleSlider.Hide();
+            if(_circleSlider!= null)
+                _circleSlider.Hide();
             _done = true;
         }
         else
         {
             _time += Time.deltaTime;
-            _circleSlider.SetRatio(_time / _buildingTime);
+            if (_circleSlider != null)
+                _circleSlider.SetRatio(_time / _buildingTime);
         }
 
     }

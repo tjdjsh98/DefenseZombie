@@ -27,7 +27,10 @@ public static class Define
         Rock,
         Cannon,
         StepBox,
-        Core
+        Core,
+        GrassTile,
+        GroundTile,
+        Tower,
     }
     public enum CharacterName
     {
@@ -60,7 +63,8 @@ public static class Define
         Iron,
         Gun,
         Sword,
-        Spear
+        Spear,
+        BeeHive
     }
     public enum ItemType
     {

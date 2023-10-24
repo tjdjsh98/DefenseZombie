@@ -23,12 +23,32 @@ public class BuildingManager : MonoBehaviour
 
     public Action<int, Building> ReciveGenPacket;
 
+    GameObject _tileFolder;
+
     public void Init()
     {
         _blankBox = Resources.Load<GameObject>("BlankBox");
+        _tileFolder = GameObject.Find("TileFolder");
+        if (_tileFolder.gameObject == null)
+        {
+            _tileFolder = new GameObject("TileFolder");
+            _tileFolder.AddComponent<CompositeCollider2D>();
+        }
+
+        for(int x = -30;  x <= 30; x++)
+        {
+            GenerateBuilding(BuildingName.GrassTile,new Vector2Int(x,-2));
+            for(int y = -3; y >= -10; y--)
+            {
+                GenerateBuilding(BuildingName.GroundTile, new Vector2Int(x, y));
+            }
+        }
+
 
         GenerateBuilding(BuildingName.CommandCenter, new Vector2Int(0, -3));
         
+
+
     }
 
     private void Update()
@@ -108,6 +128,10 @@ public class BuildingManager : MonoBehaviour
         }
 
         Building building = Instantiate(buildingOrigin);
+        if(building._isTile)
+        {
+            building.transform.parent = _tileFolder.transform;
+        }
         building.BuildingId = ++_buildingId;
         Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
         buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;

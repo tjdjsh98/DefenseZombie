@@ -289,7 +289,8 @@ public class MiniPlayerCharacter : PlayerCharacter
         else
         {
             Building building = GetOverrapGameObject<Building>();
-            if (building != null)
+
+            if (!building._isTile&&building != null)
             {
                 if (building.BuildingSize.width == 1)
                 {
