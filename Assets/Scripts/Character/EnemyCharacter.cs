@@ -85,7 +85,7 @@ public class EnemyCharacter : Character
 
             foreach(var hit in hits)
             {
-                PlayerCharacter character = hit.collider.gameObject.GetComponent<PlayerCharacter>();
+                Character character = hit.collider.gameObject.GetComponent<Character>();
                 Building building = hit.collider.gameObject.GetComponent<Building>();
                 if (character != null)
                 {

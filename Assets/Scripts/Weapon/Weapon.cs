@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    [SerializeField]protected MiniPlayerCharacter _character;
+    [SerializeField]protected CustomCharacter _character;
     protected PlayerController _playerController;
     protected HelperAI _helperAi;
     protected AnimatorHandler _animatorHandler;
@@ -33,7 +33,7 @@ public class Weapon : MonoBehaviour
     public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
     protected virtual void Awake()
     {
-        _character = GetComponent<MiniPlayerCharacter>();
+        _character = GetComponent<CustomCharacter>();
         _playerController = GetComponent<PlayerController>();
         _helperAi = GetComponent<HelperAI>();
         _animatorHandler = GetComponent<AnimatorHandler>();

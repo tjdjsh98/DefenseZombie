@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpannerPlayerCharacter : PlayerCharacter
+public class SpannerPlayerCharacter : Character
 {
     AnimatorHandler _animatorHandler;
     protected override void Awake()

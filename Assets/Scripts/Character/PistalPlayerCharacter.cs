@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class PistalPlayerCharacter : PlayerCharacter
+public class PistalPlayerCharacter : Character
 {
     [SerializeField] float _walkSpeed;
     [SerializeField] float _backWalkSpeed;

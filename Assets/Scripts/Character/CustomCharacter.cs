@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using static Define;
 
-public class MiniPlayerCharacter : PlayerCharacter
+public class CustomCharacter : Character
 {
     AnimatorHandler _animatorHandler;
     SpriteChanager _chanager;

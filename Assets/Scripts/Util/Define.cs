@@ -44,8 +44,9 @@ public static class Define
         Zombie,
         ShieldMiniBear,
         Horriy,
-        MiniCharacter,
-        Bee
+        CustomCharacter,
+        Bee,
+        CustomEnemy
     }
 
     public enum WeaponName

@@ -26,7 +26,7 @@ public class ParabolaProjectile : MonoBehaviour
     {
         if (collision?.gameObject.tag == "Player")
         {
-            PlayerCharacter playerCharacter = collision.gameObject.GetComponent<PlayerCharacter>();
+            Character playerCharacter = collision.gameObject.GetComponent<Character>();
             playerCharacter?.Damage(1, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
 
             if (playerCharacter != null) Destroy(gameObject);

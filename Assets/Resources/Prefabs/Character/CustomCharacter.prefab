@@ -936,7 +936,7 @@ GameObject:
   - component: {fileID: 5823153669523172687}
   - component: {fileID: 8767798638352431458}
   m_Layer: 6
-  m_Name: MiniCharacter
+  m_Name: CustomCharacter
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

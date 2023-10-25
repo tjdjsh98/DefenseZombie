@@ -70,7 +70,7 @@ public class EnemyAI : MonoBehaviour
             }
             else
             {
-                PlayerCharacter character = Util.GetGameObjectByPhysics<PlayerCharacter>(transform.position, AttackRange, Define.PlayerLayerMask);
+                Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
                 Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
               

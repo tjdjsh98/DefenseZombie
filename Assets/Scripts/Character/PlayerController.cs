@@ -7,7 +7,7 @@ using static Define;
 
 public class PlayerController : MonoBehaviour
 {
-    MiniPlayerCharacter _character;
+    CustomCharacter _character;
     House _inHouse;
 
     Client _client;
@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
             return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
     private void Awake()
     {
-        _character = GetComponent<MiniPlayerCharacter>();
+        _character = GetComponent<CustomCharacter>();
         AttackKeyDownHandler += OnAttackKeyDown;
         if (Client.Instance.ClientId != -1)
         {
@@ -131,7 +131,7 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
-            MiniPlayerCharacter player = _character as MiniPlayerCharacter;
+            CustomCharacter player = _character as CustomCharacter;
             if (player == null) return;
 
             if(!player.GetIsLiftSomething())
