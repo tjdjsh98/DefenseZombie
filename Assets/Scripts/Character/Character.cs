@@ -53,6 +53,10 @@ public class Character : MonoBehaviour,IHp
     protected float _ySpeed;
     public float YSpeed=>_ySpeed;
     
+
+    // 행동 제약
+    public bool IsEnableMove { get; set; } = true;
+
     // 행동 상태
     public bool IsAttacking { set; get; }
     public bool IsJumping { set; get; }
@@ -86,6 +90,10 @@ public class Character : MonoBehaviour,IHp
         _animator = GetComponent<Animator>();
 
         Hp = _maxHp;
+
+        ICharacterOption[] options = GetComponents<ICharacterOption>();
+        foreach(var option in options)
+            option.Init();
     }
 
 
@@ -130,7 +138,7 @@ public class Character : MonoBehaviour,IHp
 
     protected virtual void MoveCharacter()
     {
-        if (IsHide) return;
+        if (IsHide || !IsEnableMove) return;
         _currentSpeed = _rigidBody.velocity.x;
         if (CharacterState != CharacterState.Idle)
         {
@@ -317,8 +325,10 @@ public class Character : MonoBehaviour,IHp
     public void StopMove()
     {
         _rigidBody.velocity = new Vector2(0, _isEnableFly?0:_rigidBody.velocity.y);
+        _currentSpeed = 0;
+        _currentYSpeed = 0;
     }
-    protected virtual void Turn(float direction)
+    public virtual void Turn(float direction)
     {
         if (direction == 0) return;
         if (TurnedHandler != null)
@@ -352,7 +362,7 @@ public class Character : MonoBehaviour,IHp
             Dead();
     }
 
-    protected void Dead()
+    protected virtual void Dead()
     {
         if (Client.Instance.IsMain)
         {
@@ -474,7 +484,19 @@ public class Character : MonoBehaviour,IHp
             _currentPacket = packet;
         }
     }
+
+    public void FreezeRigidbody()
+    {
+        _rigidBody.isKinematic = true;
+    }
+
+    public void ReleaseRigidbody()
+    {
+        _rigidBody.isKinematic = false;
+    }
+
 }
+
 public enum CharacterState
 {
     Idle,

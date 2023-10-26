@@ -5,12 +5,12 @@ using UnityEngine;
 using UnityEngine.U2D.Animation;
 using static Define;
 
-public class SpriteChanager : MonoBehaviour
+public class SpriteChanager : MonoBehaviour, ICharacterOption
 {
     [SerializeField] CharacterSetUpParts _defaultSetUpParts;
     Dictionary<CharacterParts, SpriteLibrary> _spriteLibararyDictionary = new Dictionary<CharacterParts, SpriteLibrary>();
 
-    private void Awake()
+    public void Init()
     {
         Transform[] transformList = GetComponentsInChildren<Transform>();
         foreach (Transform t in transformList)

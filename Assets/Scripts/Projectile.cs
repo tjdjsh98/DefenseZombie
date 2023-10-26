@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static Define;
 
 public class Projectile : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class Projectile : MonoBehaviour
 
     [SerializeField] bool _autoDestroy;
     [SerializeField] float _destroyTime;
+
+    string _tag;
 
     void Awake()
     {
@@ -24,9 +27,9 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Enemy")
+        if (collision.gameObject.tag == _tag)
         {
-            EnemyCharacter enemy = collision.gameObject.GetComponent<EnemyCharacter>();
+            Character enemy = collision.gameObject.GetComponent<Character>();
             enemy?.Damage(1, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
 
             if (enemy != null) Destroy(gameObject);
@@ -46,10 +49,10 @@ public class Projectile : MonoBehaviour
     {
         _rigidbody.AddForce(direction.normalized * power,ForceMode2D.Impulse);
     }
-    public void Fire(float direction, Vector3 rotation)
+    public void Fire(float direction, Vector3 rotation, CharacterTag attackTag)
     {
         _isFire= true;
-
+        _tag = attackTag.ToString();
         rotation.z -= direction< 0 ? 180 : 0;
 
         transform.rotation = Quaternion.Euler(rotation);

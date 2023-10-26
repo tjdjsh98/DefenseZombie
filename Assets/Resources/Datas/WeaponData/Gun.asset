@@ -19,15 +19,15 @@ MonoBehaviour:
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
   <AttackList>k__BackingField:
   - attackEffectName: 
-    attackEffectPoint: {x: 0, y: 0, z: 0}
+    attackEffectPoint: {x: 1.39, y: 2.25, z: 0}
     projectile: {fileID: -1882469459523969698, guid: 134218f7f0413934f81594b5d2a0a968, type: 3}
-    firePos: {x: 0.21, y: 0.51, z: 0}
+    firePos: {x: 0.13, y: 0.5, z: 0}
     hitEffectName: 
     attackRange:
       center: {x: 0, y: 0, z: 0}
-      size: {x: 0, y: 0, z: 0}
+      size: {x: 8, y: 8, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
-    attacKShape: 2
+    attacKShape: 0
     damage: 1
     power: 1
     stagger: 0.1

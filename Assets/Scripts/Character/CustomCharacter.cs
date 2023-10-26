@@ -13,26 +13,25 @@ public class CustomCharacter : Character
     [SerializeField] GameObject _frontHandPos;
     [SerializeField] GameObject _frontHand;
 
-    [SerializeField] WeaponName _equipWeaponName;
-    [SerializeField] bool _equipButton;
+    Building _takenBuilding;
+    Item _takenItem;
+    public Item TakenItem => _takenItem;
 
-    Building _liftBuilding;
-    Item _liftItem;
-    public Item LiftItem => _liftItem;
-
-    [SerializeField] WeaponData _weaponData;
+    [SerializeField]WeaponData _defaultWeapon;
+    public WeaponData DefaultWeapon => _defaultWeapon;
+    WeaponData _weaponData;
     public WeaponData WeaponData => _weaponData;
 
     public int attackType = 0;
 
-    public bool IsLift => _liftBuilding != null || (_liftItem != null && !IsEquip);
+    public bool IsLift => _takenBuilding != null || (_takenItem != null && !IsEquip);
     public bool IsEquip => _weaponData != null;
-    public Attack Attack
+    public AttackData Attack
     {
         get
         {
             if (_weaponData == null || _weaponData.AttackList.Count <= attackType)
-                return new Attack();
+                return new AttackData();
 
             return _weaponData.AttackList[attackType];
         }
@@ -51,17 +50,29 @@ public class CustomCharacter : Character
 
         _animatorHandler.DodgeEndHandler += () => { CharacterState = CharacterState.Idle; };
 
-        TakeOffWeapon();
+
+        if (_defaultWeapon != null)
+        {
+            string weaponName = _defaultWeapon.WeaponName.ToString();
+            ItemName itemName = ItemName.None;
+            Enum.TryParse(weaponName, true, out itemName);
+
+            if (itemName != ItemName.None)
+            {
+                Item item = Manager.Item.GenerateItem(itemName, transform.position);
+                GrapItem(item);
+            }
+        }
+       
     }
 
     protected override void Update()
     {
         base.Update();
-        RotateWeapon();
     }
     protected override void MoveCharacter()
     {
-        if (IsHide) return;
+        if (IsHide || !IsEnableMove) return;
         _currentSpeed = _rigidBody.velocity.x;
         if (CharacterState != CharacterState.Idle)
         {
@@ -134,30 +145,17 @@ public class CustomCharacter : Character
         _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
     }
 
-    void RotateWeapon()
-    {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = 0;
-
-        Turn(mousePos.x - transform.position.x);
-
-        if (IsEquip ) 
-        {
-            float rotation = Mathf.Atan2((mousePos.y - _frontHandPos.transform.position.y) , Mathf.Abs(mousePos.x - _frontHandPos.transform.position.x));
-            rotation = rotation / Mathf.PI * 180f;
-
-            _frontHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0,0,rotation));
-        }
-    }
 
     public bool EquipWeapon(WeaponName name)
     {
         
         WeaponData data = Manager.Data.GetWeaponData(name);
-        _weaponData = data;
+
         if (data == null) return false;
 
-        if(data.IsFrontWeapon)
+        _weaponData = data;
+
+        if (data.IsFrontWeapon)
             _chanager.ChangeSprite(CharacterParts.FrontWeapon, data.WeaponSpriteLibrary);
         else
             _chanager.ChangeSprite(CharacterParts.BehindWeapon, data.WeaponSpriteLibrary);
@@ -179,10 +177,13 @@ public class CustomCharacter : Character
     {
         WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
 
-        if(_weaponData.IsFrontWeapon)
-            _chanager.ChangeDefaultSprite(CharacterParts.FrontWeapon);
-        else
-            _chanager.ChangeDefaultSprite(CharacterParts.BehindWeapon);
+        if (_weaponData != null)
+        {
+            if (_weaponData.IsFrontWeapon)
+                _chanager.ChangeDefaultSprite(CharacterParts.FrontWeapon);
+            else
+                _chanager.ChangeDefaultSprite(CharacterParts.BehindWeapon);
+        }
         RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
 
         AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
@@ -254,37 +255,15 @@ public class CustomCharacter : Character
         return IsEquip || IsLift;
     }
 
-    public GameObject LiftSomething()
+    public GameObject GrapSomething()
     {
-        if (_liftItem || _liftBuilding) return null;
+        if (_takenItem || _takenBuilding) return null;
 
         Item item = GetOverrapGameObject<Item>();
         if (item != null)
         {
-            if (item.ItemData.ItemType == ItemType.Etc)
-            {
-                _liftItem = item;
-                _liftItem.FreezeRigidBody();
-                _liftItem.transform.parent = _liftPos.transform;
-                _liftItem.transform.localPosition = Vector3.zero;
-
-            }
-            else if(item.ItemData.ItemType == ItemType.Equipment)
-            {
-                string ItemName = item.ItemData.ItemName.ToString();
-
-                WeaponName weaponName = WeaponName.None;
-                Enum.TryParse(ItemName,true, out weaponName);
-
-                if (EquipWeapon(weaponName))
-                {
-                    item.Hide();
-                    _liftItem = item;
-                }
-
-                SetAnimatorBool("IsEquip", true);
-                return item.gameObject;
-            }
+            GrapItem(item);
+            return item.gameObject;
         }
         else
         {
@@ -296,11 +275,11 @@ public class CustomCharacter : Character
                 {
                     Manager.Building.RemoveBuilding(building);
 
-                    _liftBuilding = building;
+                    _takenBuilding = building;
                     building.transform.parent = _liftPos.transform;
                     building.transform.localPosition = Vector3.zero;
 
-                    _preLiftBuildingBuildingScale = _liftBuilding.transform.localScale;
+                    _preLiftBuildingBuildingScale = _takenBuilding.transform.localScale;
                     _preLiftBuildingCharacterScale = transform.transform.localScale;
 
                 }
@@ -311,44 +290,73 @@ public class CustomCharacter : Character
         return null;
     }
 
+    void GrapItem(Item item)
+    {
+        if (_takenItem || _takenBuilding || IsEquip) return;
+
+        if (item.ItemData.ItemType == ItemType.Etc)
+        {
+            _takenItem = item;
+            _takenItem.FreezeRigidBody();
+            _takenItem.transform.parent = _liftPos.transform;
+            _takenItem.transform.localPosition = Vector3.zero;
+
+        }
+        else if (item.ItemData.ItemType == ItemType.Equipment)
+        {
+            string ItemName = item.ItemData.ItemName.ToString();
+
+            WeaponName weaponName = WeaponName.None;
+            Enum.TryParse(ItemName, true, out weaponName);
+
+            if (EquipWeapon(weaponName))
+            {
+                item.Hide();
+                _takenItem = item;
+            }
+
+            SetAnimatorBool("IsEquip", true);
+        }
+    }
+
     public void ReleaseItem()
     {
-        _liftItem.ReleaseRigidBody();
-        _liftItem.transform.parent = transform.parent;
-        _liftItem = null;
+        _takenItem.ReleaseRigidBody();
+        _takenItem.transform.parent = transform.parent;
+        _takenItem = null;
     }
     public void Putdown()
     {
-        if(_liftItem != null)
+        if(_takenItem != null)
         {
-            if (_liftItem.ItemData.ItemType == ItemType.Etc)
+            if (_takenItem.ItemData.ItemType == ItemType.Etc)
             {
-                _liftItem.ReleaseRigidBody();
-                _liftItem.transform.parent = transform.parent;
-                _liftItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
+                _takenItem.ReleaseRigidBody();
+                _takenItem.transform.parent = transform.parent;
+                _takenItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
             }
-            else if(_liftItem.ItemData.ItemType == ItemType.Equipment)
+            else if(_takenItem.ItemData.ItemType == ItemType.Equipment)
             {
                 if (TakeOffWeapon())
                 {
-                    _liftItem.ReleaseRigidBody();
-                    _liftItem.transform.parent = transform.parent;
-                    _liftItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
-                    _liftItem.Show();
+                    _takenItem.ReleaseRigidBody();
+                    _takenItem.transform.parent = transform.parent;
+                    _takenItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
+                    _takenItem.Show();
                 }
             }
 
-            _liftItem = null;
+            _takenItem = null;
         }
-        if(_liftBuilding != null) {
-            if (Manager.Building.SetBuilding(gameObject,transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), _liftBuilding))
+        if(_takenBuilding != null) {
+            if (Manager.Building.SetBuilding(gameObject,transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), _takenBuilding))
             {
-                _liftBuilding = null;
+                _takenBuilding = null;
             }
         }
     }
 
-    protected override void Turn(float direction)
+    public override void Turn(float direction)
     {
         if (direction == 0) return;
         if (TurnedHandler != null)
@@ -358,23 +366,50 @@ public class CustomCharacter : Character
         scale.x = direction > 0 ? 1 : -1;
         transform.localScale = scale;
 
-        if(_liftBuilding != null)
+        if(_takenBuilding != null)
         {
             if(_preLiftBuildingCharacterScale.x == transform.localScale.x)
             {
-                if(_liftBuilding.transform.localScale.x != _preLiftBuildingBuildingScale.x)
+                if(_takenBuilding.transform.localScale.x != _preLiftBuildingBuildingScale.x)
                 {
-                    _liftBuilding.transform.localScale = _preLiftBuildingBuildingScale;
+                    _takenBuilding.transform.localScale = _preLiftBuildingBuildingScale;
                 }
             }
             else
             {
-                if (_liftBuilding.transform.localScale.x == _preLiftBuildingBuildingScale.x)
+                if (_takenBuilding.transform.localScale.x == _preLiftBuildingBuildingScale.x)
                 {
                     Vector3 temp = _preLiftBuildingBuildingScale;
                     temp.x = -_preLiftBuildingBuildingScale.x;
-                    _liftBuilding.transform.localScale = temp;
+                    _takenBuilding.transform.localScale = temp;
                 }
+            }
+        }
+    }
+
+    public void RotationFrontHand(Vector3 targetPos)
+    {
+        float rotation = Mathf.Atan2((targetPos.y - _frontHandPos.transform.position.y), Mathf.Abs(targetPos.x - _frontHandPos.transform.position.x));
+        rotation = rotation / Mathf.PI * 180f;
+
+        _frontHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, rotation));
+    }
+
+    protected override void Dead()
+    {
+        if (Client.Instance.IsMain)
+        {
+            DeadHandler?.Invoke();
+            Putdown();
+            Manager.Character.RequestRemoveCharacter(CharacterId);
+        }
+        else
+        {
+            if (Client.Instance.ClientId == -1)
+            {
+                Putdown(); 
+                DeadHandler?.Invoke();
+                Manager.Character.RemoveCharacter(CharacterId);
             }
         }
     }

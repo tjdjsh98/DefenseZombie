@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimatorHandler : MonoBehaviour
+public class AnimatorHandler : MonoBehaviour, ICharacterOption
 {
     Character _character;
 
@@ -13,9 +13,9 @@ public class AnimatorHandler : MonoBehaviour
     public Action ConnectComboHandler;
     public Action DestroyHandler;
     public Action DodgeEndHandler;
-    
 
-    private void Awake()
+
+    public void Init()
     {
         _character = GetComponent<Character>();
     }

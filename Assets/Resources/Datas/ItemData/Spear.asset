@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc220a6ee54a4fd4da852c2bdf932562, type: 3}
   m_Name: Spear
   m_EditorClassIdentifier: 
-  <ItemName>k__BackingField: 5
+  <ItemName>k__BackingField: 6
   <ItemSprite>k__BackingField: {fileID: 1953286635, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
   <ItemType>k__BackingField: 1
   <Origin>k__BackingField: {fileID: 0}

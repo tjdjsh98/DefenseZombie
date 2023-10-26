@@ -63,7 +63,7 @@ public class Cannon : MonoBehaviour
         {
             Projectile projectile = Instantiate(_projectile);
             projectile.transform.position = _firePoint.transform.position;
-            projectile.Fire(transform.lossyScale.x, _cannonPos.transform.eulerAngles);
+            projectile.Fire(transform.lossyScale.x, _cannonPos.transform.eulerAngles,Define.CharacterTag.Enemy);
             _time = 0;
         }
     }

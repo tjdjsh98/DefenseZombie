@@ -10,7 +10,7 @@ public struct Range
 
 
 [System.Serializable]
-public struct Attack
+public struct AttackData
 {
     public string attackEffectName;
     public Vector3 attackEffectPoint;

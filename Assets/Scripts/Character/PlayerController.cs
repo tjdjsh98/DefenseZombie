@@ -8,7 +8,7 @@ using static Define;
 public class PlayerController : MonoBehaviour
 {
     CustomCharacter _character;
-    House _inHouse;
+    InteractableObject _interactingObject;
 
     Client _client;
     public Client Client {
@@ -44,7 +44,20 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         Control();
+        RotateWeapon();
     }
+
+    void RotateWeapon()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos.z = 0;
+
+        _character.Turn(mousePos.x - transform.position.x);
+
+        if (_character.IsEquip)
+            _character.RotationFrontHand(mousePos);
+    }
+
 
     void Control()
     {
@@ -72,21 +85,12 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (_inHouse == null)
-            {
-                House house = _character.GetOverrapGameObject<House>();
-                if (house != null)
-                {
-                    house.EnterCharacter(_character);
-                    Manager.Game.Commander.Open();
-                    _inHouse = house;
-                }
-            }
+            if (_interactingObject == null)
+                Interact();
             else
             {
-                Manager.Game.Commander.Close();
-                _inHouse.LeaveCharacter();
-                _inHouse = null;
+                if(_interactingObject.ExitInteract(_character))
+                    _interactingObject = null;
             }
         }
 
@@ -136,7 +140,7 @@ public class PlayerController : MonoBehaviour
 
             if(!player.GetIsLiftSomething())
             {
-                player.LiftSomething();
+                player.GrapSomething();
             }
             else
             {
@@ -164,6 +168,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void Interact()
+    {
+        InteractableObject obj = _character.GetOverrapGameObject<InteractableObject>();
+
+        if (obj.Interact(_character))
+        {
+            _interactingObject = obj;
+        }
+    }
     IEnumerator CorSendMovePacket()
     {
         while (true)
@@ -181,9 +194,9 @@ public class PlayerController : MonoBehaviour
     {
         if(_character.IsLift)
         {
-            if(_character.IsLift && _character.LiftItem)
+            if(_character.IsLift && _character.TakenItem)
             {
-                Item item = _character.LiftItem;
+                Item item = _character.TakenItem;
                 _character.ReleaseItem();
                 Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                 item.GetComponent<Projectile>().Throw(mousePos - _character.transform.position, 20);

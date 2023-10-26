@@ -64,7 +64,7 @@ public static class Util
         return result;
     }
 
-    public static void GetHItsByPhysics(Transform transform, Attack attack, int layerMask , out RaycastHit2D[] hits)
+    public static void GetHItsByPhysics(Transform transform, AttackData attack, int layerMask , out RaycastHit2D[] hits)
     {
         Range attackRange = attack.attackRange;
         

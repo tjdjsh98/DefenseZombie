@@ -59,6 +59,7 @@ public static class Define
 
     public enum ItemName
     {
+        None,
         Wood,
         Stone,
         Iron,
@@ -84,4 +85,17 @@ public static class Define
         FrontWeapon,
         BehindWeapon,
     }
+
+    public enum CharacterTag
+    {
+        Player,
+        Enemy
+    }
 }
+
+
+public interface ICharacterOption
+{
+    public void Init();
+}
+

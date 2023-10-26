@@ -1,23 +1,32 @@
 using System.Collections;
 using UnityEngine;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : MonoBehaviour, ICharacterOption
 {
-    protected EnemyCharacter _character;
+    protected Character _character;
     protected AnimatorHandler _animatorHandler;
+    [SerializeField] protected Weapon _weapon;
 
-    [SerializeField] protected Range _searchRange;
     [SerializeField] protected Range _attackRange;
+    [SerializeField] protected Range _searchRange;
     protected float _movePacketDelay = 0.25f;
+
+    protected Character _target;
 
     protected Range AttackRange
     {
         get
         {
-            Range temp = _attackRange;
-            temp.center.x = transform.localScale.x > 0 ? temp.center.x : -temp.center.x;
+            if (_weapon == null)
+                return _attackRange;
+            else
+            {
+                Range range = _weapon.WeaponAttackData.attackRange;
 
-            return temp;
+                range.center.x = transform.localScale.x > 0 ? range.center.x : -range.center.x;
+
+                return _weapon.WeaponAttackData.attackRange;
+            }
         }
     }
     protected Range SearchRange
@@ -31,10 +40,14 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
-    private void Awake()
+    [SerializeField] float _attackDelay;
+    float _attackTime;
+
+    public virtual void Init()
     {
-        _character = GetComponent<EnemyCharacter>();
+        _character = GetComponent<Character>();
         _animatorHandler = GetComponent<AnimatorHandler>();
+        _weapon = GetComponent<Weapon>();
         if (Client.Instance.ClientId != -1)
         {
             StartCoroutine(CorSendMovePacket());
@@ -46,9 +59,6 @@ public class EnemyAI : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(transform.position + SearchRange.center, SearchRange.size);
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireCube(transform.position + AttackRange.center, AttackRange.size);
     }
 
     private void Update()
@@ -59,34 +69,40 @@ public class EnemyAI : MonoBehaviour
     protected virtual void AI()
     {
         if (!Client.Instance.IsMain && Client.Instance.ClientId != -1) return;
-        if (_character.Target != null && !_character.Target.gameObject.activeSelf) _character.Target = null;
+
+        if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.IsAttacking) return;
 
         if (_character.CharacterState == CharacterState.Idle)
         {
-            if (_character.Target == null)
+            _attackTime += Time.deltaTime;
+            if (_target == null)
             {
                 Search();
             }
             else
             {
+
                 Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
                 Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
-              
                 if (character != null || building != null)
                 {
                     _character.StopMove();
                     _character.SetCharacterDirection(Vector2.zero);
-                    _character.IsAttacking = true;
-                    _character.CharacterState = CharacterState.Attack;
-                    Client.Instance.SendCharacterInfo(_character);
+
+                    if (_attackDelay < _attackTime)
+                    {
+                        _attackTime = 0;
+                        _character.IsAttacking = true;
+                        _character.CharacterState = CharacterState.Attack;
+                        Client.Instance.SendCharacterInfo(_character);
+                    }
+
+                    return;
                 }
-                else
-                {
-                    _character.IsAttacking = false;
-                    _character.SetCharacterDirection(_character.Target.transform.position - transform.position);
-                }
+                _character.SetCharacterDirection(_target.transform.position - transform.position);
+                _character.Turn((_target.transform.position - transform.position).x);
             }
         }
         else
@@ -99,10 +115,10 @@ public class EnemyAI : MonoBehaviour
     protected void Search()
     {
         int layerMask = LayerMask.GetMask("Player");
-        RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + SearchRange.center, SearchRange.size, 0, Vector2.zero,0,layerMask);
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + SearchRange.center, SearchRange.size, 0, Vector2.zero, 0, layerMask);
         if (hits.Length <= 0) return;
 
-        foreach(RaycastHit2D hit in hits)
+        foreach (RaycastHit2D hit in hits)
         {
             if (hit.collider.gameObject == _character.gameObject) continue;
             if (hit.collider.gameObject.tag == "Player")
@@ -110,7 +126,7 @@ public class EnemyAI : MonoBehaviour
                 Character character = hit.collider.gameObject.GetComponentInParent<Character>();
                 if (character != null)
                 {
-                    _character.Target = character;
+                    _target = character;
                     break;
                 }
             }

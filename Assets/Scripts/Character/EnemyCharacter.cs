@@ -3,7 +3,7 @@ using UnityEngine;
 public class EnemyCharacter : Character
 {
     AnimatorHandler _animatorHandler;
-    [SerializeField] Attack _attack;
+    [SerializeField] AttackData _attack;
     [SerializeField] Vector3 _injectPosition;
     Vector3 InjectPosition
     {

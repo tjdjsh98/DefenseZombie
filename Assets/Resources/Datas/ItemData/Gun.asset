@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc220a6ee54a4fd4da852c2bdf932562, type: 3}
   m_Name: Gun
   m_EditorClassIdentifier: 
-  <ItemName>k__BackingField: 3
+  <ItemName>k__BackingField: 4
   <ItemSprite>k__BackingField: {fileID: 21300000, guid: cbd85ea427e72684b8185f28f3a9646b, type: 3}
   <ItemType>k__BackingField: 1
+  <Origin>k__BackingField: {fileID: 0}

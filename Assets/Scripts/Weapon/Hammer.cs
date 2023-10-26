@@ -7,9 +7,9 @@ public class Hammer : Weapon
 {
     bool _connectCombo;
 
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
     }
     protected override void OnAttackKeyDown()
     {

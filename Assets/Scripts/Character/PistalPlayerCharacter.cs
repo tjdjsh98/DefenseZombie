@@ -81,7 +81,7 @@ public class PistalPlayerCharacter : Character
         _lowerSpriteRenderer.enabled = true;
     }
 
-    protected override void Turn(float direction)
+    public override void Turn(float direction)
     {
         if (!IsAttacking)
         {
