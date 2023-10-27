@@ -21,6 +21,9 @@ public class Manager : MonoBehaviour
     static ItemManager _item;
     public static ItemManager Item { get { Init(); return _item; } }
 
+    static UIManager _ui;
+    public static UIManager UI { get { Init(); return _ui; } }
+
     static GameManager _game;
     public static GameManager Game { get { Init(); return _game; } }
 
@@ -38,12 +41,14 @@ public class Manager : MonoBehaviour
         _character = GameObject.Find(_managerName).GetOrAddComponent<CharacterManager>();
         _building = GameObject.Find(_managerName).GetOrAddComponent<BuildingManager>();
         _item = GameObject.Find(_managerName).GetOrAddComponent<ItemManager>();
+        _ui = GameObject.Find(_managerName).GetOrAddComponent<UIManager>();
         _game = GameObject.Find(_managerName).GetOrAddComponent<GameManager>();
 
         _data.Init();
         _character.Init();
         _building.Init();
         _item.Init();
+        _ui.Init();
         _game.Init();
 
         Application.runInBackground = true;

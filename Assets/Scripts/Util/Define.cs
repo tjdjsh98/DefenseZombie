@@ -22,15 +22,15 @@ public static class Define
 
     public enum BuildingName
     { 
-        CommandCenter,
-        Barricade,
-        Rock,
-        Cannon,
-        StepBox,
-        Core,
-        GrassTile,
-        GroundTile,
-        Tower,
+        CommandCenter = 0,
+        Barricade = 1,
+        Rock = 2,
+        Cannon = 3,
+        StepBox = 4,
+        Core = 5,
+        GrassTile = 6,
+        GroundTile = 7,
+        Tower = 8,
     }
     public enum CharacterName
     {
@@ -90,6 +90,20 @@ public static class Define
     {
         Player,
         Enemy
+    }
+
+    public enum UIName
+    {
+        Level,
+        Commander,
+        Item,
+        Build
+    }
+    public enum EffectName
+    {
+        None,
+        Normal,
+        Dash,
     }
 }
 

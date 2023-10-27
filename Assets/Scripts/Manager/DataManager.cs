@@ -7,11 +7,11 @@ public class DataManager : MonoBehaviour
 {
     Dictionary<CharacterName, Character> _characterDictionary = new Dictionary<CharacterName, Character>();
     Dictionary<BuildingName, Building> _buildingDictionary = new Dictionary<BuildingName, Building>();
-    Dictionary<string, GameObject> _effectDictionary = new Dictionary<string, GameObject>();
     Dictionary<string, ParabolaProjectile> _projectileDictionary = new Dictionary<string, ParabolaProjectile>();
     Dictionary<WeaponName, WeaponData> _weaponDataDictionary = new Dictionary<WeaponName, WeaponData>();
     Dictionary<ItemName, ItemData> _itemDataDictionary = new Dictionary<ItemName, ItemData>();
     Dictionary<string, GameObject> _etcDictionary = new Dictionary<string, GameObject>();
+    Dictionary<EffectName, Effect> _effectDictionary = new Dictionary<EffectName, Effect>();
     public void Init()
     {
         LoadCharacter();
@@ -82,22 +82,21 @@ public class DataManager : MonoBehaviour
     }
     void LoadEffect()
     {
-        GameObject[] effects = Resources.LoadAll<GameObject>("Prefabs/Effect");
+        Effect[] effects = Resources.LoadAll<Effect>("Prefabs/Effect");
 
-        foreach (GameObject effect in effects)
+        foreach (Effect effect in effects)
         {
-            _effectDictionary.Add(effect.name, effect);
+            _effectDictionary.Add(effect.EffectName, effect);
         }
     }
 
-    public GameObject GetEffect(string name)
+    public GameObject GetEffect(EffectName name)
     {
-        GameObject effect = null;
-        if (string.IsNullOrEmpty(name)) return null;
+        Effect effect = null;
 
         if(_effectDictionary.TryGetValue(name, out effect))
         {
-            return effect;
+            return effect.gameObject;
         }
 
         return null;

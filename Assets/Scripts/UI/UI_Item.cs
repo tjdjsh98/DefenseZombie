@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class UI_Item : MonoBehaviour
+public class UI_Item : UIBase
 {
     [SerializeField]TextMeshProUGUI _textOrigin;
 
     List<TextMeshProUGUI> _texts = new List<TextMeshProUGUI>();
 
-    private void Awake()
+    public override void Init()
     {
         Manager.Game.InventoryChanagedHandler += OnInventoryChanged;
+
+        _isDone= true;
     }
 
     void OnInventoryChanged()

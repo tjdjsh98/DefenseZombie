@@ -12,11 +12,11 @@ public struct Range
 [System.Serializable]
 public struct AttackData
 {
-    public string attackEffectName;
+    public EffectName attackEffectName;
     public Vector3 attackEffectPoint;
     public Projectile projectile;
     public Vector3 firePos;
-    public string hitEffectName;
+    public EffectName hitEffectName;
     public Range attackRange;
     public Vector3 AttackDirection;
     public AttacKShape attacKShape;

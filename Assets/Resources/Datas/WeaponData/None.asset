@@ -14,7 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <WeaponName>k__BackingField: 0
   <IsFrontWeapon>k__BackingField: 1
-  <ThumbnailSprite>k__BackingField: {fileID: 21300000, guid: cbd85ea427e72684b8185f28f3a9646b, type: 3}
+  <ThumbnailSprite>k__BackingField: {fileID: 0}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
-  <AttackList>k__BackingField: []
+  <AttackList>k__BackingField:
+  - attackEffectName: 0
+    attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
+    hitEffectName: 1
+    attackRange:
+      center: {x: 0.18, y: 0.49, z: 0}
+      size: {x: 0.8, y: 1, z: 0}
+    AttackDirection: {x: 0, y: 0, z: 0}
+    attacKShape: 0
+    damage: 1
+    power: 0.5
+    stagger: 0
+    penetrationPower: 0

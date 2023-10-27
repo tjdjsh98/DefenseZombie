@@ -44,7 +44,7 @@ public class Spanner : Weapon
 
         if (_attackType == 0)
         {
-            GameObject attackEffect = Manager.Data.GetEffect(WeaponAttackData.attackEffectName);
+            GameObject attackEffect = Manager.Data.GetEffect(WeaponAttackData.attackEffectName).gameObject;
             if (attackEffect != null)
             {
                 GameObject effect = Instantiate(attackEffect);

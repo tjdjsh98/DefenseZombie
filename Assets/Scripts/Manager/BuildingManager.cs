@@ -59,6 +59,8 @@ public class BuildingManager : MonoBehaviour
             int drawCount = 0;
             Vector3Int cellPos = Vector3Int.zero;
             cellPos.x = (_builder.transform.localScale.x > 0 ? Mathf.CeilToInt(_builder.transform.position.x + 0.5f) : Mathf.FloorToInt(_builder.transform.position.x - 0.5f));
+            if (Manager.Character.MainCharacter.transform.localScale.x < 0)
+                cellPos.x -= darwBuilding.BuildingSize.width - 1;
             cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
             for (int i =0; i < darwBuilding.BuildingSize.width * darwBuilding.BuildingSize.height;i++)
@@ -78,7 +80,7 @@ public class BuildingManager : MonoBehaviour
                 color.g = 1;
                 color.a = 0.9f;
 
-                Vector3Int pos = cellPos + new Vector3Int(i % darwBuilding.BuildingSize.width * (_builder.transform.localScale.x > 0 ? 1 : -1), i / darwBuilding.BuildingSize.width, 0);
+                Vector3Int pos = cellPos + new Vector3Int(i % darwBuilding.BuildingSize.width , i / darwBuilding.BuildingSize.width, 0);
                 if (_buildingCoordiate.ContainsKey(pos.x))
                 {
                     if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
@@ -168,8 +170,11 @@ public class BuildingManager : MonoBehaviour
     {
         if (!IsDrawing) return -1;
 
+        Building darwBuilding = Manager.Data.GetBuilding(_drawingBuildingName);
         Vector2Int cellPos = Vector2Int.zero;
         cellPos.x = (_builder.transform.localScale.x > 0 ? Mathf.CeilToInt(_builder.transform.position.x + 0.5f) : Mathf.FloorToInt(_builder.transform.position.x - 0.5f));
+        if(Manager.Character.MainCharacter.transform.localScale.x < 0)
+                cellPos.x -= darwBuilding.BuildingSize.width - 1;
         cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
         if (Client.Instance.ClientId != -1)

@@ -173,7 +173,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
                             Vector3 point = hit.point;
 
-                            GameObject hitEffect = Manager.Data.GetEffect(WeaponAttackData.hitEffectName);
+                            GameObject hitEffect = Manager.Data.GetEffect(WeaponAttackData.hitEffectName).gameObject;
                             if (hitEffect)
                             {
                                 GameObject g = Instantiate(hitEffect);

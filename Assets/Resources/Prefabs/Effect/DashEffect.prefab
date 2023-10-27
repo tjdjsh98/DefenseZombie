@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6631886188071618670}
   - component: {fileID: 3046105174773377334}
   - component: {fileID: 6668804017293544280}
+  - component: {fileID: -2003793177664889357}
   m_Layer: 0
   m_Name: DashEffect
   m_TagString: Untagged
@@ -26,13 +27,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1878775153127377543}
+  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.56281626, y: -2.7605312, z: -0.022971475}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &6631886188071618670
 Animator:
@@ -119,3 +120,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83c1b7dfc7848284aa4b0ec56af1ce88, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-2003793177664889357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1878775153127377543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 03bbec56b84090e47bd9656102f2e6bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _effectName: 2

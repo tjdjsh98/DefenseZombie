@@ -1,26 +1,26 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Building : MonoBehaviour, IHp
 {
     List<SpriteRenderer> _spriteRenderers;
     BoxCollider2D _boxCollider;
-
     CircleSlider _circleSlider;
+
+    public int BuildingId { set; get; }
 
     [field: SerializeField] public bool _isTile;
     [field: SerializeField] public Define.BuildingName BuildingName { private set; get; }
-    public int BuildingId { set; get; }
     [field: SerializeField] public int MaxHp { set; get; } 
     [field: SerializeField] public int Hp { set; get; } 
     [SerializeField] BuildingSize _size;
+    [SerializeField] float _buildingTime;
+    [SerializeField] BuildingBlueprint _blueprint;
+
     public BuildingSize BuildingSize => _size;
 
-    [SerializeField] float _buildingTime;
     float _time;
 
     List<Vector2Int> _coordinate = new List<Vector2Int>();

@@ -18,11 +18,11 @@ MonoBehaviour:
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: 5508cb133a6137544937384a230d8e0e, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: f5697f794ad9fec4a9df2d0bd998ee63, type: 2}
   <AttackList>k__BackingField:
-  - attackEffectName: 
+  - attackEffectName: 0
     attackEffectPoint: {x: 0, y: 0, z: 0}
     projectile: {fileID: 0}
     firePos: {x: 0, y: 0, z: 0}
-    hitEffectName: 
+    hitEffectName: 1
     attackRange:
       center: {x: 0.48, y: 0.78, z: 0}
       size: {x: 1.08, y: 1.49, z: 0}
