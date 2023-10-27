@@ -14,6 +14,7 @@ public class Character : MonoBehaviour,IHp
     protected Animator _animator;
 
     [SerializeField] protected Range _characterSize;
+    public Range CharacterSize => _characterSize;
 
     [SerializeField] bool _isEnableFly;
     [SerializeField] float _currentYSpeed;

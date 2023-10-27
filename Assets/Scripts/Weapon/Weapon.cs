@@ -24,7 +24,15 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 return _defaultAttack;
             }
 
-            return _character.DefaultWeapon.AttackList[_attackType];
+            if(_character.WeaponData== null)
+            {
+                return _character.DefaultWeapon.AttackList[_attackType];
+            }
+            else
+            {
+                return _character.WeaponData.AttackList[_attackType];
+
+            }
         }
     }
 

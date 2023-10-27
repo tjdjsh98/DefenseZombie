@@ -40,8 +40,8 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
         }
     }
 
-    [SerializeField] float _attackDelay;
-    float _attackTime;
+    [SerializeField] protected float _attackDelay;
+    protected float _attackTime;
 
     public virtual void Init()
     {

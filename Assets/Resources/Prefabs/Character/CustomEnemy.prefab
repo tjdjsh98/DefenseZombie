@@ -162,7 +162,7 @@ GameObject:
   - component: {fileID: 9127980369373757880}
   - component: {fileID: 4784570898945671801}
   - component: {fileID: 1486531621071791439}
-  - component: {fileID: 1917275513026005815}
+  - component: {fileID: 7634549512888743910}
   - component: {fileID: 7636020597731638507}
   - component: {fileID: 6261214198764784204}
   - component: {fileID: 5595146076010845156}
@@ -307,7 +307,7 @@ MonoBehaviour:
   _defaultWeapon: {fileID: 11400000, guid: 406b1450e8bd98d46ad03bd1e135c3a3, type: 2}
   attackType: 0
   _liftPos: {fileID: 7946594430840207039}
---- !u!114 &1917275513026005815
+--- !u!114 &7634549512888743910
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -316,7 +316,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2211045767833013839}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a4002694af7dd046b3663f0bccaae0d, type: 3}
+  m_Script: {fileID: 11500000, guid: 23d02b923d9991143bd5259cfc041bc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _weapon: {fileID: 7636020597731638507}
