@@ -8,7 +8,7 @@ public class Item : MonoBehaviour
     public ItemData ItemData => _itemData;
 
     int _itemNumber;
-    public int ItemNumber => _itemNumber;
+    public int ItemId => _itemNumber;
     SpriteRenderer _spriteRenderer;
     Rigidbody2D _rigidbody;
 

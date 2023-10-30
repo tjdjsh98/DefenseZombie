@@ -37,7 +37,7 @@ public class BuildingManager : MonoBehaviour
             _tileFolder.AddComponent<CompositeCollider2D>();
         }
 
-        for(int x = -30;  x <= 30; x++)
+        for(int x = -20;  x <= 20; x++)
         {
             GenerateBuilding(BuildingName.GrassTile,new Vector2Int(x,-2));
             for(int y = -3; y >= -10; y--)

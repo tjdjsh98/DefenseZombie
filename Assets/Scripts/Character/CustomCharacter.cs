@@ -50,6 +50,7 @@ public class CustomCharacter : Character
 
         _animatorHandler.DodgeEndHandler += () => { CharacterState = CharacterState.Idle; };
 
+        SetAnimatorBool("IsFrontWeapon", true);
 
         if (_defaultWeapon != null)
         {
@@ -164,8 +165,13 @@ public class CustomCharacter : Character
 
         AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
 
-        myOverrideController["UpperAttack"] = data.AttackAnimationClip;
+        if(data.IsFrontWeapon)
+            myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
+        else
+            myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
+
         SetAnimatorBool("IsEquip", true);
+        SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
 
         _frontHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
         _frontHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
@@ -190,6 +196,7 @@ public class CustomCharacter : Character
 
         myOverrideController["UpperAttack"] = data.AttackAnimationClip;
         SetAnimatorBool("IsEquip", false);
+        SetAnimatorBool("IsFrontWeapon", true);
 
         _frontHandPos.transform.localPosition = Vector3.zero;
         _frontHand.transform.localPosition = Vector3.zero;
@@ -315,17 +322,19 @@ public class CustomCharacter : Character
                 _takenItem = item;
             }
 
-            SetAnimatorBool("IsEquip", true);
         }
     }
 
+    // 아이템의 강체 고정을 해제
     public void ReleaseItem()
     {
         _takenItem.ReleaseRigidBody();
         _takenItem.transform.parent = transform.parent;
         _takenItem = null;
     }
-    public void Putdown()
+
+    // 손에 들고있는 아이템, 작은 건물, 무기를 내려놓음
+    public void PutdownItem()
     {
         if(_takenItem != null)
         {
@@ -333,7 +342,7 @@ public class CustomCharacter : Character
             {
                 _takenItem.ReleaseRigidBody();
                 _takenItem.transform.parent = transform.parent;
-                _takenItem.transform.position = transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left);
+                _takenItem.transform.position = transform.position;
             }
             else if(_takenItem.ItemData.ItemType == ItemType.Equipment)
             {
@@ -400,14 +409,14 @@ public class CustomCharacter : Character
         if (Client.Instance.IsMain)
         {
             DeadHandler?.Invoke();
-            Putdown();
+            PutdownItem();
             Manager.Character.RequestRemoveCharacter(CharacterId);
         }
         else
         {
             if (Client.Instance.ClientId == -1)
             {
-                Putdown(); 
+                PutdownItem(); 
                 DeadHandler?.Invoke();
                 Manager.Character.RemoveCharacter(CharacterId);
             }

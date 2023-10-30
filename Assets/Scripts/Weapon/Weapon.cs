@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Weapon : MonoBehaviour,ICharacterOption
@@ -103,6 +104,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
     protected virtual void OnAttackKeyDown()
     {
+        if (Manager.Building.IsDrawing) return;
         if (_character.IsLift) return;
         if (_character.IsAttacking) return;
 
@@ -136,7 +138,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
             Range attackRange = WeaponAttackData.attackRange;
             attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? WeaponAttackData.attackRange.center.x : -WeaponAttackData.attackRange.center.x);
 
-            int layerMask = LayerMask.GetMask(_enableAttackLayer);
+            int layerMask = LayerMask.GetMask(_enableAttackLayer) | Define.BuildingLayerMask;
             RaycastHit2D[] hits;
             Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
             Vector3 pos = rotationMatrix.MultiplyVector(attackRange.center);
@@ -160,7 +162,9 @@ public class Weapon : MonoBehaviour,ICharacterOption
             {
                 foreach (RaycastHit2D hit in hits)
                 {
-                    Character character = hit.collider.GetComponentInParent<Character>();
+                    Character character = hit.collider.GetComponent<Character>();
+                    Building building = hit.collider.GetComponent<Building>();
+                    
                     if (character != null && character != _character)
                     {
                         Camera.main.GetComponent<CameraMove>().ShakeCamera(WeaponAttackData.power, 0.4f);
@@ -173,6 +177,23 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
                             Vector3 point = hit.point;
 
+                            GameObject hitEffect = Manager.Data.GetEffect(WeaponAttackData.hitEffectName).gameObject;
+                            if (hitEffect)
+                            {
+                                GameObject g = Instantiate(hitEffect);
+                                g.transform.position = point;
+                            }
+                        }
+                        penetration++;
+                        if (penetration > WeaponAttackData.penetrationPower) break;
+                    }
+                    else if(building != null)
+                    {
+                        if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
+                        {
+                            building.Damage(WeaponAttackData.damage);
+
+                            Vector3 point = hit.point;
                             GameObject hitEffect = Manager.Data.GetEffect(WeaponAttackData.hitEffectName).gameObject;
                             if (hitEffect)
                             {

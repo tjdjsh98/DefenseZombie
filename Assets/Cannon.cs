@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Cannon : MonoBehaviour
+public class Cannon : MonoBehaviour, IBuildingOption
 {
     [SerializeField] Range _detectRange;
     Character _target;
@@ -17,13 +17,18 @@ public class Cannon : MonoBehaviour
     [SerializeField] float _coolTime;
     float _time;
 
+   
+
+    public void Init()
+    {
+        
+    }
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
 
         Gizmos.DrawWireCube(transform.position + _detectRange.center, _detectRange.size);
     }
-
     void Update()
     {
         Detect();
@@ -35,16 +40,8 @@ public class Cannon : MonoBehaviour
     {
         if (_target != null) return;
 
-         List<Character> characterList = Util.GetGameObjectsByPhysics<Character>(transform.position, _detectRange, 1 << LayerMask.NameToLayer("Character"));
+         _target = Util.GetGameObjectByPhysics<Character>(transform.position, _detectRange, Define.EnemyLayerMask);
 
-        foreach (Character character in characterList)
-        {
-            if(character.tag == "Enemy")
-            {
-                _target = character;
-                return;
-            }
-        }
     }
     void ControlCannon()
     {
@@ -59,7 +56,7 @@ public class Cannon : MonoBehaviour
     void Fire()
     {
         _time += Time.deltaTime;
-        if(_coolTime <= _time)
+        if(_coolTime <= _time && _target != null)
         {
             Projectile projectile = Instantiate(_projectile);
             projectile.transform.position = _firePoint.transform.position;
@@ -67,4 +64,6 @@ public class Cannon : MonoBehaviour
             _time = 0;
         }
     }
+
+ 
 }

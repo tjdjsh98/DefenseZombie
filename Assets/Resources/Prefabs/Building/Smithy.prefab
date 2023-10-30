@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 872912963
   m_SortingLayer: 1
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: 15e5c05752b7dbb41a17e40d71c21816, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 31ed5fec6ed99fd43a5ba168ae6016f9, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 7715304793495419924}
   - component: {fileID: 8583667906555671318}
   m_Layer: 9
-  m_Name: Barricade
+  m_Name: Smithy
   m_TagString: Building
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -206,16 +206,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isTile: 0
-  <BuildingName>k__BackingField: 1
+  <BuildingName>k__BackingField: 10
   <MaxHp>k__BackingField: 10
   <Hp>k__BackingField: 10
   _size:
     isShow: 1
-    width: 1
-    height: 2
+    width: 3
+    height: 3
     pivotX: 0
     pivotY: 0
-    isPlace: 0101
+    isPlace: 010101010101010101
   _buildingTime: 1
   _blueprint:
     _blueprintItmeList:

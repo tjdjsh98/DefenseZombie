@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Define;
 
-public class DropItemOption : MonoBehaviour, ICharacterOption
+public class DropItemCharacterOption : MonoBehaviour, ICharacterOption
 {
     Character _character;
 
@@ -12,7 +12,8 @@ public class DropItemOption : MonoBehaviour, ICharacterOption
     {
         _character= GetComponent<Character>();
 
-        _character.DeadHandler += OnDead;
+        if(_character != null)
+            _character.DeadHandler += OnDead;
     }
 
     void OnDead()

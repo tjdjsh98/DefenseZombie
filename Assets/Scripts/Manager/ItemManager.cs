@@ -12,6 +12,9 @@ public class ItemManager : MonoBehaviour
 
     public void Init()
     {
+        GenerateItem(ItemName.Wood, Vector3.zero);
+        GenerateItem(ItemName.Wood, Vector3.zero);
+        GenerateItem(ItemName.Wood, Vector3.zero);
     }
 
     public Item GenerateItem(ItemName itemName, Vector3 position)
@@ -34,7 +37,7 @@ public class ItemManager : MonoBehaviour
         position.z = 0;
         item.transform.position = position;
 
-        _itemDictionary.Add(item.ItemNumber, item);
+        _itemDictionary.Add(item.ItemId, item);
 
         return item;
     }
@@ -45,5 +48,17 @@ public class ItemManager : MonoBehaviour
         _itemDictionary.TryGetValue(itemNumber, out item);
         
         return item;
+    }
+
+    public bool DestroyItem(int itemNumber)
+    {
+        Item item = null;
+
+        if(_itemDictionary.TryGetValue(itemNumber, out item))
+        {
+            Destroy(item.gameObject);
+            _itemDictionary.Remove(itemNumber);
+        }
+        return false;
     }
 }

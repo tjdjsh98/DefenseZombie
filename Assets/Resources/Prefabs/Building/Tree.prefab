@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1648659106855865751}
   - component: {fileID: 5058202082548528561}
   - component: {fileID: 232371304325963389}
-  - component: {fileID: 1013027816328694947}
+  - component: {fileID: 5918314377060300674}
   m_Layer: 8
   m_Name: Tree
   m_TagString: Building
@@ -135,7 +135,7 @@ MonoBehaviour:
   _buildingTime: 0
   _blueprint:
     _blueprintItmeList: []
---- !u!114 &1013027816328694947
+--- !u!114 &5918314377060300674
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,7 +144,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3365703064158369444}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c74247cedfdb2294d986355fe3121cfa, type: 3}
+  m_Script: {fileID: 11500000, guid: c524a8a71fdb194409e97ca3d8a9669f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   data: 01000000

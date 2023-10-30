@@ -11,8 +11,9 @@ public static class Define
         LayerMask.GetMask("OnlyPlayerPassableBuilding") |
         LayerMask.GetMask("OnlyEnemyPassableBuilding") |
         LayerMask.GetMask("BothUnpassableBuilding");
-
-    public static int GroundLayer = LayerMask.GetMask("Ground");
+    public static int GroundLayerMask = LayerMask.GetMask("Ground");
+    public static int UnconstructedBuildingLayerMask = LayerMask.GetMask("UnconstrctedBuilding");
+    public static int UnconstructedBuildingLayer = LayerMask.NameToLayer("UnconstrctedBuilding");
     public enum AttacKShape
     {
         Rectagle,
@@ -32,6 +33,7 @@ public static class Define
         GroundTile = 7,
         Tower = 8,
         Tree= 9,
+        Smithy = 10,
     }
     public enum CharacterName
     {
@@ -110,6 +112,11 @@ public static class Define
 
 
 public interface ICharacterOption
+{
+    public void Init();
+}
+
+public interface IBuildingOption
 {
     public void Init();
 }

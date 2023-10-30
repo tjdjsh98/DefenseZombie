@@ -98,7 +98,6 @@ public class GameManager : MonoBehaviour
                     Building building = Manager.Data.GetBuilding(BuildingName.Rock);
                     Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
 
-                    Debug.Log(cellPos);
                     if(cellPos.x != -999)
                     {
                         Building rock = Manager.Building.GenerateBuilding(BuildingName.Rock,cellPos);
@@ -106,7 +105,7 @@ public class GameManager : MonoBehaviour
                         if(rock != null)
                         {
                             _rockCount++;
-                            rock.DestroyHandler += ()=> { _rockCount--; } ;
+                            rock.DestroyedHandler += ()=> { _rockCount--; } ;
                         }
                     }
                 }
@@ -123,7 +122,7 @@ public class GameManager : MonoBehaviour
                         if (tree != null)
                         {
                             _treeCount++;
-                            tree.DestroyHandler += () => { _treeCount--; };
+                            tree.DestroyedHandler += () => { _treeCount--; };
                         }
                     }
                 }

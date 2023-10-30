@@ -85,43 +85,30 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            if (_interactingObject == null)
-                Interact();
+            // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
+            if (_character.TakenItem != null && !_character.IsEquip)
+            {
+                Building building = _character.GetOverrapGameObject<Building>(Define.UnconstructedBuildingLayerMask);
+
+                if(building != null && !building.IsConstructDone)
+                {
+                    if(building.AddItemToConstruction(_character.TakenItem.ItemData.ItemName))
+                    {
+                        Item item = _character.TakenItem;
+                        _character.PutdownItem();
+                        Manager.Item.DestroyItem(item.ItemId);
+                    }
+                }
+            }
             else
             {
-                if(_interactingObject.ExitInteract(_character))
-                    _interactingObject = null;
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            if (!Manager.Building.IsDrawing)
-                Manager.Building.StartBuildingDraw(this.gameObject, Define.BuildingName.Barricade);
-            else
-                Manager.Building.PlayerRequestBuilding();
-        }
-        if (Manager.Building.IsDrawing)
-        { 
-            if (Input.GetKeyDown(KeyCode.F1))
-            {
-                _selectBuildingNameIndex--;
-                if(_selectBuildingNameIndex < 0)
+                if (_interactingObject == null)
+                    Interact();
+                else
                 {
-                    _selectBuildingNameIndex = Enum.GetValues(typeof(BuildingName)).Length-1;
+                    if (_interactingObject.ExitInteract(_character))
+                        _interactingObject = null;
                 }
-                Manager.Building.StartBuildingDraw(this.gameObject, (BuildingName)_selectBuildingNameIndex);
-            }
-
-            if (Input.GetKeyDown(KeyCode.F2))
-            {
-                _selectBuildingNameIndex++;
-                if (Enum.GetValues(typeof(BuildingName)).Length <= _selectBuildingNameIndex)
-                {
-                    _selectBuildingNameIndex = 0;
-                }
-
-                Manager.Building.StartBuildingDraw(this.gameObject, (BuildingName)_selectBuildingNameIndex);
             }
         }
 
@@ -144,7 +131,7 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                player.Putdown();
+                player.PutdownItem();
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -202,6 +189,9 @@ public class PlayerController : MonoBehaviour
                 item.GetComponent<Projectile>().Throw(mousePos - _character.transform.position, 20);
             }
         }
+        else if(Manager.Building.IsDrawing)
+        {
+            Manager.Building.PlayerRequestBuilding();
+        }
     }
-
 }

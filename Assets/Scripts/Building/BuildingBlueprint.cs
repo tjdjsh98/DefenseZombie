@@ -11,8 +11,14 @@ public class BuildingBlueprint
 }
 
 [System.Serializable]
-public struct BlueprintItem
+public class BlueprintItem
 {
     public ItemName name;
-    public int count;
+    public int requireCount;
+    public int currentCount;
+
+    public void AddCount()
+    {
+        currentCount++;
+    }
 }

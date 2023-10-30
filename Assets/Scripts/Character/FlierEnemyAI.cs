@@ -79,7 +79,7 @@ public class FlierEnemyAI : EnemyAI
 
     bool CheckIsEnoughFly()
     {
-        List<GameObject> list = Util.Raycast(transform.position,Vector3.down, _flyHeight, Define.GroundLayer);
+        List<GameObject> list = Util.Raycast(transform.position,Vector3.down, _flyHeight, Define.GroundLayerMask);
 
         if (list.Count > 0) return false;
 
