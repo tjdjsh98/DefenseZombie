@@ -34,4 +34,24 @@ public static class Extension
 
         return componet;
     }
+
+    public static T GetRandom<T>(this List<T> list)
+    {
+        if (list.Count <= 0) return default(T);
+
+        T result = list[Random.Range(0, list.Count)];
+
+        return result;
+    }
+
+    public static void Shuffle<T>(this List<T> list)
+    {
+        for(int i =0; i < list.Count; i++)
+        {
+            int random = Random.Range(0,list.Count);
+            T temp = list[i];
+            list[i] = list[random];
+            list[random] = temp;
+        }
+    }
 }

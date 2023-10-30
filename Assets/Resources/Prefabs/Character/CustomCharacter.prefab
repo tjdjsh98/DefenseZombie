@@ -33,7 +33,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6147046528517410800}
-  - {fileID: 8167297892624502579}
   m_Father: {fileID: 5647708866091060087}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &7782719253983151999
@@ -530,11 +529,11 @@ Transform:
   m_GameObject: {fileID: 4739439959996475644}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.173, z: 0}
+  m_LocalPosition: {x: -0.079, y: 1.173, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1760237564069235223}
+  m_Father: {fileID: 1257234216079015285}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5551859977916438208
 GameObject:
@@ -1067,7 +1066,7 @@ MonoBehaviour:
   _accelSpeed: 40
   _groundBreakSpeed: 40
   _airBreakSpeed: 20
-  _speed: 3
+  _maxSpeed: 3
   _groundCheckRange:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
@@ -1116,11 +1115,11 @@ MonoBehaviour:
   _character: {fileID: 8797273952533053488}
   _attackType: 0
   _defaultAttack:
-    attackEffectName: 
+    attackEffectName: 0
     attackEffectPoint: {x: 0, y: 0, z: 0}
     projectile: {fileID: 0}
     firePos: {x: 0, y: 0, z: 0}
-    hitEffectName: 
+    hitEffectName: 0
     attackRange:
       center: {x: 0, y: 0, z: 0}
       size: {x: 0, y: 0, z: 0}
@@ -1189,6 +1188,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1031622380752641266}
+  - {fileID: 8167297892624502579}
   - {fileID: 5647708866091060087}
   - {fileID: 770565324858971730}
   m_Father: {fileID: 1544368848223953580}

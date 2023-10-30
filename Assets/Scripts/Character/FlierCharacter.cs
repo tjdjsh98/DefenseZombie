@@ -55,8 +55,8 @@ public class FlierCharacter : Character
                 _currentSpeed += _accelSpeed * Time.deltaTime;
             }
 
-            if (_currentSpeed > _speed)
-                _currentSpeed = _speed;
+            if (_currentSpeed > _maxSpeed)
+                _currentSpeed = _maxSpeed;
         }
         else if (_characterMoveDirection.x < 0)
         {
@@ -70,8 +70,8 @@ public class FlierCharacter : Character
                 _currentSpeed -= _accelSpeed * Time.deltaTime;
             }
 
-            if (_currentSpeed < -_speed)
-                _currentSpeed = -_speed;
+            if (_currentSpeed < -_maxSpeed)
+                _currentSpeed = -_maxSpeed;
         }
         if (_jumpCount == 0 && IsJumping)
         {

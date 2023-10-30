@@ -29,6 +29,7 @@ public class EnterAndStand : InteractableObject
         _enterCharacter.transform.parent = transform.root;
         _enterCharacter.transform.position = transform.position;
         _enterCharacter.IsEnableMove =true;
+        _enterCharacter = null;
         return true;
     }
 }

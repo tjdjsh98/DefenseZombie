@@ -29,6 +29,10 @@ public class Building : MonoBehaviour, IHp
 
     bool _done;
 
+    // 좌표에서 사라지기 전, 오브젝트가 파괴되기 전에 실행됩니다.
+    public Action DestroyHandler;
+
+
     private void Awake()
     {
         _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
@@ -99,6 +103,7 @@ public class Building : MonoBehaviour, IHp
         Hp -= dmg;
         if(Hp <=0)
         {
+            DestroyHandler?.Invoke();
             Manager.Building.RemoveBuilding(this);
             Destroy(gameObject);
         }

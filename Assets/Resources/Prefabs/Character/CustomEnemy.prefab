@@ -166,6 +166,7 @@ GameObject:
   - component: {fileID: 7636020597731638507}
   - component: {fileID: 6261214198764784204}
   - component: {fileID: 5595146076010845156}
+  - component: {fileID: -1658844381814214121}
   m_Layer: 7
   m_Name: CustomEnemy
   m_TagString: Enemy
@@ -297,14 +298,14 @@ MonoBehaviour:
   _accelSpeed: 40
   _groundBreakSpeed: 40
   _airBreakSpeed: 20
-  _speed: 3
+  _maxSpeed: 2
   _groundCheckRange:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
   _frontHandPos: {fileID: 285117940277506658}
   _frontHand: {fileID: 4472389917153705133}
-  _defaultWeapon: {fileID: 11400000, guid: 406b1450e8bd98d46ad03bd1e135c3a3, type: 2}
+  _defaultWeapon: {fileID: 11400000, guid: 9f6c2994a01b5a94a870e24117bbb624, type: 2}
   attackType: 0
   _liftPos: {fileID: 7946594430840207039}
 --- !u!114 &7634549512888743910
@@ -342,11 +343,11 @@ MonoBehaviour:
   _character: {fileID: 1486531621071791439}
   _attackType: 0
   _defaultAttack:
-    attackEffectName: 
+    attackEffectName: 0
     attackEffectPoint: {x: 0, y: 0, z: 0}
     projectile: {fileID: 0}
     firePos: {x: 0, y: 0, z: 0}
-    hitEffectName: 
+    hitEffectName: 0
     attackRange:
       center: {x: 0.45, y: 1.05, z: 0}
       size: {x: 0, y: 0, z: 0}
@@ -394,6 +395,19 @@ MonoBehaviour:
     _behindHandSpriteLibraryAsset: {fileID: 7108339969198208228, guid: 9473985b0e22186419ad65d13691b0d9, type: 3}
     _frontWeaponSpriteLibraryAsset: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
     _behindWeaponSpriteLibraryAsset: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
+--- !u!114 &-1658844381814214121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2211045767833013839}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c74247cedfdb2294d986355fe3121cfa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data: 02000000
 --- !u!1 &2351486543499529294
 GameObject:
   m_ObjectHideFlags: 0

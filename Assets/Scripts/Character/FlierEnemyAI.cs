@@ -22,9 +22,9 @@ public class FlierEnemyAI : EnemyAI
 
                 Vector3 moveDirection = Vector3.zero;
 
-                if (Mathf.Abs(_character.transform.position.y - _flyHeight) >= 0.1)
+                if (!CheckIsEnoughFly())
                 {
-                    moveDirection.y = _flyHeight - transform.position.y;
+                    moveDirection.y = 1;
                 }
                 _character.SetCharacterDirection(moveDirection);
             }
@@ -36,6 +36,11 @@ public class FlierEnemyAI : EnemyAI
 
                 if (character != null || building != null)
                 {
+                    if(character != null)
+                        _character.Turn(character.transform.position.x - transform.position.x);
+                    if (building != null)
+                        _character.Turn(building.transform.position.x - transform.position.x);
+
                     _character.StopMove();
                     _character.SetCharacterDirection(Vector2.zero);
                     _character.IsAttacking = true;
@@ -48,11 +53,11 @@ public class FlierEnemyAI : EnemyAI
 
                     Vector3 moveDirection = Vector3.zero;
 
-                    moveDirection.x = _target.transform.position.x - transform.position.x;
+                    moveDirection.x = _target.transform.position.x - (transform.position.x + AttackRange.center.x);
                     // 1보다 멀다면 자신의 높이로
-                    if(Mathf.Abs(_character.transform.position.y - _flyHeight) >= 0.1 &&Mathf.Abs(moveDirection.x) > 1)
+                    if(!CheckIsEnoughFly() &&Mathf.Abs(moveDirection.x) > 1)
                     {
-                        moveDirection.y = _flyHeight - transform.position.y;
+                        moveDirection.y = 1;    
                     }
                     // 1보다 가깝다면 내려간다.
                     else
@@ -71,4 +76,13 @@ public class FlierEnemyAI : EnemyAI
         }
     }
 
+
+    bool CheckIsEnoughFly()
+    {
+        List<GameObject> list = Util.Raycast(transform.position,Vector3.down, _flyHeight, Define.GroundLayer);
+
+        if (list.Count > 0) return false;
+
+        return true;
+    }
 }

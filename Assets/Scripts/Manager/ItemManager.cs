@@ -12,7 +12,6 @@ public class ItemManager : MonoBehaviour
 
     public void Init()
     {
-        GenerateItem(ItemName.BeeHive, Vector3.one * 3);
     }
 
     public Item GenerateItem(ItemName itemName, Vector3 position)

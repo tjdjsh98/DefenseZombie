@@ -31,6 +31,7 @@ public static class Define
         GrassTile = 6,
         GroundTile = 7,
         Tower = 8,
+        Tree= 9,
     }
     public enum CharacterName
     {

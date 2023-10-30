@@ -34,7 +34,7 @@ public class SpannerPlayerCharacter : Character
         }
         if(IsDodge)
         {
-            _rigidBody.velocity = new Vector2(_speed * (transform.localScale.x > 0? 1 : -1)
+            _rigidBody.velocity = new Vector2(_maxSpeed * (transform.localScale.x > 0? 1 : -1)
                 , _rigidBody.velocity.y);
         }
         if (CharacterState != CharacterState.Dodge && IsDodge)

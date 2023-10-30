@@ -118,8 +118,8 @@ public class CustomCharacter : Character
                 _currentSpeed += _accelSpeed * Time.deltaTime;
             }
 
-            if (_currentSpeed > _speed)
-                _currentSpeed = _speed;
+            if (_currentSpeed > _maxSpeed)
+                _currentSpeed = _maxSpeed;
         }
         else if (_characterMoveDirection.x < 0)
         {
@@ -133,8 +133,8 @@ public class CustomCharacter : Character
                 _currentSpeed -= _accelSpeed * Time.deltaTime;
             }
 
-            if (_currentSpeed < -_speed)
-                _currentSpeed = -_speed;
+            if (_currentSpeed < -_maxSpeed)
+                _currentSpeed = -_maxSpeed;
         }
         if (_jumpCount == 0 && IsJumping)
         {
@@ -223,7 +223,7 @@ public class CustomCharacter : Character
         }
         if (IsDodge)
         {
-            _rigidBody.velocity = new Vector2(_speed * (transform.localScale.x > 0 ? 1 : -1)
+            _rigidBody.velocity = new Vector2(_maxSpeed * (transform.localScale.x > 0 ? 1 : -1)
                 , _rigidBody.velocity.y);
         }
         if (CharacterState != CharacterState.Dodge && IsDodge)
@@ -269,7 +269,7 @@ public class CustomCharacter : Character
         {
             Building building = GetOverrapGameObject<Building>();
 
-            if (!building._isTile&&building != null)
+            if (building != null && !building._isTile&&building != null)
             {
                 if (building.BuildingSize.width == 1)
                 {

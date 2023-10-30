@@ -41,8 +41,8 @@ public class Character : MonoBehaviour,IHp
     [SerializeField] protected float _airBreakSpeed;
     public float CurrentSpeed => _currentSpeed;
     protected float BreakSpeed => IsContactGround? _groundBreakSpeed : _airBreakSpeed;
-    [SerializeField]protected float _speed = 5.0f;
-    public float Speed { set { _speed = value; } get { return _speed; } }
+    [SerializeField]protected float _maxSpeed = 5.0f;
+    public float Speed { set { _maxSpeed = value; } get { return _maxSpeed; } }
 
     // 점프
     [SerializeField] protected Range _groundCheckRange;
@@ -174,6 +174,7 @@ public class Character : MonoBehaviour,IHp
             return;
         }
 
+        // 속도 줄이기, 브레이크
         if (_characterMoveDirection.x == 0)
         {
             if (_currentSpeed < 0)
@@ -191,33 +192,37 @@ public class Character : MonoBehaviour,IHp
         }
         else if (_characterMoveDirection.x > 0)
         {
+            // 관성
             if (_currentSpeed < 0)
             {
                 _currentSpeed += BreakSpeed * Time.deltaTime;
             }
+            // 가속
             else
             {
                 Turn(_currentSpeed);
-                _currentSpeed += _accelSpeed * Time.deltaTime;
+                _currentSpeed += _accelSpeed* Mathf.Clamp01(_characterMoveDirection.x) * Time.deltaTime;
             }
 
-            if (_currentSpeed > _speed)
-                _currentSpeed = _speed;
+            if (_currentSpeed > _maxSpeed)
+                _currentSpeed = _maxSpeed;
         }
         else if (_characterMoveDirection.x < 0)
         {
+            // 관성
             if (_currentSpeed > 0)
             {
                 _currentSpeed -= BreakSpeed * Time.deltaTime;
             }
+            // 가속
             else
             {
                 Turn(_currentSpeed);
-                _currentSpeed -= _accelSpeed * Time.deltaTime;
+                _currentSpeed -= _accelSpeed* Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime;
             }
 
-            if (_currentSpeed < -_speed)
-                _currentSpeed = -_speed;
+            if (_currentSpeed < -_maxSpeed)
+                _currentSpeed = -_maxSpeed;
         }
 
 
@@ -249,8 +254,8 @@ public class Character : MonoBehaviour,IHp
                     _currentYSpeed += _accelSpeed * Time.deltaTime;
                 }
 
-                if (_currentYSpeed > _speed)
-                    _currentYSpeed = _speed;
+                if (_currentYSpeed > _maxSpeed)
+                    _currentYSpeed = _maxSpeed;
             }
             else if (_characterMoveDirection.y < 0)
             {
@@ -263,8 +268,8 @@ public class Character : MonoBehaviour,IHp
                     _currentYSpeed -= _accelSpeed * Time.deltaTime;
                 }
 
-                if (_currentYSpeed < -_speed)
-                    _currentYSpeed = -_speed;
+                if (_currentYSpeed < -_maxSpeed)
+                    _currentYSpeed = -_maxSpeed;
             }
         }
         

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
@@ -122,6 +123,32 @@ public static class Util
 
         return null;
     }
+
+    public static List<GameObject> Raycast(Vector3 position,Vector3 direction, float distance, int layerMask = -1 , string tag = null)
+    {
+        RaycastHit2D[] hits;
+
+        if (layerMask != -1)
+            hits = Physics2D.RaycastAll(position, direction, distance, layerMask);
+        else
+            hits = Physics2D.RaycastAll(position, direction,distance, 0);
+
+        List<GameObject> result = new List<GameObject>();
+        foreach (var hit in hits)
+        {
+            if(tag == null)
+            {
+                result.Add(hit.collider.gameObject);
+            }
+            else if (hit.collider.gameObject.tag == tag)
+            {
+                result.Add(hit.collider.gameObject);
+            }
+        }
+
+        return result;
+    }
+
 }
 
 [System.Serializable]

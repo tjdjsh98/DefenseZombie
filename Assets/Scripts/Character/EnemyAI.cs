@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static Define;
 
 public class EnemyAI : MonoBehaviour, ICharacterOption
 {
@@ -17,16 +18,16 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
     {
         get
         {
+            Range range;
             if (_weapon == null)
-                return _attackRange;
+                range = _attackRange;
             else
-            {
-                Range range = _weapon.WeaponAttackData.attackRange;
+                range = _weapon.WeaponAttackData.attackRange;
 
-                range.center.x = transform.localScale.x > 0 ? range.center.x : -range.center.x;
+            range.center.x = transform.localScale.x > 0 ? range.center.x : -range.center.x;
 
-                return _weapon.WeaponAttackData.attackRange;
-            }
+            return range;
+            
         }
     }
     protected Range SearchRange

@@ -52,7 +52,7 @@ public class PistalPlayerCharacter : Character
                 walk = true;
                 backWalk = false;
             }
-            _speed = backWalk ? _backWalkSpeed : _walkSpeed;
+            _maxSpeed = backWalk ? _backWalkSpeed : _walkSpeed;
 
             SetAnimatorBool("Walk", walk);
             SetAnimatorBool("BackWalk", backWalk);

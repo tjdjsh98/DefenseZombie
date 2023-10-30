@@ -26,6 +26,11 @@ public class GameManager : MonoBehaviour
 
     public Action InventoryChanagedHandler;
 
+    int _rockCount;
+    int _rockMaxCount = 1;
+    int _treeCount;
+    int _treeMaxCount = 1;
+
     public void Init()
     {
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);
@@ -39,6 +44,7 @@ public class GameManager : MonoBehaviour
             // 싱글일 때, 혹은 멀티인데 메인 클라이언트라면
             if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
             {
+                // 웨이브 별 몬스터 생성
                 if (!IsStartLevel)
                 {
                     time -= UnityEngine.Time.fixedDeltaTime;
@@ -84,6 +90,45 @@ public class GameManager : MonoBehaviour
                         }
                     }
                 }
+
+                // 일정 갯수의 나무와 바위 지속 생성
+
+                if(_rockMaxCount > _rockCount)
+                {
+                    Building building = Manager.Data.GetBuilding(BuildingName.Rock);
+                    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
+
+                    Debug.Log(cellPos);
+                    if(cellPos.x != -999)
+                    {
+                        Building rock = Manager.Building.GenerateBuilding(BuildingName.Rock,cellPos);
+
+                        if(rock != null)
+                        {
+                            _rockCount++;
+                            rock.DestroyHandler += ()=> { _rockCount--; } ;
+                        }
+                    }
+                }
+
+                if(_treeMaxCount > _treeCount)
+                {
+                    Building building = Manager.Data.GetBuilding(BuildingName.Tree);
+                    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
+
+                    if (cellPos.x != -999)
+                    {
+                        Building tree = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos);
+
+                        if (tree != null)
+                        {
+                            _treeCount++;
+                            tree.DestroyHandler += () => { _treeCount--; };
+                        }
+                    }
+                }
+
+
             }
             
             yield return new WaitForFixedUpdate();

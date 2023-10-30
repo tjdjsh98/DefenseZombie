@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using static Define;
 
@@ -129,6 +131,7 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
+        // 건물 생성
         Building building = Instantiate(buildingOrigin);
         if(building._isTile)
         {
@@ -139,8 +142,10 @@ public class BuildingManager : MonoBehaviour
         buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
         building.transform.position = buildingPos;
 
+        _buildingDictionary.Add(building.BuildingId, building);
 
-        // 겹치는 부분에 좌표 설정
+
+        // 생성 좌표 입력
         for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
         {
             if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
@@ -338,6 +343,14 @@ public class BuildingManager : MonoBehaviour
         building.ClearCoordinate();
     }
 
+    public bool GetIsExistBuilding(Vector2Int cellPos)
+    {
+        if (!_buildingCoordiate.ContainsKey(cellPos.x)) return false;
+        if (!_buildingCoordiate[cellPos.x].ContainsKey(cellPos.y)) return false;
+
+        return _buildingCoordiate[cellPos.x][cellPos.y] != null;
+    }
+
     void ShowPreviewBuilding()
     {
         Building building = Manager.Data.GetBuilding(_drawingBuildingName);
@@ -376,5 +389,39 @@ public class BuildingManager : MonoBehaviour
         {
             sr.transform.position = pos;
         }
+    }
+
+    // 타일인데 위쪽이 해당 칸 만큼 비어있다면 반환해줍니다.
+    // 해당하는 타일이 없다면 (-999, -999)를 반환합니다.
+    public Vector2Int FindRandomEmptyGroundInRange(BuildingSize size)
+    {
+        List<Building> buildingList = _buildingDictionary.Values.ToList();
+        buildingList.Shuffle();
+        foreach(var building in buildingList)
+        {
+            bool _isSuccess = true;
+            if(building._isTile)
+            {
+                Vector2Int tempCell = building.GetCoordinate()[0];
+
+                for(int w = 0; w < size.width ; w++)
+                {
+                    for(int h = 0; h < size.height ; h++)
+                    {
+                        if (GetIsExistBuilding(tempCell + new Vector2Int(w,h+1)))
+                        {
+                            _isSuccess = false;
+                            break;
+                        }
+                    }
+                    if (!_isSuccess) break;
+                }
+
+                if (_isSuccess)
+                    return tempCell + Vector2Int.up;
+            }
+        }
+
+        return Vector2Int.one * -999;
     }
 }
