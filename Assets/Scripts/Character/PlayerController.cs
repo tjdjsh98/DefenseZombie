@@ -95,7 +95,7 @@ public class PlayerController : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.C))
         {
-            Manager.Item.GenerateItem(Define.ItemName.Stone, transform.position + Vector3.right);
+            Manager.Game.GenerateSupplies();
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
@@ -111,6 +111,7 @@ public class PlayerController : MonoBehaviour
             {
                 List<IEnableInsertItem> insertableList = _character.GetOverrapGameObjects<IEnableInsertItem>();
 
+                bool isSucess = false;
                 if (insertableList.Count > 0)
                 {
                     foreach(var insertable in insertableList)
@@ -120,10 +121,14 @@ public class PlayerController : MonoBehaviour
                             Item item = _character.TakenItem;
                             _character.PutdownItem();
                             Manager.Item.DestroyItem(item.ItemId);
-
+                            isSucess = true;
                             break;
                         }
                     }
+                }
+                if(!isSucess) 
+                {
+                    player.PutdownItem();
                 }
             }
             else
@@ -132,10 +137,7 @@ public class PlayerController : MonoBehaviour
                 {
                     player.GrapSomething();
                 }
-                else
-                {
-                    player.PutdownItem();
-                }
+               
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape))

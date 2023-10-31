@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Define;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -175,6 +176,14 @@ public class GameManager : MonoBehaviour
     public Dictionary<ItemData,int> GetInventory()
     {
         return _inventory;
+    }
+
+    public void GenerateSupplies()
+    {
+        Vector3 pos = Vector3.zero;
+        pos.x = Random.Range(-10f, 10f);
+        pos.y = 10;
+        Manager.Item.GenerateItem(ItemName.Supplies, pos);
     }
 }
 

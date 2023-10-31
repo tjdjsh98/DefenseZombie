@@ -69,7 +69,8 @@ public static class Define
         Gun,
         Sword,
         Spear,
-        BeeHive
+        BeeHive,
+        Supplies
     }
     public enum ItemType
     {
@@ -108,6 +109,7 @@ public static class Define
         None,
         Normal,
         Dash,
+        Dust
     }
 }
 
