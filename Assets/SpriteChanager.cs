@@ -37,6 +37,7 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
 
     public void ChangeSprite(CharacterParts part, SpriteLibraryAsset asset)
     {
+        Debug.Log(part);
         if (_spriteLibararyDictionary.ContainsKey(part))
         {
             _spriteLibararyDictionary[part].spriteLibraryAsset = asset;
@@ -45,6 +46,7 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
     }
     public void ChangeDefaultSprite(CharacterParts part)
     {
+
         if (_spriteLibararyDictionary.ContainsKey(part))
         {
             switch (part)

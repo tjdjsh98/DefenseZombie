@@ -12,6 +12,7 @@ public class DataManager : MonoBehaviour
     Dictionary<ItemName, ItemData> _itemDataDictionary = new Dictionary<ItemName, ItemData>();
     Dictionary<string, GameObject> _etcDictionary = new Dictionary<string, GameObject>();
     Dictionary<EffectName, Effect> _effectDictionary = new Dictionary<EffectName, Effect>();
+    
     public void Init()
     {
         LoadCharacter();

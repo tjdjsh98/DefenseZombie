@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using static Define;
 
-public class Building : MonoBehaviour, IHp
+public class Building : MonoBehaviour, IHp, IEnableInsertItem
 {
     List<SpriteRenderer> _spriteRenderers;
     BoxCollider2D _boxCollider;
@@ -29,7 +29,7 @@ public class Building : MonoBehaviour, IHp
 
     public Action<float> TurnHandler;
 
-    public Action<bool> BlueprintChangedHandler;
+    public Action<bool> ItemChangedHandler { get; set; }
 
     bool _isConstuctDone;
     public bool IsConstructDone => _isConstuctDone;
@@ -56,7 +56,7 @@ public class Building : MonoBehaviour, IHp
             option.Init();
         Hp = MaxHp;
 
-        if (Blueprint.BlueprintItmeList.Count > 0)
+        if (Blueprint.BlueprintItemList.Count > 0)
         {
             _originLayer = gameObject.layer;
             gameObject.layer = UnconstructedBuildingLayer;
@@ -122,17 +122,19 @@ public class Building : MonoBehaviour, IHp
     // 건축 중인 건물에 재료 아이템을 넣음
     // 건축이 완료된 건물이거나 해당 아이템이 필요없다면 false를 반환
     // 해당 아이템을 추가 완료된다면 아이템을 없애지 않고 내용물에 추가만 합니다.
-    public bool AddItemToConstruction(ItemName itemName)
+    public bool InsertItem(ItemName itemName)
     {
-        for(int i =0; i < Blueprint.BlueprintItmeList.Count; i++)
+        if (IsConstructDone) return false;
+
+        for(int i =0; i < Blueprint.BlueprintItemList.Count; i++)
         {
-            if (Blueprint.BlueprintItmeList[i].name == itemName)
+            if (Blueprint.BlueprintItemList[i].name == itemName)
             {
-                if (Blueprint.BlueprintItmeList[i].requireCount > Blueprint.BlueprintItmeList[i].currentCount)
+                if (Blueprint.BlueprintItemList[i].requireCount > Blueprint.BlueprintItemList[i].currentCount)
                 {
-                    Blueprint.BlueprintItmeList[i].AddCount();
-                    bool isFinish = CheckIsFinishConstruct();
-                    BlueprintChangedHandler?.Invoke(isFinish);
+                    Blueprint.BlueprintItemList[i].AddCount();
+                    bool isFinish = CheckIsFinish();
+                    ItemChangedHandler?.Invoke(isFinish);
                     return true;    
                 }
             }
@@ -141,13 +143,13 @@ public class Building : MonoBehaviour, IHp
         return false;
     }
 
-    bool CheckIsFinishConstruct()
+    public bool CheckIsFinish()
     {
         bool isSuccess = true;
 
-        for (int i = 0; i < Blueprint.BlueprintItmeList.Count; i++)
+        for (int i = 0; i < Blueprint.BlueprintItemList.Count; i++)
         {
-            if (Blueprint.BlueprintItmeList[i].requireCount > Blueprint.BlueprintItmeList[i].currentCount)
+            if (Blueprint.BlueprintItemList[i].requireCount > Blueprint.BlueprintItemList[i].currentCount)
             {
                 isSuccess = false;
                 break;

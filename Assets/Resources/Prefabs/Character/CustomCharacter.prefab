@@ -216,13 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c29cff538c195c249b69c6f2236de67b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Library:
-  - m_Name: Idle
-    m_Hash: 0
-    m_CategoryList:
-    - m_Name: Idle
-      m_Hash: 0
-      m_Sprite: {fileID: 0}
+  m_Library: []
   m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: e0164a0d55e840d4babd5ccd5dfea5a0, type: 3}
 --- !u!114 &7042045069992236760
 MonoBehaviour:
@@ -1073,6 +1067,8 @@ MonoBehaviour:
   _jumpPower: 10
   _frontHandPos: {fileID: 9214590172164724445}
   _frontHand: {fileID: 270150092319229456}
+  _behindHandPos: {fileID: 5551859977916438208}
+  _behindHand: {fileID: 7291942318908313539}
   _defaultWeapon: {fileID: 11400000, guid: 9f6c2994a01b5a94a870e24117bbb624, type: 2}
   attackType: 0
   _liftPos: {fileID: 4739439959996475644}

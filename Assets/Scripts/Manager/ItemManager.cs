@@ -37,6 +37,8 @@ public class ItemManager : MonoBehaviour
         position.z = 0;
         item.transform.position = position;
 
+        item.UpBound(10);
+
         _itemDictionary.Add(item.ItemId, item);
 
         return item;

@@ -7,7 +7,7 @@ public class UI_Build : UIBase
 {
     public override void Init()
     {
-        base.Init();
+        
     }
 
     public void StartBuild(int buildingIndex)

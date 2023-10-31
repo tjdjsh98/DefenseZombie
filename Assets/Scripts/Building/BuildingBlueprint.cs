@@ -7,12 +7,18 @@ using static Define;
 public class BuildingBlueprint
 {
     [SerializeField]List<BlueprintItem> _blueprintItmeList = new List<BlueprintItem>();
-    public List<BlueprintItem> BlueprintItmeList => _blueprintItmeList;
+    public List<BlueprintItem> BlueprintItemList => _blueprintItmeList;
 }
 
 [System.Serializable]
 public class BlueprintItem
 {
+    public BlueprintItem(BlueprintItem blueprintItem)
+    {
+        name = blueprintItem.name;
+        requireCount = blueprintItem.requireCount;
+        currentCount = blueprintItem.currentCount;
+    }
     public ItemName name;
     public int requireCount;
     public int currentCount;

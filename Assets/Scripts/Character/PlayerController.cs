@@ -85,30 +85,11 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
-            if (_character.TakenItem != null && !_character.IsEquip)
-            {
-                Building building = _character.GetOverrapGameObject<Building>(Define.UnconstructedBuildingLayerMask);
-
-                if(building != null && !building.IsConstructDone)
-                {
-                    if(building.AddItemToConstruction(_character.TakenItem.ItemData.ItemName))
-                    {
-                        Item item = _character.TakenItem;
-                        _character.PutdownItem();
-                        Manager.Item.DestroyItem(item.ItemId);
-                    }
-                }
-            }
+            if (_interactingObject == null)
+                Interact();
             else
             {
-                if (_interactingObject == null)
-                    Interact();
-                else
-                {
-                    if (_interactingObject.ExitInteract(_character))
-                        _interactingObject = null;
-                }
+                ExitInteract();
             }
         }
 
@@ -125,13 +106,36 @@ public class PlayerController : MonoBehaviour
             CustomCharacter player = _character as CustomCharacter;
             if (player == null) return;
 
-            if(!player.GetIsLiftSomething())
+            // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
+            if (_character.TakenItem != null && !_character.IsEquip)
             {
-                player.GrapSomething();
+                List<IEnableInsertItem> insertableList = _character.GetOverrapGameObjects<IEnableInsertItem>();
+
+                if (insertableList.Count > 0)
+                {
+                    foreach(var insertable in insertableList)
+                    {
+                        if (insertable.InsertItem(_character.TakenItem.ItemData.ItemName))
+                        {
+                            Item item = _character.TakenItem;
+                            _character.PutdownItem();
+                            Manager.Item.DestroyItem(item.ItemId);
+
+                            break;
+                        }
+                    }
+                }
             }
             else
             {
-                player.PutdownItem();
+                if (!player.GetIsLiftSomething())
+                {
+                    player.GrapSomething();
+                }
+                else
+                {
+                    player.PutdownItem();
+                }
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape))
@@ -159,10 +163,18 @@ public class PlayerController : MonoBehaviour
     {
         InteractableObject obj = _character.GetOverrapGameObject<InteractableObject>();
 
-        if (obj.Interact(_character))
+        if (obj != null && obj.Interact(_character))
         {
             _interactingObject = obj;
         }
+    }
+
+    public void ExitInteract()
+    {
+        if(_interactingObject == null ) return;
+
+        if (_interactingObject.ExitInteract(_character))
+            _interactingObject = null;
     }
     IEnumerator CorSendMovePacket()
     {

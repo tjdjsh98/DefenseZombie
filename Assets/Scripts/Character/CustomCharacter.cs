@@ -13,6 +13,9 @@ public class CustomCharacter : Character
     [SerializeField] GameObject _frontHandPos;
     [SerializeField] GameObject _frontHand;
 
+    [SerializeField] GameObject _behindHandPos;
+    [SerializeField] GameObject _behindHand;
+
     Building _takenBuilding;
     Item _takenItem;
     public Item TakenItem => _takenItem;
@@ -173,8 +176,16 @@ public class CustomCharacter : Character
         SetAnimatorBool("IsEquip", true);
         SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
 
-        _frontHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
-        _frontHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
+        if(data.IsFrontWeapon)
+        { 
+            _frontHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
+            _frontHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
+        }
+        else
+        {
+            _behindHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
+            _behindHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
+        }
 
         return true;
     }
@@ -201,6 +212,9 @@ public class CustomCharacter : Character
         _frontHandPos.transform.localPosition = Vector3.zero;
         _frontHand.transform.localPosition = Vector3.zero;
         _frontHandPos.transform.localRotation = Quaternion.identity;
+        _behindHandPos.transform.localPosition = Vector3.zero;
+        _behindHand.transform.localPosition = Vector3.zero;
+        _behindHandPos.transform.localRotation = Quaternion.identity;
 
         _weaponData = null;
 
@@ -398,10 +412,21 @@ public class CustomCharacter : Character
 
     public void RotationFrontHand(Vector3 targetPos)
     {
-        float rotation = Mathf.Atan2((targetPos.y - _frontHandPos.transform.position.y), Mathf.Abs(targetPos.x - _frontHandPos.transform.position.x));
-        rotation = rotation / Mathf.PI * 180f;
+        if (_weaponData != null && _weaponData.IsFrontWeapon)
+        {
+            float rotation = Mathf.Atan2((targetPos.y - _frontHandPos.transform.position.y), Mathf.Abs(targetPos.x - _frontHandPos.transform.position.x));
+            rotation = rotation / Mathf.PI * 180f;
 
-        _frontHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, rotation));
+            _frontHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, rotation));
+        }
+
+        if (_weaponData != null && !_weaponData.IsFrontWeapon)
+        {
+            float rotation = Mathf.Atan2((targetPos.y - _behindHandPos.transform.position.y), Mathf.Abs(targetPos.x - _behindHandPos.transform.position.x));
+            rotation = rotation / Mathf.PI * 180f;
+
+            _behindHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, rotation));
+        }
     }
 
     protected override void Dead()

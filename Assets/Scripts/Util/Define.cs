@@ -100,7 +100,8 @@ public static class Define
         Level,
         Commander,
         Item,
-        Build
+        Build,
+        Smithy
     }
     public enum EffectName
     {

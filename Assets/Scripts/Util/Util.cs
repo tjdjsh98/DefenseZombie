@@ -21,7 +21,7 @@ public static class Util
         return null;
     }
 
-    public static T GetGameObjectByPhysics<T>(Vector3 position, Range range, int layerMask = -1) where T : MonoBehaviour
+    public static T GetGameObjectByPhysics<T>(Vector3 position, Range range, int layerMask = -1) 
     {
         RaycastHit2D[] hits;
         if (layerMask != -1)
@@ -29,7 +29,7 @@ public static class Util
         else
             hits = Physics2D.BoxCastAll (position + range.center, range.size, 0, Vector2.zero);
 
-        T result = null;
+        T result = default(T);
 
 
         foreach(var hit in hits)
@@ -42,7 +42,7 @@ public static class Util
 
         return result;
     }
-    public static List<T> GetGameObjectsByPhysics<T>(Vector3 position, Range range, int layerMask = -1) where T : MonoBehaviour
+    public static List<T> GetGameObjectsByPhysics<T>(Vector3 position, Range range, int layerMask = -1) 
     {
         List<T> result = new List<T>();
         RaycastHit2D[] hits;
@@ -53,13 +53,13 @@ public static class Util
 
         foreach (var hit in hits)
         {
-            T temp = hit.collider.gameObject.GetComponent<T>();
+            T[] temps = hit.collider.gameObject.GetComponents<T>();
 
-            if(temp != null)
+            foreach(var temp in temps)
             {
                 result.Add(temp);
-            } 
-                
+
+            }
         }
 
         return result;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using static Define;
 
@@ -407,10 +408,18 @@ public class Character : MonoBehaviour,IHp
 
         return gameObject;
     }
-
-    public T GetOverrapGameObject<T>(int layerMask = -1) where T : MonoBehaviour
+    public List<T> GetOverrapGameObjects<T>(int layerMask = -1)
     {
-        T gameObject = null;
+        List<T> gameObjectList;
+
+        gameObjectList = Util.GetGameObjectsByPhysics<T>(transform.position, _characterSize, layerMask);
+
+        return gameObjectList;
+    }
+
+    public T GetOverrapGameObject<T>(int layerMask = -1) 
+    {
+        T gameObject = default(T);
 
         gameObject = Util.GetGameObjectByPhysics<T>(transform.position, _characterSize, layerMask);
 

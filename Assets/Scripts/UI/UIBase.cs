@@ -9,8 +9,5 @@ public abstract class UIBase : MonoBehaviour
     public UIName UIName=> _uiName;
 
     public bool _isDone = false;
-    public virtual void Init()
-    {
-
-    }
+    public abstract void Init();
 }

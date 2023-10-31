@@ -10,12 +10,16 @@ public class UIManager : MonoBehaviour
     Dictionary<UIName, UIBase> _uiDictionary = new Dictionary<UIName, UIBase>();
     public void Init()
     {
-        UIBase[] uis = GameObject.Find(_canvasName).GetComponentsInChildren<UIBase>();
+        GameObject canvas = GameObject.Find(_canvasName);
 
-        foreach (UIBase ui in uis)
+        for(int i = 0; i < canvas.transform.childCount; i++)
         {
-            ui.Init();
-            _uiDictionary.Add(ui.UIName, ui);
+            UIBase ui = canvas.transform.GetChild(i).GetComponent<UIBase>();
+            if(ui != null)
+            {
+                ui.Init();
+                _uiDictionary.Add(ui.UIName, ui);
+            }
         }
     }
 

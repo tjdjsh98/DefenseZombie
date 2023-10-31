@@ -42,4 +42,9 @@ public class Item : MonoBehaviour
     {
         gameObject.SetActive(true);
     }
+
+    public void UpBound(float power)
+    {
+        _rigidbody.AddForce(Vector2.up* power,ForceMode2D.Impulse);
+    }
 }
