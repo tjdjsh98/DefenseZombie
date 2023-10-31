@@ -1,3 +1,4 @@
+using TMPro.EditorUtilities;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -210,12 +211,22 @@ public class Weapon : MonoBehaviour,ICharacterOption
         }
         else
         {
-            _frontfirePoint.transform.localPosition = WeaponAttackData.firePos;
-
-            Projectile projectile = Instantiate(WeaponAttackData.projectile);
-            projectile.transform.position = _frontfirePoint.transform.position;
-            projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
-                gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+            if ((_character.WeaponData != null && _character.WeaponData.IsFrontWeapon) ||_character.WeaponData == null)
+            {
+                _frontfirePoint.transform.localPosition = WeaponAttackData.firePos;
+                Projectile projectile = Instantiate(WeaponAttackData.projectile);
+                projectile.transform.position = _frontfirePoint.transform.position;
+                projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
+                    gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+            }
+            else if (_character.WeaponData != null && !_character.WeaponData.IsFrontWeapon)
+            {
+                _behindfirePoint.transform.localPosition = WeaponAttackData.firePos;
+                Projectile projectile = Instantiate(WeaponAttackData.projectile);
+                projectile.transform.position = _behindfirePoint.transform.position;
+                projectile.Fire(transform.localScale.x, _behindfirePoint.transform.eulerAngles,
+                    gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+            }
         }
     }
 

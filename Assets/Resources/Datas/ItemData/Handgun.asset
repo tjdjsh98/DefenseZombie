@@ -9,14 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 20f2c12f84e81014d9ff9e0330a3d41b, type: 3}
-  m_Name: 1
+  m_Script: {fileID: 11500000, guid: bc220a6ee54a4fd4da852c2bdf932562, type: 3}
+  m_Name: Handgun
   m_EditorClassIdentifier: 
-  <ResultItemName>k__BackingField: 9
-  <BlueprintItemList>k__BackingField:
-  - name: 2
-    requireCount: 1
-    currentCount: 0
-  - name: 1
-    requireCount: 1
-    currentCount: 0
+  <ItemName>k__BackingField: 9
+  <ItemSprite>k__BackingField: {fileID: 21300000, guid: 885aa514b049ebe4e963465b88b0d7ac, type: 3}
+  <ItemType>k__BackingField: 1
+  <Origin>k__BackingField: {fileID: 0}

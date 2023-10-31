@@ -57,7 +57,8 @@ public static class Define
         None,
         Gun,
         Sword,
-        Spear
+        Spear,
+        Handgun
     }
 
     public enum ItemName
@@ -70,7 +71,8 @@ public static class Define
         Sword,
         Spear,
         BeeHive,
-        Supplies
+        Supplies,
+        Handgun
     }
     public enum ItemType
     {

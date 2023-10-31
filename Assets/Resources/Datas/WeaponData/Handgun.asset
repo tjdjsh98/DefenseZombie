@@ -10,22 +10,22 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72baa7c15bd87584ba23783a00ba15a3, type: 3}
-  m_Name: Spear
+  m_Name: Handgun
   m_EditorClassIdentifier: 
-  <WeaponName>k__BackingField: 3
-  <IsFrontWeapon>k__BackingField: 1
-  <ThumbnailSprite>k__BackingField: {fileID: 1953286635, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
-  <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: e0164a0d55e840d4babd5ccd5dfea5a0, type: 3}
-  <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
+  <WeaponName>k__BackingField: 4
+  <IsFrontWeapon>k__BackingField: 0
+  <ThumbnailSprite>k__BackingField: {fileID: 21300000, guid: 885aa514b049ebe4e963465b88b0d7ac, type: 3}
+  <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: 5d02a2dd3302d144493e36d2791f7e48, type: 3}
+  <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: a314a56fdccc90b4d81cb36b21137555, type: 2}
   <AttackList>k__BackingField:
   - attackEffectName: 0
     attackEffectPoint: {x: 0, y: 0, z: 0}
-    projectile: {fileID: 0}
-    firePos: {x: 0, y: 0, z: 0}
+    projectile: {fileID: -1882469459523969698, guid: 134218f7f0413934f81594b5d2a0a968, type: 3}
+    firePos: {x: 0.94, y: 0.52, z: 0}
     hitEffectName: 1
     attackRange:
-      center: {x: 0.95, y: 0.56, z: 0}
-      size: {x: 1.96, y: 1.05, z: 0}
+      center: {x: 0.48, y: 0.78, z: 0}
+      size: {x: 1.08, y: 1.49, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
     damage: 1

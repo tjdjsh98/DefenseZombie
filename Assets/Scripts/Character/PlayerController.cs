@@ -137,7 +137,11 @@ public class PlayerController : MonoBehaviour
                 {
                     player.GrapSomething();
                 }
-               
+                else
+                {
+                    player.PutdownItem();
+                }
+
             }
         }
         if (Input.GetKeyDown(KeyCode.Escape))

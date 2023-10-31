@@ -67,6 +67,10 @@ public class CustomCharacter : Character
                 GrapItem(item);
             }
         }
+        else
+        {
+            TakeOffWeapon();
+        }
        
     }
 
@@ -205,9 +209,12 @@ public class CustomCharacter : Character
 
         AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
 
-        myOverrideController["UpperAttack"] = data.AttackAnimationClip;
+        if (data.IsFrontWeapon)
+            myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
+        else
+            myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
         SetAnimatorBool("IsEquip", false);
-        SetAnimatorBool("IsFrontWeapon", true);
+        SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
 
         _frontHandPos.transform.localPosition = Vector3.zero;
         _frontHand.transform.localPosition = Vector3.zero;

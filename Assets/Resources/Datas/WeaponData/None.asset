@@ -16,7 +16,7 @@ MonoBehaviour:
   <IsFrontWeapon>k__BackingField: 1
   <ThumbnailSprite>k__BackingField: {fileID: 0}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
-  <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: b16e2c70f99e69a49ba6b33346d403bf, type: 2}
+  <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: d66d6ce1277566e4f85053bd04f5996a, type: 2}
   <AttackList>k__BackingField:
   - attackEffectName: 0
     attackEffectPoint: {x: 0, y: 0, z: 0}
