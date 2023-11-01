@@ -75,7 +75,9 @@ public class Weapon : MonoBehaviour,ICharacterOption
     {
         Gizmos.color = Color.red;
 
-        Range attackRange = WeaponAttackData.attackRange;
+        WeaponData weaponData = _character.PreTakenWeaponData == null ? WeaponData : _character.PreTakenWeaponData;
+
+        Range attackRange = weaponData.AttackList[0].attackRange;
 
         Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
         Gizmos.matrix = rotationMatrix;
@@ -83,16 +85,16 @@ public class Weapon : MonoBehaviour,ICharacterOption
         if (_character != null)
             attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
 
-        Vector3 point = WeaponAttackData.attackEffectPoint;
+        Vector3 point = weaponData.AttackList[0].attackEffectPoint;
 
         Gizmos.DrawWireSphere( point, 0.1f);
 
-        if(WeaponAttackData.projectile)
+        if(weaponData.AttackList[0].projectile)
         {
             Gizmos.DrawWireSphere( WeaponAttackData.firePos, 0.1f);
         }
 
-        switch (WeaponAttackData.attacKShape)
+        switch (weaponData.AttackList[0].attacKShape)
         {
             case Define.AttacKShape.Rectagle:
                 Gizmos.DrawWireCube( attackRange.center, attackRange.size);
@@ -105,7 +107,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 break;
         }
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, WeaponAttackData.AttackDirection.normalized);
+        Gizmos.DrawRay(transform.position, weaponData.AttackList[0].AttackDirection.normalized);
 
     }
 
@@ -153,7 +155,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 Instantiate(g).transform.position = character.transform.position;
             }
         }
-        if (WeaponAttackData.projectile == null)
+        else if (WeaponAttackData.projectile == null)
         {
             Range attackRange = WeaponAttackData.attackRange;
             attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? WeaponAttackData.attackRange.center.x : -WeaponAttackData.attackRange.center.x);

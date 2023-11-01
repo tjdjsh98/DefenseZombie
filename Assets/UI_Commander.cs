@@ -140,7 +140,6 @@ public class UI_Commander : UIBase
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             foreach(var ai in _list)
             {
-                Debug.Log(ai);
                 ai.SetMainPos(mousePosition.x);
             }
         }

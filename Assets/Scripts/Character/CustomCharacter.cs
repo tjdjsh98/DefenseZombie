@@ -23,7 +23,7 @@ public class CustomCharacter : Character
 
     // 가지고 나올 무기 정보
     [SerializeField]WeaponData _preTakenWeaponData;
-
+    public WeaponData PreTakenWeaponData => _preTakenWeaponData;
     // 현재 장착 중인 무기의 정보
     WeaponData _weaponData;
     public WeaponData WeaponData
