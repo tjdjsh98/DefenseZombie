@@ -1162,6 +1162,8 @@ MonoBehaviour:
     power: 0
     stagger: 0
     penetrationPower: 0
+    actualAttackEffectName: 0
+    isTargeting: 0
   _frontWeapon: {fileID: 2117841643158420137}
   _frontfirePoint: {fileID: 8889592209697593388}
   _behindWeapon: {fileID: 2368006003090742442}
@@ -1208,6 +1210,7 @@ MonoBehaviour:
   _attackRange:
     center: {x: 0.5, y: 0.5, z: 0}
     size: {x: 2, y: 2, z: 0}
+  _isPickItem: 1
 --- !u!1 &6092340621936118896
 GameObject:
   m_ObjectHideFlags: 0

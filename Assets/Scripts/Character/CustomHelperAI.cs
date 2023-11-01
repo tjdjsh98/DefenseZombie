@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Tracing;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -8,7 +9,6 @@ public class CustomHelperAI : HelperAI
 {
     CustomCharacter _customCharacter;
     Weapon _weapon;
-
     protected override Range AttackRange
     {
         get
@@ -26,6 +26,9 @@ public class CustomHelperAI : HelperAI
         }   
     }
 
+    [SerializeField] bool _isPickItem;
+    Item _targetItem;
+
     public override void Init()
     {
         base.Init();
@@ -39,10 +42,80 @@ public class CustomHelperAI : HelperAI
         if (_character.IsAttacking) return;
         _time += Time.deltaTime;
 
+        if (_isPickItem)
+        {
+            PickItemAI();
+        }
+        else
+        {
+            if (_time >= _searchRenewTime)
+            {
+                _time = 0;
+                Search();
+            }
+            if (_character.CharacterState == CharacterState.Idle)
+            {
+                if (_mainPointAlter)
+                {
+                    _movePoint = _mainPoint;
+                    _mainPointAlter = false;
+                }
+                if (_target == null)
+                {
+                    if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
+                    {
+                        _character.SetCharacterDirection(Vector3.zero);
+                        _idleElapsed += Time.deltaTime;
+                        if (_idleElapsed >= _idleDuration)
+                        {
+                            _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
+                            _idleElapsed = 0;
+                        }
+                    }
+                    else
+                    {
+                        _character.Turn((_movePoint - transform.position).x);
+                        _character.SetCharacterDirection(_movePoint - transform.position);
+
+                    }
+                }
+                else
+                {
+                    Vector3 targetPos = _target.transform.position;
+                    targetPos += _target.CharacterSize.center;
+
+                    _character.Turn((targetPos - transform.position).x);
+                    _customCharacter.RotationFrontHand(targetPos);
+
+                    Range range = AttackRange;
+                    range.center /= 2;
+                    if (Util.GetIsInRange(_character.gameObject, _target.gameObject, range))
+                    {
+                        _character.SetCharacterDirection(Vector3.zero);
+                        AttackHanlder?.Invoke();
+                        Client.Instance.SendCharacterInfo(_character);
+                    }
+                    else
+                    {
+                        _character.SetCharacterDirection(_target.transform.position - transform.position);
+                    }
+                }
+            }
+            else
+            {
+                _character.SetCharacterDirection(Vector2.zero);
+            }
+        }
+    }
+
+    void PickItemAI()
+    {
+        if (_targetItem != null && _targetItem.IsFreeze)
+            _targetItem = null;
+
         if (_time >= _searchRenewTime)
         {
-            _time = 0;
-            Search();
+            SearchItem();
         }
         if (_character.CharacterState == CharacterState.Idle)
         {
@@ -51,50 +124,81 @@ public class CustomHelperAI : HelperAI
                 _movePoint = _mainPoint;
                 _mainPointAlter = false;
             }
-            if (_target == null)
+
+            if (_customCharacter.TakenItem == null && _customCharacter.WeaponData.WeaponName == Define.WeaponName.None)
             {
-                if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
+
+                if (_targetItem == null)
                 {
-                    _character.SetCharacterDirection(Vector3.zero);
-                    _idleElapsed += Time.deltaTime;
-                    if (_idleElapsed >= _idleDuration)
+                    if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
                     {
-                        _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
-                        _idleElapsed = 0;
+                        _character.SetCharacterDirection(Vector3.zero);
+                        _idleElapsed += Time.deltaTime;
+                        if (_idleElapsed >= _idleDuration)
+                        {
+                            _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
+                            _idleElapsed = 0;
+                        }
+                    }
+                    else
+                    {
+                        _character.Turn((_movePoint - transform.position).x);
+                        _character.SetCharacterDirection(_movePoint - transform.position);
+
                     }
                 }
                 else
                 {
-                    _character.Turn((_movePoint - transform.position).x);
-                    _character.SetCharacterDirection(_movePoint - transform.position);
-                   
+                    if (Mathf.Abs(_targetItem.transform.position.x - transform.position.x) > 0.2f)
+                    {
+                        _character.Turn((_targetItem.transform.position - transform.position).x);
+                        _customCharacter.SetCharacterDirection(_targetItem.transform.position - transform.position);
+                    }
+                    else
+                    {
+                        _customCharacter.GrapItem(_targetItem);
+                    }
                 }
             }
             else
             {
-                Vector3 targetPos = _target.transform.position;
-                targetPos += _target.CharacterSize.center;
-
-                _character.Turn((targetPos - transform.position).x);
-                _customCharacter.RotationFrontHand(targetPos);
-
-                Range range = AttackRange;
-                range.center /= 2;
-                if (Util.GetIsInRange(_character.gameObject, _target.gameObject, range))
+                if (Mathf.Abs(_mainPoint.x - transform.position.x) > 0.2f)
                 {
-                    _character.SetCharacterDirection(Vector3.zero);
-                    AttackHanlder?.Invoke();
-                    Client.Instance.SendCharacterInfo(_character);
+                    _customCharacter.Turn((_mainPoint - transform.position).x);
+                    _customCharacter.SetCharacterDirection(_mainPoint - transform.position);
                 }
                 else
                 {
-                    _character.SetCharacterDirection(_target.transform.position - transform.position);
+                    _customCharacter.PutdownItem();
                 }
             }
         }
-        else
+    }
+
+    protected void SearchItem()
+    {
+        int layerMask = Define.ItemLayerMask;
+        RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + SearchRange.center, SearchRange.size, 0, Vector2.zero, 0, layerMask);
+        if (hits.Length <= 0) return;
+
+        bool isSearch = false;
+
+        // 가장 근접한 적을 우선 타겟으로 둔다
+        float distance = 100;
+        foreach (RaycastHit2D hit in hits)
         {
-            _character.SetCharacterDirection(Vector2.zero);
+            if (Mathf.Abs(hit.collider.gameObject.transform.position.x - _mainPoint.x) < 1f) continue;
+
+            Item item = hit.collider.gameObject.GetComponent<Item>();
+
+            if (item != null && (transform.position - item.transform.position).magnitude < distance)
+            {
+                distance = (transform.position - item.transform.position).magnitude;
+                _targetItem= item;
+                isSearch = true;
+            }
         }
+        if (!isSearch) _targetItem = null;
+        
     }
 }

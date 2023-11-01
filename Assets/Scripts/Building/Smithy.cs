@@ -49,6 +49,7 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
         if (_openCharacter != null || _mainBlueprint != null) return false;
 
         _openCharacter = character;
+        character.IsEnableAttack = false;
 
         if(_ui == null)_ui = Manager.UI.GetUI(Define.UIName.Smithy) as UI_Smithy;
 
@@ -60,7 +61,7 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
     public override bool ExitInteract(Character character)
     {
         _ui.Close();
-
+        character.IsEnableAttack = true;
         _openCharacter = null;
 
         return true;

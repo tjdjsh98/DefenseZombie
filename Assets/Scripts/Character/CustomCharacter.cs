@@ -319,7 +319,7 @@ public class CustomCharacter : Character
         return null;
     }
 
-    void GrapItem(Item item)
+    public void GrapItem(Item item)
     {
         if (_takenItem || _takenBuilding || IsEquip) return;
 

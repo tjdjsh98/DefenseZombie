@@ -16,6 +16,8 @@ public static class Define
     public static int GroundLayerMask = LayerMask.GetMask("Ground");
     public static int UnconstructedBuildingLayerMask = LayerMask.GetMask("UnconstrctedBuilding");
     public static int UnconstructedBuildingLayer = LayerMask.NameToLayer("UnconstrctedBuilding");
+    public static int ItemLayerMask = LayerMask.GetMask("Item");
+
     public enum AttacKShape
     {
         Rectagle,
@@ -51,10 +53,7 @@ public static class Define
         Horriy,
         CustomCharacter,
         Bee,
-        CustomEnemy,
-        CustomEnemySpear,
-        CustomEnemyHandgun,
-
+        CustomEnemy
     }
 
     public enum WeaponName

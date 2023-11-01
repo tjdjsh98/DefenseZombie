@@ -40,6 +40,7 @@ public class GameManager : MonoBehaviour
     }
     IEnumerator CorStartLevel()
     {
+        int index = 0;
         while (true)
         {
             // 싱글일 때, 혹은 멀티인데 메인 클라이언트라면
@@ -53,21 +54,32 @@ public class GameManager : MonoBehaviour
                     {
                         if (_levels.Count <= _level) _level = 0;
 
-                        for(int i = 0; i < 3; i++)
-                            Manager.Building.GenerateBuilding(BuildingName.Rock, new Vector2Int(UnityEngine.Random.Range(-20, 20),-3));
-
                         IsStartLevel = true;
+                        index = 0;
                         time = _levels[_level].nextInterval;
+                    }
+                }
+                else
+                {
+                    if (index < _levels[_level].levelCharacterList.Count)
+                    {
+                        LevelCharacter levelCharacter = _levels[_level].levelCharacterList[index];
+                        CharacterName enemyName = levelCharacter.characterName;
 
-                        Vector3 genPosition = new Vector3(20, -1f, 0);
-                        for (int i = 0; i < _levels[_level].count; i++)
+                        for (int i = 0; i < (levelCharacter.spawnCount == 0 ? 1 : levelCharacter.spawnCount); i++)
                         {
-                            CharacterName enemyName = _levels[_level].enemyName;
+                            Vector3 genPos = Vector3.zero;
+                            if (levelCharacter.isRandomSpawn)
+                                genPos = new Vector3(Random.Range(0, 2) == 0 ? 20 : -20, -2f, 0);
+                            else if (levelCharacter.isRightSpawn)
+                                genPos = new Vector3(20, -2f, 0);
+                            else if (!levelCharacter.isRandomSpawn)
+                                genPos = new Vector3(-20, -2f, 0);
 
                             Character character = null;
-                            int requsetNumber= Manager.Character.GenerateCharacter(enemyName, genPosition,ref character);
+                            int requsetNumber = Manager.Character.GenerateCharacter(enemyName, genPos, ref character);
 
-                            if(requsetNumber != -1)
+                            if (requsetNumber != -1)
                             {
                                 _generateRequestList.Add(requsetNumber);
                             }
@@ -77,19 +89,34 @@ public class GameManager : MonoBehaviour
                                 character.DeadHandler += () =>
                                 {
                                     SummonCount--;
-                                    if (SummonCount <= 0)
-                                    {
-                                        IsStartLevel = false;
-                                        _level++;
-                                        SummonCount = 0;
-                                    }
                                 };
                             }
 
-                            yield return new WaitForSeconds(_levels[_level].genInterval);
+                            if(character != null)
+                            {
+                                CustomCharacter customCharacter = character as CustomCharacter;
+
+                                if(levelCharacter.itemCharacterHas != null)
+                                {
+                                    Item item = Manager.Item.GenerateItem(levelCharacter.itemCharacterHas.ItemName,character.transform.position);
+                                    customCharacter.GrapItem(item);
+                                }
+                            }
+                        }
+
+                        yield return new WaitForSeconds(_levels[_level].levelCharacterList[index].nextGenDelay);
+
+                        index++;
+                    }
+                    else
+                    {
+                        if(SummonCount <= 0)
+                        {
+                            IsStartLevel = false;
+                            _level++;
                         }
                     }
-                }
+                }    
 
                 // 일정 갯수의 나무와 바위 지속 생성
 
@@ -145,12 +172,6 @@ public class GameManager : MonoBehaviour
                 character.DeadHandler += () =>
                 {
                     SummonCount--;
-                    if (SummonCount == 0)
-                    {
-                        IsStartLevel = false;
-                        _level++;
-                    }
-
                 };
             }
         }
@@ -190,8 +211,17 @@ public class GameManager : MonoBehaviour
 public class Level
 {
     public string levelName;
-    public float genInterval;
-    public CharacterName enemyName;
-    public int count;
+    public List<LevelCharacter> levelCharacterList;
     public float nextInterval;
+}
+
+[System.Serializable]
+public class LevelCharacter
+{
+    public CharacterName characterName;
+    public ItemData itemCharacterHas;
+    public int spawnCount;
+    public bool isRandomSpawn;
+    public bool isRightSpawn;
+    public float nextGenDelay;
 }

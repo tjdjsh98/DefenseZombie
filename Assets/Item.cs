@@ -12,6 +12,7 @@ public class Item : MonoBehaviour
     SpriteRenderer _spriteRenderer;
     Rigidbody2D _rigidbody;
 
+    public bool IsFreeze => _rigidbody.isKinematic;
     
     public void Init(ItemData itemData, int itemNumber)
     {
@@ -25,11 +26,13 @@ public class Item : MonoBehaviour
 
     public void FreezeRigidBody()
     {
+        _rigidbody.velocity = Vector3.zero;
         _rigidbody.isKinematic = true;
     }
 
     public void ReleaseRigidBody()
     {
+        _rigidbody.velocity = Vector3.zero;
         _rigidbody.isKinematic = false;
     }
 
