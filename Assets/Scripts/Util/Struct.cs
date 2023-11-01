@@ -25,6 +25,8 @@ public struct AttackData
     public float power;
     public float stagger;
     public int penetrationPower;
+    public EffectName actualAttackEffectName;
+    public bool isTargeting;
 }
 
 // 캐릭터가 아이템을 넣을 수 있는 오브젝트

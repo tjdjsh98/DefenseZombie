@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor.Tilemaps;
 using UnityEngine;
 using static Define;
 
@@ -17,7 +18,7 @@ public class CharacterManager : MonoBehaviour
                 // 싱글 이때
                 if (Client.Instance.ClientId == -1)
                 {
-                    _main = Manager.Character.GenerateCharacter(CharacterName.CustomCharacter, Vector3.zero) as Character;
+                    Manager.Character.GenerateCharacter(CharacterName.CustomCharacter, Vector3.zero, ref _main);
                 }
                 else
                 {
@@ -41,7 +42,35 @@ public class CharacterManager : MonoBehaviour
     {
         
     }
-    public Character GenerateCharacter(CharacterName name,Vector3 position)
+
+    // 해당 아이디에 해당하는 캐릭터 반환
+    public Character GetCharacter(int id)
+    {
+        Character character = null;
+
+        _characterDictionary.TryGetValue(id, out character);
+
+        return character;
+    }
+
+    // 싱글, 멀티 혼용으로 사용하는 캐릭터 생성 함수
+    public int GenerateCharacter(CharacterName name, Vector3 position,ref Character character, bool isPlayerCharacter = false)
+    {
+        int requestNumber = -1;
+        if(Client.Instance.ClientId == -1)
+        {
+            character = GenerateCharacter(name, position);
+        }
+        else
+        {
+            requestNumber = RequestGenerateCharacter(name, position,isPlayerCharacter);
+        }
+
+        return requestNumber;
+    }
+    
+    // 싱글 일 떄 캐릭터 생성
+    private Character GenerateCharacter(CharacterName name,Vector3 position)
     {
         Character characterOrigin = Manager.Data.GetCharacter(name);
 
@@ -57,22 +86,37 @@ public class CharacterManager : MonoBehaviour
 
         return character;
     }
-
-    public Character GetCharacter(int id)
+    // 멀티 일 떄 캐릭터 만드는 것을 서버에게 요청합니다.
+    private int RequestGenerateCharacter(CharacterName name, Vector3 position, bool isPlayerCharacter = false)
     {
-        Character character = null;
+        int requestNumber = UnityEngine.Random.Range(3000, 99999);
 
-        _characterDictionary.TryGetValue(id, out character);
+        Client.Instance.SendRequestGenreateCharacter(name, position, requestNumber, isPlayerCharacter);
 
-        return character;
+        return requestNumber;
     }
 
-    public void RequestRemoveCharacter(int id)
+    // 싱글, 멀티 혼용으로 사용하는 캐릭터 삭제 함수
+    public void RemoveCharacter(int id)
+    {
+        if(Client.Instance.ClientId == -1)
+        {
+            SingleRemoveCharacter(id);
+        }
+        else
+        {
+            RequestRemoveCharacter(id);
+        }
+    }
+
+    // 멀티 일 떄 캐릭터 삭제를 서버에게 요청합니다.
+    private void RequestRemoveCharacter(int id)
     {
         Client.Instance.SendRequestRemoveCharacter(id);
     }
 
-    public void RemoveCharacter(int id)
+    // 싱글 일 떄 캐릭터 삭제
+    void SingleRemoveCharacter(int id)
     {
         Character character = null;
 
@@ -85,33 +129,6 @@ public class CharacterManager : MonoBehaviour
         _characterDictionary.Remove(id);
     }
 
-
-    public Character GenerateAndSendPacket(CharacterName name, Vector3 position, bool isPlayerCharacter = false)
-    {
-        Character characterOrigin = Manager.Data.GetCharacter(name);
-
-        if (characterOrigin == null) return null;
-
-        Character character = Instantiate(characterOrigin);
-        character.transform.position = position;
-        if (Client.Instance.ClientId == -1)
-            character.CharacterId = ++_characterId;
-            
-        _characterDictionary.Add(character.CharacterId, character);
-
-
-        return character;
-    }
-
-    // 캐릭터 만드는 것을 서버에게 요청합니다.
-    public int RequestGenerateCharacter(CharacterName name, Vector3 position, bool isPlayerCharacter = false)
-    {
-        int requestNumber = UnityEngine.Random.Range(3000, 99999);
-
-        Client.Instance.SendRequestGenreateCharacter(name, position, requestNumber, isPlayerCharacter);
-
-        return requestNumber;
-    }
 
     // 패킷으로 받은 정보로 더미 캐릭터를 만듭니다.
     // 자신의 캐릭터의 ID와 맞는 캐릭터와 맞으면 조작 가능 캐릭터가 나옵니다.

@@ -35,7 +35,7 @@ public class Client : MonoBehaviour
     bool _isEnableEnterGame = false;
     bool _successEnterGame = false;
     bool _isRequestAllInfo = false;
-    public bool IsSingle { get; set; } = false;
+    public bool IsSingle { get { return ClientId == -1; } }
     [field:SerializeField]public float Delay = 0;
 
     public static float SendPacketInterval = 0.1f;

@@ -305,7 +305,9 @@ MonoBehaviour:
   _jumpPower: 10
   _frontHandPos: {fileID: 285117940277506658}
   _frontHand: {fileID: 4472389917153705133}
-  _defaultWeapon: {fileID: 11400000, guid: 9f6c2994a01b5a94a870e24117bbb624, type: 2}
+  _behindHandPos: {fileID: 6853389751011361528}
+  _behindHand: {fileID: 1604390588027744911}
+  _preTakenWeaponData: {fileID: 11400000, guid: c41fe078c846d0040b3f207527d001b8, type: 2}
   attackType: 0
   _liftPos: {fileID: 7946594430840207039}
 --- !u!114 &7634549512888743910
@@ -357,6 +359,8 @@ MonoBehaviour:
     power: 0
     stagger: 0
     penetrationPower: 0
+    actualAttackEffectName: 0
+    isTargeting: 0
   _frontWeapon: {fileID: 5271968893856518667}
   _frontfirePoint: {fileID: 7831616519700213943}
   _behindWeapon: {fileID: 6797797859868578522}

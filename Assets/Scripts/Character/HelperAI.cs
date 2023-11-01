@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class HelperAI : MonoBehaviour
+public class HelperAI : MonoBehaviour, ICharacterOption
 {
-    Character _character;
+    protected Character _character;
 
-    Character _target;
+    protected Character _target;
 
-    [SerializeField] Vector3 _mainPoint;
-    [SerializeField] float _aroundRange;
-    [SerializeField] Range _searchRange;
-    [SerializeField]Range _attackRange;
-    Range AttackRange
+    [SerializeField]protected Vector3 _mainPoint;
+    [SerializeField] protected float _aroundRange;
+    [SerializeField] protected Range _searchRange;
+    [SerializeField]protected Range _attackRange;
+    protected virtual Range AttackRange
     {
         get
         {
@@ -24,7 +24,7 @@ public class HelperAI : MonoBehaviour
             return temp;
         }
     }
-    Range SearchRange
+    protected Range SearchRange
     {
         get
         {
@@ -35,18 +35,18 @@ public class HelperAI : MonoBehaviour
         }
     }
 
-    float _time = 0;
-    float _searchRenewTime = 1f;
-
-    float _idleDuration = 3;
-    float _idleElapsed = 0;
-    Vector3 _movePoint;
+    protected float _time = 0;
+    protected float _searchRenewTime = 1f;
+    
+    protected float _idleDuration = 3;
+    protected float _idleElapsed = 0;
+    protected Vector3 _movePoint;
 
     public Action AttackHanlder;
 
-    bool _mainPointAlter;
+    protected bool _mainPointAlter;
 
-    protected void Awake()
+    public virtual void Init()
     {
         _character = GetComponent<Character>();
         if (Client.Instance.ClientId != -1)
@@ -65,7 +65,7 @@ public class HelperAI : MonoBehaviour
     }
     private void Update()
     {
-        if (!Client.Instance.IsMain) return;
+        if (!Client.Instance.IsMain && !Client.Instance.IsSingle) return;
         AI();
     }
 
@@ -75,7 +75,7 @@ public class HelperAI : MonoBehaviour
         _mainPointAlter = true;
     }
 
-    void AI()
+    protected virtual void AI()
     {
         if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.IsAttacking) return;
@@ -130,9 +130,9 @@ public class HelperAI : MonoBehaviour
     }
 
 
-    void Search()
+    protected void Search()
     {
-        int layerMask = LayerMask.GetMask("Character");
+        int layerMask = Define.EnemyLayerMask;
         RaycastHit2D[] hits = Physics2D.BoxCastAll(transform.position + SearchRange.center, SearchRange.size, 0, Vector2.zero, 0, layerMask);
         if (hits.Length <= 0) return;
 
@@ -141,14 +141,13 @@ public class HelperAI : MonoBehaviour
         foreach (RaycastHit2D hit in hits)
         {
             if (hit.collider.gameObject == _character.gameObject) continue;
-            if (hit.collider.gameObject.tag == "Enemy")
+
+            Character character = hit.collider.gameObject.GetComponentInParent<Character>();
+            if (character != null && (transform.position - character.transform.position).magnitude < distance)
             {
-                Character character = hit.collider.gameObject.GetComponentInParent<Character>();
-                if (character != null && (transform.position - character.transform.position).magnitude < distance)
-                {
-                    _target = character;
-                }
+                _target = character;
             }
+            
         }
     }
 

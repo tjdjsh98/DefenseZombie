@@ -10,7 +10,7 @@ public class Character : MonoBehaviour,IHp
     protected Rigidbody2D _rigidBody;
     [field: SerializeField]public CharacterName CharacterName {private set; get; }
     public Rigidbody2D RigidBody => _rigidBody;
-    protected SpriteRenderer _spriteRenderer;
+    protected SpriteRenderer[] _spriteRenderers;
     protected CapsuleCollider2D _capsuleCollider;
     protected Animator _animator;
 
@@ -58,6 +58,7 @@ public class Character : MonoBehaviour,IHp
 
     // 행동 제약
     public bool IsEnableMove { get; set; } = true;
+    public bool IsEnableAttack { get; set; } = true;
 
     // 행동 상태
     public bool IsAttacking { set; get; }
@@ -87,7 +88,8 @@ public class Character : MonoBehaviour,IHp
     protected virtual void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
-        _spriteRenderer = transform.Find("Model").GetComponent<SpriteRenderer>();
+        _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>();
+
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
         _animator = GetComponent<Animator>();
 
@@ -371,19 +373,8 @@ public class Character : MonoBehaviour,IHp
 
     protected virtual void Dead()
     {
-        if (Client.Instance.IsMain)
-        {
-            DeadHandler?.Invoke();
-            Manager.Character.RequestRemoveCharacter(CharacterId);
-        }
-        else
-        {
-            if (Client.Instance.ClientId == -1)
-            {
-                DeadHandler?.Invoke();
-                Manager.Character.RemoveCharacter(CharacterId);
-            }
-        }
+        DeadHandler?.Invoke();
+        Manager.Character.RemoveCharacter(CharacterId);
     }
 
     IEnumerator CorTurnToIdle(float time)
@@ -432,7 +423,11 @@ public class Character : MonoBehaviour,IHp
         _rigidBody.velocity = Vector2.zero;
         _rigidBody.isKinematic = true;
         _capsuleCollider.enabled = false;
-        _spriteRenderer.enabled = false;
+
+        foreach(var sr in _spriteRenderers)
+        {
+            sr.enabled = false;
+        }
         IsHide = true;
     }
 
@@ -440,7 +435,10 @@ public class Character : MonoBehaviour,IHp
     {
         _rigidBody.isKinematic = false;
         _capsuleCollider.enabled = true;
-        _spriteRenderer.enabled = true;
+        foreach (var sr in _spriteRenderers)
+        {
+            sr.enabled = true;
+        }
         IsHide = false;
     }
     public void SetVelocity(Vector2 velocity)

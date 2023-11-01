@@ -25,22 +25,22 @@ public class Weapon : MonoBehaviour,ICharacterOption
             {
                 return _defaultAttack;
             }
-
-            if(_character.WeaponData== null)
-            {
-                return _character.DefaultWeapon.AttackList[_attackType];
-            }
-            else
-            {
-                return _character.WeaponData.AttackList[_attackType];
-
-            }
+            return _character.WeaponData.AttackList[_attackType];
         }
     }
-
+    public WeaponData WeaponData
+    {
+        get
+        {
+            return _character.WeaponData;
+        }
+    }
     [SerializeField] protected string _enableAttackLayer = "Enemy";
     
     public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
+
+    float _attackTime;
+
     public virtual void Init()
     {
         _character = GetComponent<CustomCharacter>();
@@ -63,6 +63,12 @@ public class Weapon : MonoBehaviour,ICharacterOption
             _animatorHandler.AttackHandler += Attack;
         }
         _animatorHandler.AttackEndHandler += OnAttackEnd;
+    }
+
+    public void Update()
+    {
+        if (!_character.IsAttacking!)
+            _attackTime += Time.deltaTime;
     }
 
     protected virtual void OnDrawGizmos()
@@ -108,7 +114,9 @@ public class Weapon : MonoBehaviour,ICharacterOption
         if (Manager.Building.IsDrawing) return;
         if (_character.IsLift) return;
         if (_character.IsAttacking) return;
+        if (WeaponData.AttackDelay > _attackTime) return;
 
+        _attackTime = 0;
         _character.IsAttacking = true;
         _character.AttackType = _attackType;
 
@@ -134,6 +142,17 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
     public virtual void Attack()
     {   
+        if(WeaponAttackData.actualAttackEffectName != Define.EffectName.None)
+        {
+            int layerMask = gameObject.tag == "Enemy" ? Define.PlayerLayerMask : Define.EnemyLayerMask;
+            Character character = Util.GetGameObjectByPhysics<Character>(transform.position,WeaponAttackData.attackRange,layerMask);
+
+            if(character != null)
+            {
+                GameObject g = Manager.Data.GetEffect(WeaponAttackData.actualAttackEffectName);
+                Instantiate(g).transform.position = character.transform.position;
+            }
+        }
         if (WeaponAttackData.projectile == null)
         {
             Range attackRange = WeaponAttackData.attackRange;

@@ -20,16 +20,9 @@ public class GeneratCharacterPeriodically : MonoBehaviour
         else
         {
             _time = 0;
-            if (Client.Instance.ClientId == -1) {
-                Manager.Character.GenerateCharacter(_genList[Random.Range(0, _genList.Count)], transform.position);
-            }
-            else
-            {
-                if(Client.Instance.IsMain) 
-                {
-                    Manager.Character.RequestGenerateCharacter(_genList[Random.Range(0, _genList.Count)], transform.position);
-                }
-            }
+
+            Character character = null;
+            Manager.Character.GenerateCharacter(_genList[Random.Range(0, _genList.Count)], transform.position, ref character);
         }
     }
 }

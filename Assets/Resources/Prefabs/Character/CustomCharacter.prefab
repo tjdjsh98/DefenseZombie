@@ -1069,7 +1069,7 @@ MonoBehaviour:
   _frontHand: {fileID: 270150092319229456}
   _behindHandPos: {fileID: 5551859977916438208}
   _behindHand: {fileID: 7291942318908313539}
-  _defaultWeapon: {fileID: 11400000, guid: 9f6c2994a01b5a94a870e24117bbb624, type: 2}
+  _preTakenWeaponData: {fileID: 0}
   attackType: 0
   _liftPos: {fileID: 4739439959996475644}
 --- !u!114 &-3789622636814383866

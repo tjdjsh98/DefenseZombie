@@ -5,7 +5,9 @@ using UnityEngine;
 public static class Define
 {
     public static int PlayerLayerMask = LayerMask.GetMask("Player");
+    public static int PlayerLayer = LayerMask.NameToLayer("Player");
     public static int EnemyLayerMask = LayerMask.GetMask("Enemy");
+    public static int EnemyLayer = LayerMask.NameToLayer("Enemy");
     public static int CharacterLayerMask = PlayerLayerMask | EnemyLayerMask;
     public static int BuildingLayerMask = LayerMask.GetMask("BothPassableBuilding") |
         LayerMask.GetMask("OnlyPlayerPassableBuilding") |
@@ -49,7 +51,10 @@ public static class Define
         Horriy,
         CustomCharacter,
         Bee,
-        CustomEnemy
+        CustomEnemy,
+        CustomEnemySpear,
+        CustomEnemyHandgun,
+
     }
 
     public enum WeaponName
@@ -58,7 +63,8 @@ public static class Define
         Gun,
         Sword,
         Spear,
-        Handgun
+        Handgun,
+        ZeusSpear
     }
 
     public enum ItemName
@@ -72,7 +78,8 @@ public static class Define
         Spear,
         BeeHive,
         Supplies,
-        Handgun
+        Handgun,
+        ZeusSpear
     }
     public enum ItemType
     {
@@ -111,7 +118,8 @@ public static class Define
         None,
         Normal,
         Dash,
-        Dust
+        Dust,
+        Thunder
     }
 }
 

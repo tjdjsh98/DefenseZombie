@@ -63,7 +63,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!IsControllerable) return;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
             AttackKeyDownHandler?.Invoke();
         if (Input.GetMouseButtonUp(0))
             AttackKeyUpHandler?.Invoke();

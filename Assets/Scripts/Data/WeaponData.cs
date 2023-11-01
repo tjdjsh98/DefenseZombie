@@ -14,4 +14,8 @@ public class WeaponData : ScriptableObject
     [field: SerializeField] public SpriteLibraryAsset WeaponSpriteLibrary { set; get; }
     [field: SerializeField] public AnimationClip AttackAnimationClip { set; get; }
     [field: SerializeField] public List<AttackData> AttackList { set; get; }
+
+    [field: SerializeField] public float AttackDelay { set; get; }
+
+  
 }

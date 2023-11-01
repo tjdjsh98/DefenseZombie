@@ -56,7 +56,7 @@ class PacketHandler
     {
         S_BroadcastLeaveGame pkt = packet as S_BroadcastLeaveGame;
 
-        Manager.Character.RequestRemoveCharacter(pkt.playerId);
+        Manager.Character.RemoveCharacter(pkt.playerId);
     }
 
     public static void S_BroadcastCharacterInfoHandler(PacketSession session, IPacket packet)

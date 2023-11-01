@@ -29,7 +29,8 @@ public class AnimatorHandler : MonoBehaviour, ICharacterOption
     }
     public void AnimatorAttackEnd()
     {
-        _character.IsAttacking = false;
+        if(_character != null)
+            _character.IsAttacking = false;
         AttackEndHandler?.Invoke();
     }
 
@@ -51,6 +52,12 @@ public class AnimatorHandler : MonoBehaviour, ICharacterOption
 
     public void AnimatorSetAttackType(int type)
     {
-        _character.AttackType = type;
+        if(_character != null)
+            _character.AttackType = type;
+    }
+
+    public void ShakeEffect(float power)
+    {
+        Camera.main.GetComponent<CameraMove>().ShakeCamera(power, 0.4f);
     }
 }

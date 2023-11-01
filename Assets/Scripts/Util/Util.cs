@@ -64,6 +64,11 @@ public static class Util
 
         return result;
     }
+    public static void GetHItsByPhysics(Transform transform, Range range, int layerMask, out RaycastHit2D[] hits)
+    {
+        range.center.x = (transform.localScale.x > 0 ? range.center.x : -range.center.x);
+        hits = Physics2D.BoxCastAll(transform.position + range.center, range.size, 0, Vector2.zero, 0, layerMask);
+    }
 
     public static void GetHItsByPhysics(Transform transform, AttackData attack, int layerMask , out RaycastHit2D[] hits)
     {
@@ -149,6 +154,13 @@ public static class Util
         return result;
     }
 
+
+    public static void DrawRangeGizmo(GameObject target, Range range, Color color)
+    {
+        Gizmos.color = color;
+
+        Gizmos.DrawWireCube(target.transform.position + range.center, range.size);
+    }
 }
 
 [System.Serializable]

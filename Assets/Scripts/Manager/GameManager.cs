@@ -64,27 +64,26 @@ public class GameManager : MonoBehaviour
                         {
                             CharacterName enemyName = _levels[_level].enemyName;
 
-                            if (Client.Instance.ClientId == -1)
-                            {
-                                Character character = Manager.Character.GenerateCharacter(enemyName, genPosition);
+                            Character character = null;
+                            int requsetNumber= Manager.Character.GenerateCharacter(enemyName, genPosition,ref character);
 
-                                if (character != null) {
-                                    SummonCount++;
-                                    character.DeadHandler += () =>
-                                    {
-                                        SummonCount--;
-                                        if (SummonCount <= 0)
-                                        {
-                                            IsStartLevel = false;
-                                            _level++;
-                                            SummonCount = 0;
-                                        }
-                                    };
-                                }
-                            }
-                            else
+                            if(requsetNumber != -1)
                             {
-                                _generateRequestList.Add(Manager.Character.RequestGenerateCharacter(enemyName, genPosition));
+                                _generateRequestList.Add(requsetNumber);
+                            }
+                            if (character != null)
+                            {
+                                SummonCount++;
+                                character.DeadHandler += () =>
+                                {
+                                    SummonCount--;
+                                    if (SummonCount <= 0)
+                                    {
+                                        IsStartLevel = false;
+                                        _level++;
+                                        SummonCount = 0;
+                                    }
+                                };
                             }
 
                             yield return new WaitForSeconds(_levels[_level].genInterval);

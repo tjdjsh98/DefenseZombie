@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.U2D.Animation;
 using static Define;
+using static UnityEditor.Progress;
 
 public class CustomCharacter : Character
 {
@@ -20,25 +21,22 @@ public class CustomCharacter : Character
     Item _takenItem;
     public Item TakenItem => _takenItem;
 
-    [SerializeField]WeaponData _defaultWeapon;
-    public WeaponData DefaultWeapon => _defaultWeapon;
-    WeaponData _weaponData;
-    public WeaponData WeaponData => _weaponData;
+    // 가지고 나올 무기 정보
+    [SerializeField]WeaponData _preTakenWeaponData;
 
+    // 현재 장착 중인 무기의 정보
+    WeaponData _weaponData;
+    public WeaponData WeaponData
+    {
+        get {
+            if (_weaponData == null) return Manager.Data.GetWeaponData(WeaponName.None);
+            return _weaponData; }
+    }
     public int attackType = 0;
 
     public bool IsLift => _takenBuilding != null || (_takenItem != null && !IsEquip);
     public bool IsEquip => _weaponData != null;
-    public AttackData Attack
-    {
-        get
-        {
-            if (_weaponData == null || _weaponData.AttackList.Count <= attackType)
-                return new AttackData();
-
-            return _weaponData.AttackList[attackType];
-        }
-    }
+  
 
     [SerializeField] GameObject _liftPos;
 
@@ -53,25 +51,21 @@ public class CustomCharacter : Character
 
         _animatorHandler.DodgeEndHandler += () => { CharacterState = CharacterState.Idle; };
 
-        SetAnimatorBool("IsFrontWeapon", true);
+        SetAnimatorBool("IsFrontWeapon", true);   
 
-        if (_defaultWeapon != null)
+        if(_preTakenWeaponData != null)
         {
-            string weaponName = _defaultWeapon.WeaponName.ToString();
-            ItemName itemName = ItemName.None;
+            string weaponName = _preTakenWeaponData.WeaponName.ToString();
+
+            ItemName itemName = Define.ItemName.None;
             Enum.TryParse(weaponName, true, out itemName);
 
-            if (itemName != ItemName.None)
+            if(itemName != ItemName.None)
             {
                 Item item = Manager.Item.GenerateItem(itemName, transform.position);
                 GrapItem(item);
             }
         }
-        else
-        {
-            TakeOffWeapon();
-        }
-       
     }
 
     protected override void Update()
@@ -156,7 +150,7 @@ public class CustomCharacter : Character
 
     public bool EquipWeapon(WeaponName name)
     {
-        
+
         WeaponData data = Manager.Data.GetWeaponData(name);
 
         if (data == null) return false;
@@ -172,10 +166,13 @@ public class CustomCharacter : Character
 
         AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
 
-        if(data.IsFrontWeapon)
-            myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
-        else
-            myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
+        if (data.AttackAnimationClip != null)
+        {
+            if (data.IsFrontWeapon)
+                myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
+            else
+                myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
+        }
 
         SetAnimatorBool("IsEquip", true);
         SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
@@ -198,13 +195,9 @@ public class CustomCharacter : Character
     {
         WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
 
-        if (_weaponData != null)
-        {
-            if (_weaponData.IsFrontWeapon)
-                _chanager.ChangeDefaultSprite(CharacterParts.FrontWeapon);
-            else
-                _chanager.ChangeDefaultSprite(CharacterParts.BehindWeapon);
-        }
+        _chanager.ChangeDefaultSprite(CharacterParts.FrontWeapon);
+        _chanager.ChangeDefaultSprite(CharacterParts.BehindWeapon);
+
         RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
 
         AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
@@ -213,6 +206,7 @@ public class CustomCharacter : Character
             myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
         else
             myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
+
         SetAnimatorBool("IsEquip", false);
         SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
 
@@ -260,9 +254,16 @@ public class CustomCharacter : Character
             IsDodge = false;
         }
 
-      
-        SetAnimatorInteger("AttackType", AttackType);
-        SetAnimatorBool("Attack", IsAttacking);
+
+        if (IsEnableAttack)
+        {
+            SetAnimatorInteger("AttackType", AttackType);
+            SetAnimatorBool("Attack", IsAttacking);
+        }
+        else
+        {
+            IsAttacking = false;
+        }
 
         SetAnimatorFloat("VelocityY", _rigidBody.velocity.y);
 
@@ -322,27 +323,30 @@ public class CustomCharacter : Character
     {
         if (_takenItem || _takenBuilding || IsEquip) return;
 
-        if (item.ItemData.ItemType == ItemType.Etc)
+        if (item != null)
         {
-            _takenItem = item;
-            _takenItem.FreezeRigidBody();
-            _takenItem.transform.parent = _liftPos.transform;
-            _takenItem.transform.localPosition = Vector3.zero;
-
-        }
-        else if (item.ItemData.ItemType == ItemType.Equipment)
-        {
-            string ItemName = item.ItemData.ItemName.ToString();
-
-            WeaponName weaponName = WeaponName.None;
-            Enum.TryParse(ItemName, true, out weaponName);
-
-            if (EquipWeapon(weaponName))
+            if (item.ItemData.ItemType == ItemType.Etc)
             {
-                item.Hide();
                 _takenItem = item;
-            }
+                _takenItem.FreezeRigidBody();
+                _takenItem.transform.parent = _liftPos.transform;
+                _takenItem.transform.localPosition = Vector3.zero;
 
+            }
+            else if (item.ItemData.ItemType == ItemType.Equipment)
+            {
+                string ItemName = item.ItemData.ItemName.ToString();
+
+                WeaponName weaponName = WeaponName.None;
+                Enum.TryParse(ItemName, true, out weaponName);
+
+                if (EquipWeapon(weaponName))
+                {
+                    item.Hide();
+                    _takenItem = item;
+                }
+
+            }
         }
     }
 
@@ -438,20 +442,8 @@ public class CustomCharacter : Character
 
     protected override void Dead()
     {
-        if (Client.Instance.IsMain)
-        {
-            DeadHandler?.Invoke();
-            PutdownItem();
-            Manager.Character.RequestRemoveCharacter(CharacterId);
-        }
-        else
-        {
-            if (Client.Instance.ClientId == -1)
-            {
-                PutdownItem(); 
-                DeadHandler?.Invoke();
-                Manager.Character.RemoveCharacter(CharacterId);
-            }
-        }
+        PutdownItem(); 
+        DeadHandler?.Invoke();
+        Manager.Character.RemoveCharacter(CharacterId);
     }
 }

@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class UI_Commander : MonoBehaviour
+public class UI_Commander : UIBase
 {
+    CommanderCenter _commanderCenter;
+
     [SerializeField] TextMeshProUGUI _textMeshPro;
 
     Rect startSize;
@@ -21,7 +23,7 @@ public class UI_Commander : MonoBehaviour
 
 
     List<HelperAI> _list = new List<HelperAI>();
-    private void Awake()
+    public override void Init()
     {
         gameObject.SetActive(false);
     }
@@ -42,8 +44,9 @@ public class UI_Commander : MonoBehaviour
         Control();
     }
 
-    public void Open()
+    public void Open(CommanderCenter commanderCenter)
     {
+        _commanderCenter = commanderCenter;
         gameObject.SetActive(true);
     }
 
@@ -55,7 +58,8 @@ public class UI_Commander : MonoBehaviour
 
     public void Summon()
     {
-        Manager.Character.RequestGenerateCharacter(Define.CharacterName.Helper, Vector3.zero);
+        Character character = null;
+        Manager.Character.GenerateCharacter(Define.CharacterName.Helper, _commanderCenter.transform.position,ref character);
     }
 
     void Control()
@@ -88,7 +92,7 @@ public class UI_Commander : MonoBehaviour
 
             RaycastHit2D[] hits = Physics2D.BoxCastAll((boxMaxPos + boxMinPos) / 2, 
                 new Vector2(Mathf.Abs(boxMaxPos.x - boxMinPos.x), Mathf.Abs(boxMaxPos.y - boxMinPos.y))
-                , 0, Vector2.zero, 0, 1 << LayerMask.NameToLayer("Character"));
+                , 0, Vector2.zero, 0, Define.PlayerLayerMask);
 
             if(hits.Length > 0)
             {
@@ -136,6 +140,7 @@ public class UI_Commander : MonoBehaviour
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             foreach(var ai in _list)
             {
+                Debug.Log(ai);
                 ai.SetMainPos(mousePosition.x);
             }
         }
