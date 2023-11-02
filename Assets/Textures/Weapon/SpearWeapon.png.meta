@@ -127,7 +127,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 96
         width: 64
         height: 32
       alignment: 9
@@ -137,8 +137,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5a2daf65ffdb09742ae63241f3a2e6c7
-      internalID: 1953286635
+      spriteID: e1736b96ba584fc4ab448fa3b07843cc
+      internalID: -2034105252
       vertices: []
       indices: 
       edges: []
@@ -147,8 +147,8 @@ TextureImporter:
       name: SpearWeapon_1
       rect:
         serializedVersion: 2
-        x: 64
-        y: 0
+        x: 0
+        y: 64
         width: 64
         height: 32
       alignment: 9
@@ -158,8 +158,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 41e23b3db59543e4ba8f646cbad5ab33
-      internalID: 1334613555
+      spriteID: bb79fcea85e24774bb5a42e22418215c
+      internalID: 1402136834
       vertices: []
       indices: 
       edges: []
@@ -168,7 +168,28 @@ TextureImporter:
       name: SpearWeapon_2
       rect:
         serializedVersion: 2
-        x: 128
+        x: 0
+        y: 32
+        width: 64
+        height: 32
+      alignment: 9
+      pivot: {x: 0.25, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1783da917cc0eea49a81205eaba0364d
+      internalID: 43753829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SpearWeapon_3
+      rect:
+        serializedVersion: 2
+        x: 0
         y: 0
         width: 64
         height: 32
@@ -179,8 +200,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e9b73d1c1fcf45e4191d1fe17f8ccd7e
-      internalID: -473127899
+      spriteID: 368ff99b654fd274cbd1de6a4061fd04
+      internalID: 660531113
       vertices: []
       indices: 
       edges: []
@@ -196,9 +217,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      SpearWeapon_0: 1953286635
-      SpearWeapon_1: 1334613555
-      SpearWeapon_2: -473127899
+      SpearWeapon_0: -2034105252
+      SpearWeapon_1: 1402136834
+      SpearWeapon_2: 43753829
+      SpearWeapon_3: 660531113
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
