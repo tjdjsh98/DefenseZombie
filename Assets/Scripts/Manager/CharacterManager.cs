@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 using static Define;
 
@@ -48,9 +47,12 @@ public class CharacterManager : MonoBehaviour
     {
         Character character = null;
 
-        _characterDictionary.TryGetValue(id, out character);
+        if(_characterDictionary.TryGetValue(id, out character))
+        {
+            return character;
+        }
 
-        return character;
+        return null;
     }
 
     // 싱글, 멀티 혼용으로 사용하는 캐릭터 생성 함수
@@ -132,7 +134,7 @@ public class CharacterManager : MonoBehaviour
 
     // 패킷으로 받은 정보로 더미 캐릭터를 만듭니다.
     // 자신의 캐릭터의 ID와 맞는 캐릭터와 맞으면 조작 가능 캐릭터가 나옵니다.
-    public bool GeneratePacketCharacter(S_BroadcastGenerateCharacter packet)
+    public bool GenerateCharacterByPacket(S_BroadcastGenerateCharacter packet)
     {
         bool isSuccess = true;
         if (!packet.isSuccess)

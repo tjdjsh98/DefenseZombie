@@ -1,16 +1,7 @@
 using System;
-using System.Buffers.Text;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using Unity.VisualScripting;
-using UnityEditor.Tilemaps;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.TextCore.Text;
-using UnityEngine.UIElements;
 
 public static class Util
 {
@@ -169,7 +160,6 @@ public static class Util
     public static void StartWriteSerializedData()
     {
         memoryStream.Position = 0;
-        offset = 0;
     }
 
     public static void WriteSerializedData(int data)
@@ -181,10 +171,6 @@ public static class Util
     {
         byte[] buffer = BitConverter.GetBytes(data);
         memoryStream.Write(buffer, 0, sizeof(float));
-        Debug.Log(buffer[0]);
-        Debug.Log(buffer[1]);
-        Debug.Log(buffer[2]);
-        Debug.Log(buffer[3]);
     }
     public static void WriteSerializedData(bool data)
     {

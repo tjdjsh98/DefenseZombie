@@ -193,7 +193,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 885aa514b049ebe4e963465b88b0d7ac, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -201,7 +201,7 @@ SpriteRenderer:
   m_Size: {x: 4, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &8052777724473376852
@@ -1053,7 +1053,6 @@ MonoBehaviour:
     center: {x: -0.18, y: 0.51, z: 0}
     size: {x: 1.03, y: 1.28, z: 0}
   _isEnableFly: 0
-  _currentYSpeed: 0
   _maxHp: 11
   _isSuperArmerWhenAttack: 0
   _standing: 0
@@ -1069,9 +1068,9 @@ MonoBehaviour:
   _frontHand: {fileID: 270150092319229456}
   _behindHandPos: {fileID: 5551859977916438208}
   _behindHand: {fileID: 7291942318908313539}
-  _preTakenWeaponData: {fileID: 11400000, guid: c41fe078c846d0040b3f207527d001b8, type: 2}
-  attackType: 0
   _liftPos: {fileID: 4739439959996475644}
+  _preHoldingWeaponData: {fileID: 0}
+  attackType: 0
 --- !u!114 &-3789622636814383866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1109,6 +1108,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _character: {fileID: 8797273952533053488}
+  _customCharacter: {fileID: 8797273952533053488}
   _attackType: 0
   _defaultAttack:
     attackEffectName: 0

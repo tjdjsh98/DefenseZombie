@@ -98,7 +98,8 @@ public class GameManager : MonoBehaviour
 
                                 if(levelCharacter.itemCharacterHas != null)
                                 {
-                                    Item item = Manager.Item.GenerateItem(levelCharacter.itemCharacterHas.ItemName,character.transform.position);
+                                    Item item = null;
+                                    Manager.Item.GenerateItem(levelCharacter.itemCharacterHas.ItemName,character.transform.position,ref item);
                                     customCharacter.GrapItem(item);
                                 }
                             }
@@ -203,7 +204,8 @@ public class GameManager : MonoBehaviour
         Vector3 pos = Vector3.zero;
         pos.x = Random.Range(-10f, 10f);
         pos.y = 10;
-        Manager.Item.GenerateItem(ItemName.Supplies, pos);
+        Item item = null;
+        Manager.Item.GenerateItem(ItemName.Supplies, pos, ref item);
     }
 }
 

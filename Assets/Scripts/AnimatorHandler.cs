@@ -14,10 +14,13 @@ public class AnimatorHandler : MonoBehaviour, ICharacterOption
     public Action DestroyHandler;
     public Action DodgeEndHandler;
 
+    public bool IsDone { get; set; }
+
 
     public void Init()
     {
         _character = GetComponent<Character>();
+        IsDone = true;
     }
     public void AnimatorAttackStarted()
     {
@@ -59,5 +62,13 @@ public class AnimatorHandler : MonoBehaviour, ICharacterOption
     public void ShakeEffect(float power)
     {
         Camera.main.GetComponent<CameraMove>().ShakeCamera(power, 0.4f);
+    }
+
+    public void DataSerialize()
+    {
+    }
+
+    public void DataDeserialize()
+    {
     }
 }

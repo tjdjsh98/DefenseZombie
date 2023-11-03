@@ -33,7 +33,8 @@ public class Suppiles : InteractableObject
         {
             foreach (var item in itemNameList)
             {
-                Manager.Item.GenerateItem(item, transform.position);
+                Item refitem = null;
+                Manager.Item.GenerateItem(item, transform.position,ref refitem);
             }
             Manager.Item.DestroyItem(GetComponent<Item>().ItemId);
         }

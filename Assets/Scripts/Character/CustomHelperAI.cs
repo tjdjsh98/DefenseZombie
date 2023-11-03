@@ -23,7 +23,7 @@ public class CustomHelperAI : HelperAI
 
             return range;
 
-        }   
+        }
     }
 
     [SerializeField] bool _isPickItem;
@@ -33,7 +33,7 @@ public class CustomHelperAI : HelperAI
     {
         base.Init();
         _weapon = GetComponent<Weapon>();
-        _customCharacter= _character as CustomCharacter;
+        _customCharacter = _character as CustomCharacter;
     }
 
     protected override void AI()
@@ -53,58 +53,59 @@ public class CustomHelperAI : HelperAI
                 _time = 0;
                 Search();
             }
-            if (_character.CharacterState == CharacterState.Idle)
+            if (_character.IsDamaged)
             {
-                if (_mainPointAlter)
-                {
-                    _movePoint = _mainPoint;
-                    _mainPointAlter = false;
-                }
-                if (_target == null)
-                {
-                    if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
-                    {
-                        _character.SetCharacterDirection(Vector3.zero);
-                        _idleElapsed += Time.deltaTime;
-                        if (_idleElapsed >= _idleDuration)
-                        {
-                            _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
-                            _idleElapsed = 0;
-                        }
-                    }
-                    else
-                    {
-                        _character.Turn((_movePoint - transform.position).x);
-                        _character.SetCharacterDirection(_movePoint - transform.position);
+                _character.SetCharacterDirection(Vector2.zero);
+                return;
+            }
 
+            if (_mainPointAlter)
+            {
+                _movePoint = _mainPoint;
+                _mainPointAlter = false;
+            }
+
+            if (_target == null)
+            {
+                if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
+                {
+                    _character.SetCharacterDirection(Vector3.zero);
+                    _idleElapsed += Time.deltaTime;
+                    if (_idleElapsed >= _idleDuration)
+                    {
+                        _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
+                        _idleElapsed = 0;
                     }
                 }
                 else
                 {
-                    Vector3 targetPos = _target.transform.position;
-                    targetPos += _target.CharacterSize.center;
+                    _character.Turn((_movePoint - transform.position).x);
+                    _character.SetCharacterDirection(_movePoint - transform.position);
 
-                    _character.Turn((targetPos - transform.position).x);
-                    _customCharacter.RotationFrontHand(targetPos);
-
-                    Range range = AttackRange;
-                    range.center /= 2;
-                    if (Util.GetIsInRange(_character.gameObject, _target.gameObject, range))
-                    {
-                        _character.SetCharacterDirection(Vector3.zero);
-                        AttackHanlder?.Invoke();
-                        Client.Instance.SendCharacterInfo(_character);
-                    }
-                    else
-                    {
-                        _character.SetCharacterDirection(_target.transform.position - transform.position);
-                    }
                 }
             }
             else
             {
-                _character.SetCharacterDirection(Vector2.zero);
+                Vector3 targetPos = _target.transform.position;
+                targetPos += _target.CharacterSize.center;
+
+                _character.Turn((targetPos - transform.position).x);
+                _customCharacter.RotationHand(targetPos);
+
+                Range range = AttackRange;
+                range.center /= 2;
+                if (Util.GetIsInRange(_character.gameObject, _target.gameObject, range))
+                {
+                    _character.SetCharacterDirection(Vector3.zero);
+                    AttackHanlder?.Invoke();
+                    Client.Instance.SendCharacterInfo(_character);
+                }
+                else
+                {
+                    _character.SetCharacterDirection(_target.transform.position - transform.position);
+                }
             }
+
         }
     }
 
@@ -117,61 +118,65 @@ public class CustomHelperAI : HelperAI
         {
             SearchItem();
         }
-        if (_character.CharacterState == CharacterState.Idle)
+
+        if (_character.IsDamaged && _character.IsAttacking)
         {
-            if (_mainPointAlter)
-            {
-                _movePoint = _mainPoint;
-                _mainPointAlter = false;
-            }
+            _character.SetCharacterDirection(Vector2.zero);
+            return;
+        }
+        if (_mainPointAlter)
+        {
+            _movePoint = _mainPoint;
+            _mainPointAlter = false;
+        }
 
-            if (_customCharacter.TakenItem == null && _customCharacter.WeaponData.WeaponName == Define.WeaponName.None)
-            {
+        if (_customCharacter.HoldingItem == null && _customCharacter.WeaponData.WeaponName == Define.WeaponName.None)
+        {
 
-                if (_targetItem == null)
+            if (_targetItem == null)
+            {
+                if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
                 {
-                    if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
+                    _character.SetCharacterDirection(Vector3.zero);
+                    _idleElapsed += Time.deltaTime;
+                    if (_idleElapsed >= _idleDuration)
                     {
-                        _character.SetCharacterDirection(Vector3.zero);
-                        _idleElapsed += Time.deltaTime;
-                        if (_idleElapsed >= _idleDuration)
-                        {
-                            _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
-                            _idleElapsed = 0;
-                        }
-                    }
-                    else
-                    {
-                        _character.Turn((_movePoint - transform.position).x);
-                        _character.SetCharacterDirection(_movePoint - transform.position);
-
+                        _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
+                        _idleElapsed = 0;
                     }
                 }
                 else
                 {
-                    if (Mathf.Abs(_targetItem.transform.position.x - transform.position.x) > 0.2f)
-                    {
-                        _character.Turn((_targetItem.transform.position - transform.position).x);
-                        _customCharacter.SetCharacterDirection(_targetItem.transform.position - transform.position);
-                    }
-                    else
-                    {
-                        _customCharacter.GrapItem(_targetItem);
-                    }
+                    _character.Turn((_movePoint - transform.position).x);
+                    _character.SetCharacterDirection(_movePoint - transform.position);
+
                 }
             }
             else
             {
-                if (Mathf.Abs(_mainPoint.x - transform.position.x) > 0.2f)
+                if (Mathf.Abs(_targetItem.transform.position.x - transform.position.x) > 0.2f)
                 {
-                    _customCharacter.Turn((_mainPoint - transform.position).x);
-                    _customCharacter.SetCharacterDirection(_mainPoint - transform.position);
+                    _character.Turn((_targetItem.transform.position - transform.position).x);
+                    _customCharacter.SetCharacterDirection(_targetItem.transform.position - transform.position);
                 }
                 else
                 {
-                    _customCharacter.PutdownItem();
+                    _customCharacter.GrapItem(_targetItem);
                 }
             }
+        }
+        else
+        {
+            if (Mathf.Abs(_mainPoint.x - transform.position.x) > 0.2f)
+            {
+                _customCharacter.Turn((_mainPoint - transform.position).x);
+                _customCharacter.SetCharacterDirection(_mainPoint - transform.position);
+            }
+            else
+            {
+                _customCharacter.Putdown();
+            }
+
         }
     }
 
@@ -194,11 +199,11 @@ public class CustomHelperAI : HelperAI
             if (item != null && (transform.position - item.transform.position).magnitude < distance)
             {
                 distance = (transform.position - item.transform.position).magnitude;
-                _targetItem= item;
+                _targetItem = item;
                 isSearch = true;
             }
         }
         if (!isSearch) _targetItem = null;
-        
+
     }
 }

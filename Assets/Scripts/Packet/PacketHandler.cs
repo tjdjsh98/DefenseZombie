@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 class PacketHandler
@@ -24,9 +25,21 @@ class PacketHandler
         GameRoom room = clientSession.Room;
         room.Push(() => room.SyncCharacterInfo(clientSession, infoPacket));
     }
+    public static void S_BroadcastCharacterInfoHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastCharacterInfo pkt = packet as S_BroadcastCharacterInfo;
+
+        Character character = Manager.Character.GetCharacter(pkt.characterId);
+
+        character?.SetCharacterInfoPacket(pkt);
+    }
+
+
     public static void S_BroadcastNewClientHandler(PacketSession session, IPacket packet)
     {
         S_BroadcastNewClient pkt = packet as S_BroadcastNewClient;
+
+        Debug.Log(pkt.clientId);
 
         Client.Instance.EnterNewOtherClinet(pkt.clientId);
     }
@@ -59,15 +72,7 @@ class PacketHandler
         Manager.Character.RemoveCharacter(pkt.playerId);
     }
 
-    public static void S_BroadcastCharacterInfoHandler(PacketSession session, IPacket packet)
-    {
-        S_BroadcastCharacterInfo pkt = packet as S_BroadcastCharacterInfo;
-
-        Character character = Manager.Character.GetCharacter(pkt.characterId);
-
-        character?.SetCharacterInfoPacket(pkt);
-    }
-
+   
     public static void S_EnterSyncInfosHandler(PacketSession session, IPacket packet)
     {
         S_EnterSyncInfos pkt = packet as S_EnterSyncInfos;
@@ -102,7 +107,7 @@ class PacketHandler
     {
         S_BroadcastGenerateCharacter pkt = packet as S_BroadcastGenerateCharacter;
 
-        Manager.Character.GeneratePacketCharacter(pkt);
+        Manager.Character.GenerateCharacterByPacket(pkt);
     }
 
     public static void C_RequestRemoveCharacterHandler(PacketSession session, IPacket packet)
@@ -169,4 +174,39 @@ class PacketHandler
 
         Manager.Building.GenerateBuilding(pkt);
     }
+
+    public static void C_RequestGenerateItemHandler(PacketSession session, IPacket packet)
+    {
+        ClientSession clientSession = session as ClientSession;
+        if (clientSession == null) return;
+
+        C_RequestGenerateItem pkt = packet as C_RequestGenerateItem;
+        if (pkt == null) return;
+
+        GameRoom room = clientSession.Room;
+
+        room?.Push(() => { room.GenreateItem(pkt); });
+    }
+
+    public static void S_BroadcastGenerateItemHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastGenerateItem pkt = packet as S_BroadcastGenerateItem;
+        if (pkt == null) return;
+
+        Manager.Item.GenerateItemByPacket(pkt);
+    }
+    public static void C_RequestRemoveItemHandler(PacketSession session, IPacket packet)
+    {
+        C_RequestRemoveItem pkt = packet as C_RequestRemoveItem;
+
+        if (pkt == null) return;
+    }
+
+    public static void S_BroadcastRemoveItemHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastRemoveItem pkt = packet as S_BroadcastRemoveItem;
+
+        if (pkt == null) return;
+    }
+
 }

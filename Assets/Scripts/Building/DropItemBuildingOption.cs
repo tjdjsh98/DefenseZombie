@@ -17,7 +17,8 @@ public class DropItemBuildingOption : MonoBehaviour, IBuildingOption
 
     void OnDestroyed()
     {
-        Manager.Item.GenerateItem(data.GetRandom(), transform.position);
+        Item item = null;
+        Manager.Item.GenerateItem(data.GetRandom(), transform.position,ref item);
         _building.DestroyedHandler -= OnDestroyed;
     }
 }

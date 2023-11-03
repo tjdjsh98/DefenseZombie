@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using static Define;
 
@@ -20,7 +19,6 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     [SerializeField]protected bool _isEnableFly;
 
-    public CharacterState CharacterState { set; get; }
     protected Vector2 _characterMoveDirection;
     public Vector2 CharacterMoveDirection => _characterMoveDirection;
 
@@ -57,8 +55,9 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     // 행동 제약
     public bool IsEnableMove { get; set; } = true;
     public bool IsEnableAttack { get; set; } = true;
+    public bool IsEnableMoveWhileAttack { get; set; } = false;
 
-    // 행동 상태
+    // 캐릭터 상태
     public bool IsAttacking { set; get; }
     public bool IsJumping { set; get; }
     public bool IsContactGround { set; get; }
@@ -66,6 +65,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public bool IsDodge { set; get; }
     public bool IsStagger { set; get; }
 
+    public bool IsDamaged { set; get; }
     public bool IsHide { set; get; }
 
     // 행동 핸들러
@@ -83,6 +83,10 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     float _time = 0;
     float _interval = 0.02f;
 
+
+    // 캐릭터의 옵션
+    protected List<ICharacterOption> _optionList = new List<ICharacterOption>();
+
     protected virtual void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
@@ -94,8 +98,11 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         Hp = _maxHp;
 
         ICharacterOption[] options = GetComponents<ICharacterOption>();
-        foreach(var option in options)
+        foreach (var option in options)
+        {
+            _optionList.Add(option);
             option.Init();
+        }
     }
 
 
@@ -135,13 +142,43 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     }
     protected virtual void ControlAnimation()
     {
+
+        if (!IsDamaged && (!IsAttacking || IsEnableMoveWhileAttack))
+        {
+            if (_rigidBody.velocity.x != 0)
+            {
+                SetAnimatorBool("Walk", true);
+            }
+            else
+            {
+                SetAnimatorBool("Walk", false);
+            }
+        }
+        else
+        {
+            SetAnimatorBool("Walk", false);
+        }
+
+        if (IsDamaged && !IsStagger)
+        {
+            IsStagger = true;
+            SetAnimatorTrigger("Hit");
+            SetAnimatorBool("Stagger", IsStagger);
+
+        }
+        if (!IsDamaged && IsStagger)
+        {
+            IsStagger = false;
+            SetAnimatorBool("Stagger", IsStagger);
+
+        }
+        SetAnimatorBool("Attack", IsAttacking);
     }
 
 
     protected virtual void MoveCharacter()
     {
-        if (IsHide || !IsEnableMove) return;
-        if (CharacterState != CharacterState.Idle)
+        if (IsDamaged || !IsEnableMove || IsHide || (IsAttacking && !IsEnableMoveWhileAttack))
         {
             if (_rigidBody.velocity.x < 0)
             {
@@ -380,12 +417,12 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     IEnumerator CorTurnToIdle(float time)
     {
-        if (CharacterState != CharacterState.Attack || !_isSuperArmerWhenAttack)
+        if ( !_isSuperArmerWhenAttack)
         {
-            CharacterState = CharacterState.Damage;
+            IsDamaged = true;
             yield return new WaitForSeconds(time);
 
-            CharacterState = CharacterState.Idle;
+            IsDamaged = false;
             Client.Instance.SendCharacterInfo(this);
 
             _damageCoroutine = null;
@@ -451,8 +488,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     {
         if (!IsContactGround) return;
 
-        if(CharacterState == CharacterState.Idle)
-            CharacterState = CharacterState.Dodge;
+        IsDodge = true;
     }
 
     public void SetAnimatorBool(string name, bool value) => _animator.SetBool(name, value);
@@ -482,8 +518,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         IsJumping = packet.isJumping;
         IsAttacking = packet.isAttacking;
         IsConncetCombo = packet.isConnectCombo;
-        CharacterState = (CharacterState)packet.characterState;
-
+        
         if (_interval == 0)
         {
             Vector3 currentPos = new Vector3(packet.posX, packet.posY, packet.posZ);
@@ -494,6 +529,8 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
             _prePos = transform.position;
             _currentPacket = packet;
         }
+
+        DeserializeData(packet.etcData);
     }
 
     public void FreezeRigidbody()
@@ -508,12 +545,35 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     public virtual string SerializeData()
     {
-        return string.Empty;
+        Util.StartWriteSerializedData();
+
+        Util.WriteSerializedData(_hp);
+        Util.WriteSerializedData(transform.position.x);
+        Util.WriteSerializedData(transform.position.y);
+        Util.WriteSerializedData(_rigidBody.velocity.x);
+        Util.WriteSerializedData(_rigidBody.velocity.y);
+        
+
+
+        foreach (var option in _optionList)
+        {
+            option.DataSerialize();
+        }
+
+        string stringData = Util.EndWriteSerializeData();
+
+
+        return stringData;
     }
 
     public virtual void DeserializeData(string stringData)
     {
+        Util.StartReadSerializedData(stringData);
 
+        foreach(var option in _optionList)
+        {
+            option.DataDeserialize();
+        }
     }
 }
 

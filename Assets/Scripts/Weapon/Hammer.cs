@@ -16,7 +16,7 @@ public class Hammer : Weapon
         if (!_character.IsAttacking)
         {
             _attackType = 1;
-            _character.CharacterState = CharacterState.Attack;
+            _character.IsEnableMoveWhileAttack= false;
             _character.AttackType = _attackType;
             _character.IsAttacking = true;
             _connectCombo = false;
@@ -47,10 +47,6 @@ public class Hammer : Weapon
     protected override void OnAttackEnd()
     {
         _animatorHandler.ConnectComboHandler = null;
-        if (_character.CharacterState == CharacterState.Attack)
-        {
-            _character.CharacterState = CharacterState.Idle;
-            
-        }
+        
     }
 }

@@ -10,6 +10,9 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
     [SerializeField] CharacterSetUpParts _defaultSetUpParts;
     Dictionary<CharacterParts, SpriteLibrary> _spriteLibararyDictionary = new Dictionary<CharacterParts, SpriteLibrary>();
 
+    public bool IsDone { get; set; }
+
+
     public void Init()
     {
         Transform[] transformList = GetComponentsInChildren<Transform>();
@@ -79,6 +82,16 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
             }
 
         }
+    }
+
+    public void DataSerialize()
+    {
+        
+    }
+
+    public void DataDeserialize()
+    {
+        
     }
 }
 

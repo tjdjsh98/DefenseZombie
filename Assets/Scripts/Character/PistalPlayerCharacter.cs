@@ -24,39 +24,39 @@ public class PistalPlayerCharacter : Character
         base.ControlAnimation();
 
         #region 이동
-        if (CharacterState == CharacterState.Idle )
-        {
-            bool walk, backWalk = false;
+        //if (CharacterState == CharacterState.Idle )
+        //{
+        //    bool walk, backWalk = false;
 
-            if(_rigidBody.velocity.x == 0)
-            {
-                walk = false;
-                backWalk = false;
-            }
-            else if(IsAttacking)
-            {
-                if((_rigidBody.velocity.x > 0 && transform.localScale.x > 0) ||
-                    (_rigidBody.velocity.x < 0 && transform.localScale.x < 0))
-                {
-                    walk = true;
-                    backWalk = false;
-                }
-                else
-                {
-                    walk = false;
-                    backWalk = true;
-                }
-            }
-            else
-            {
-                walk = true;
-                backWalk = false;
-            }
-            _maxSpeed = backWalk ? _backWalkSpeed : _walkSpeed;
+        //    if(_rigidBody.velocity.x == 0)
+        //    {
+        //        walk = false;
+        //        backWalk = false;
+        //    }
+        //    else if(IsAttacking)
+        //    {
+        //        if((_rigidBody.velocity.x > 0 && transform.localScale.x > 0) ||
+        //            (_rigidBody.velocity.x < 0 && transform.localScale.x < 0))
+        //        {
+        //            walk = true;
+        //            backWalk = false;
+        //        }
+        //        else
+        //        {
+        //            walk = false;
+        //            backWalk = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        walk = true;
+        //        backWalk = false;
+        //    }
+        //    _maxSpeed = backWalk ? _backWalkSpeed : _walkSpeed;
 
-            SetAnimatorBool("Walk", walk);
-            SetAnimatorBool("BackWalk", backWalk);
-        }
+        //    SetAnimatorBool("Walk", walk);
+        //    SetAnimatorBool("BackWalk", backWalk);
+        //}
         #endregion
 
         #region 공격

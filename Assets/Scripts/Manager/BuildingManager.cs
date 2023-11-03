@@ -347,6 +347,15 @@ public class BuildingManager : MonoBehaviour
         return _buildingCoordiate[cellPos.x][cellPos.y] != null;
     }
 
+    public Building GetBuilding(int id)
+    {
+        Building result = null;
+        if(_buildingDictionary.TryGetValue(id,out result))
+            return result;
+
+        return null;
+    }
+
     void ShowPreviewBuilding()
     {
         Building building = Manager.Data.GetBuilding(_drawingBuildingName);

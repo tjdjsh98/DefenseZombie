@@ -110,7 +110,8 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 
         if (isSuccess)
         {
-            Manager.Item.GenerateItem(MainBlueprint.ResultItemName, transform.position);
+            Item item = null;
+            Manager.Item.GenerateItem(MainBlueprint.ResultItemName, transform.position,ref item);
             _mainBlueprint = null;
         }
 

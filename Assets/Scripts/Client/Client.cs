@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using TMPro;
-using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static Define;
@@ -34,7 +32,7 @@ public class Client : MonoBehaviour
     bool _recvAnswer = false;
     bool _isEnableEnterGame = false;
     bool _successEnterGame = false;
-    bool _isRequestAllInfo = false;
+    bool _isSendSuccessEnter = false;
     public bool IsSingle { get { return ClientId == -1; } }
     [field:SerializeField]public float Delay = 0;
 
@@ -42,6 +40,9 @@ public class Client : MonoBehaviour
     public bool IsMain => (ClientId == 1);
 
     List<int> _clientList = new List<int>();
+
+    public static bool IsFinishLoadScene;
+
     public void Send(ArraySegment<byte> segment)
     {
         _session.Send(segment);
@@ -81,9 +82,9 @@ public class Client : MonoBehaviour
             }
         }
 
-        if(_successEnterGame && !_isRequestAllInfo)
+        if(_successEnterGame && !_isSendSuccessEnter && IsFinishLoadScene)
         {
-            _isRequestAllInfo = true;
+            _isSendSuccessEnter = true;
             C_SuccessToEnterServer packet = new C_SuccessToEnterServer();
             Send(packet.Write());
 
@@ -142,13 +143,13 @@ public class Client : MonoBehaviour
         packet.posZ = character.transform.position.z;
         packet.xSpeed = character.GetVelocity.x;
         packet.ySpeed = character.GetVelocity.y;
-        packet.characterState = (int)character.CharacterState;
         packet.characterMoveDirection = character.CharacterMoveDirection.x;
         packet.attackType = character.AttackType;
         packet.isAttacking = character.IsAttacking;
         packet.isJumping = character.IsJumping;
         packet.isContactGround = character.IsContactGround;
         packet.isConnectCombo = character.IsConncetCombo;
+        packet.etcData = character.SerializeData();
 
         Send(packet.Write());
     }
@@ -198,6 +199,19 @@ public class Client : MonoBehaviour
         packet.posX = cellPos.x;
         packet.posY = cellPos.y;
 
+        Send(packet.Write());
+    }
+
+    internal void SendRequestGeneratingItem(ItemName itemName, Vector3 position, int requestNumber)
+    {
+        C_RequestGenerateItem packet = new C_RequestGenerateItem();
+
+        packet.itemName = (int)itemName;
+        packet.requestNumber = requestNumber;
+        packet.posX = position.x;
+        packet.posY = position.y;
+        packet.posZ = position.z;
+        
         Send(packet.Write());
     }
 }

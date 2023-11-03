@@ -18,48 +18,47 @@ public class CustomEnemyAI : EnemyAI
         if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.IsAttacking) return;
 
-        if (_character.CharacterState == CharacterState.Idle)
+        if(_character.IsDamaged)
         {
-            _attackTime += Time.deltaTime;
-            if (_target == null)
-            {
-                Search();
-            }
-            else
-            {
+            _character.SetCharacterDirection(Vector2.zero);
+            return;
+        }
 
-                Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
-                Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
-
-                // ÆÈ ¿òÁ÷ÀÓ
-                if(character != null && _weapon.WeaponAttackData.projectile != null)
-                {
-                    Vector3 targetPos = character.transform.position + character.CharacterSize.center;
-                    _customCharacter.RotationFrontHand(targetPos);
-                }
-
-                if (character != null || building != null)
-                {
-                    _character.StopMove();
-                    _character.SetCharacterDirection(Vector2.zero);
-
-                    if (_attackDelay < _attackTime)
-                    {
-                        _attackTime = 0;
-                        _character.IsAttacking = true;
-                        _character.CharacterState = CharacterState.Attack;
-                        Client.Instance.SendCharacterInfo(_character);
-                    }
-
-                    return;
-                }
-                _character.SetCharacterDirection(_target.transform.position - transform.position);
-                _character.Turn((_target.transform.position - transform.position).x);
-            }
+      
+        _attackTime += Time.deltaTime;
+        if (_target == null)
+        {
+            Search();
         }
         else
         {
-            _character.SetCharacterDirection(Vector2.zero);
+
+            Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
+            Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
+
+            // ÆÈ ¿òÁ÷ÀÓ
+            if(character != null && _weapon.WeaponAttackData.projectile != null)
+            {
+                Vector3 targetPos = character.transform.position + character.CharacterSize.center;
+                _customCharacter.RotationHand(targetPos);
+            }
+
+            if (character != null || building != null)
+            {
+                _character.StopMove();
+                _character.SetCharacterDirection(Vector2.zero);
+
+                if (_attackDelay < _attackTime)
+                {
+                    _attackTime = 0;
+                    _character.IsAttacking = true;
+                    Client.Instance.SendCharacterInfo(_character);
+                }
+
+                return;
+            }
+            _character.SetCharacterDirection(_target.transform.position - transform.position);
+            _character.Turn((_target.transform.position - transform.position).x);
         }
     }
 }

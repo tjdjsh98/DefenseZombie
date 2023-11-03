@@ -30,6 +30,7 @@ public class Manager : MonoBehaviour
     private void Awake()
     {
         Init();
+        Client.IsFinishLoadScene = true;
     }
 
     static void Init()

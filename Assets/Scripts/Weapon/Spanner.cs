@@ -66,7 +66,6 @@ public class Spanner : Weapon
         }
         else if (_attackType == 1)
         {
-            _character.CharacterState = CharacterState.Attack;
             Client.Instance.SendCharacterInfo(_character);
         }
     }
@@ -80,10 +79,7 @@ public class Spanner : Weapon
         {
             _character.RigidBody.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
-        if (_character.CharacterState == CharacterState.Attack)
-        {
-            _character.CharacterState = CharacterState.Idle;
-        }
+    
         Client.Instance.SendCharacterInfo(_character);
     }
 }

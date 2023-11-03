@@ -27,8 +27,6 @@ public class PlayerController : MonoBehaviour
     public Action AttackKeyDownHandler;
     public Action AttackKeyUpHandler;
 
-    int _selectBuildingNameIndex;
-
     public bool IsControllerable { get {
             return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
     private void Awake()
@@ -44,24 +42,27 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         Control();
-        RotateWeapon();
     }
 
     void RotateWeapon()
     {
+
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.z = 0;
 
         _character.Turn(mousePos.x - transform.position.x);
 
-        if (_character.IsEquip)
-            _character.RotationFrontHand(mousePos);
+        if (_character.IsEquipWeapon)
+            _character.RotationHand(mousePos);
     }
 
 
     void Control()
     {
         if (!IsControllerable) return;
+
+        RotateWeapon();
+
 
         if (Input.GetMouseButton(0))
             AttackKeyDownHandler?.Invoke();
@@ -99,7 +100,8 @@ public class PlayerController : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            Manager.Item.GenerateItem(Define.ItemName.Spear, transform.position + Vector3.right);
+            Item item = null;
+            Manager.Item.GenerateItem(Define.ItemName.Spear, transform.position + Vector3.right,ref item);
         }
         if (Input.GetKeyDown(KeyCode.E))
         {
@@ -107,7 +109,7 @@ public class PlayerController : MonoBehaviour
             if (player == null) return;
 
             // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
-            if (_character.TakenItem != null && !_character.IsEquip)
+            if (_character.HoldingItem != null && !_character.IsEquipWeapon)
             {
                 List<IEnableInsertItem> insertableList = _character.GetOverrapGameObjects<IEnableInsertItem>();
 
@@ -116,10 +118,10 @@ public class PlayerController : MonoBehaviour
                 {
                     foreach(var insertable in insertableList)
                     {
-                        if (insertable.InsertItem(_character.TakenItem.ItemData.ItemName))
+                        if (insertable.InsertItem(_character.HoldingItem.ItemData.ItemName))
                         {
-                            Item item = _character.TakenItem;
-                            _character.PutdownItem();
+                            Item item = _character.HoldingItem;
+                            _character.Putdown();
                             Manager.Item.DestroyItem(item.ItemId);
                             isSucess = true;
                             break;
@@ -128,18 +130,18 @@ public class PlayerController : MonoBehaviour
                 }
                 if(!isSucess) 
                 {
-                    player.PutdownItem();
+                    player.Putdown();
                 }
             }
             else
             {
-                if (!player.GetIsLiftSomething())
+                if (!player.HoldingItem && !player.HoldingBuilding)
                 {
                     player.GrapSomething();
                 }
                 else
                 {
-                    player.PutdownItem();
+                    player.Putdown();
                 }
 
             }
@@ -197,16 +199,15 @@ public class PlayerController : MonoBehaviour
 
     void OnAttackKeyDown()
     {
-        if(_character.IsLift)
+        
+        if(_character.HoldingItem && !_character.IsEquipWeapon)
         {
-            if(_character.IsLift && _character.TakenItem)
-            {
-                Item item = _character.TakenItem;
-                _character.ReleaseItem();
-                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                item.GetComponent<Projectile>().Throw(mousePos - _character.transform.position, 20);
-            }
+            Item item = _character.HoldingItem;
+            _character.ReleaseItem();
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            item.GetComponent<Projectile>()?.Throw(mousePos - _character.transform.position, 20);
         }
+        
         else if(Manager.Building.IsDrawing)
         {
             Manager.Building.PlayerRequestBuilding();

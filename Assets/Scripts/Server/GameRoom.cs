@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using static Define;
 using CharacterInfo = S_EnterSyncInfos.CharacterInfo;
@@ -14,9 +13,10 @@ public class GameRoom : IJobQueue
     Dictionary<int, CharacterInfo> _characterDictionary = new Dictionary<int, CharacterInfo>();
     Dictionary<int, BuildingInfo> _buildingDictionary = new Dictionary<int, BuildingInfo>();
     Dictionary<int, Dictionary<int, BuildingInfo>> _buildingCoordiate = new Dictionary<int, Dictionary<int, BuildingInfo>>();
-
+    Dictionary<int, ItemInfo> _itemDictionary = new Dictionary<int, ItemInfo>();
     static int _characterId = 1000;
     static int _buildingId = 0;
+    static int _itemId = 0;
 
     public void Push(Action job)
     {
@@ -67,8 +67,11 @@ public class GameRoom : IJobQueue
                 isJumping = c.isJumping,
                 isContactGround = c.isContactGround,
                 isConnectCombo = c.isConnectCombo,
+                etcData = c.etcData
             });
         }
+
+        
         session.Send(packet.Write());
 
         // 다른 플레이어들에게 새로운 플레이어의 입장을 알립니다.
@@ -83,7 +86,7 @@ public class GameRoom : IJobQueue
 
             S_BroadcastGenerateCharacter gen = new S_BroadcastGenerateCharacter();
 
-            Define.CharacterName characterName = (Define.CharacterName.SpannerCharacter);
+            Define.CharacterName characterName = (Define.CharacterName.CustomCharacter);
 
             gen.characterId = session.SessionId;
             gen.isSuccess = true;
@@ -141,6 +144,7 @@ public class GameRoom : IJobQueue
             info.isJumping = packet.isJumping;
             info.isContactGround = packet.isContactGround;
             info.isConnectCombo = packet.isConnectCombo;
+            info.etcData = packet.etcData;
 
             // 모두에게 알린다
             S_BroadcastCharacterInfo pkt = new S_BroadcastCharacterInfo();
@@ -158,6 +162,7 @@ public class GameRoom : IJobQueue
             pkt.isJumping = packet.isJumping;
             pkt.isContactGround = packet.isContactGround;
             pkt.isConnectCombo = packet.isConnectCombo;
+            pkt.etcData = packet.etcData;
 
             Broadcast(pkt.Write());
         }
@@ -304,6 +309,27 @@ public class GameRoom : IJobQueue
 
         Broadcast(sendPacket.Write());
     }
+
+    public void GenreateItem(C_RequestGenerateItem packet)
+    {
+        ItemInfo itemInfo = new ItemInfo();
+
+        itemInfo.itemName = (ItemName)packet.itemName;
+        itemInfo.pos = new Vector3(packet.posX,packet.posY, packet.posZ);
+        itemInfo.itemId = ++_itemId;
+        _itemDictionary.Add(itemInfo.itemId,itemInfo);
+
+        S_BroadcastGenerateItem sendPacket = new S_BroadcastGenerateItem();
+
+        sendPacket.requestNumber= packet.requestNumber;
+        sendPacket.isSuccess = true;
+        sendPacket.itemId = itemInfo.itemId;
+        sendPacket.itemName = (int)itemInfo.itemName;
+        sendPacket.posX = itemInfo.pos.x;
+        sendPacket.posY = itemInfo.pos.y;
+
+        Broadcast(sendPacket.Write());
+    }
 }
 
 public class BuildingInfo
@@ -311,4 +337,11 @@ public class BuildingInfo
     public BuildingName buildingName;
     public int buildingId;
     public Vector2Int cellPos;
+}
+
+public class ItemInfo
+{
+    public ItemName itemName;
+    public int itemId;
+    public Vector3 pos;
 }

@@ -14,7 +14,7 @@ public class ClientSession : PacketSession
     {
         Console.WriteLine($"OnConnected: {endPoint}");
 
-        Debug.Log("NewClinetConnected");
+        Debug.Log("NewClinetConnected");    
         Server.Room.Push(() => Server.Room.Enter(this));
     }
     public override void OnRecvPacket(ArraySegment<byte> buffer)

@@ -48,7 +48,7 @@ public class EnemyCharacter : Character
     {
         base.ControlAnimation();
 
-        if(CharacterState == CharacterState.Idle)
+        if(!IsDamaged && !IsAttacking)
         {
             if(_rigidBody.velocity.x != 0)
             {
@@ -59,14 +59,14 @@ public class EnemyCharacter : Character
                 SetAnimatorBool("Walk", false);
             }
         }
-        if(CharacterState == CharacterState.Damage && !IsStagger) 
+        if(!IsDamaged && !IsStagger) 
         {
             IsStagger = true;
             SetAnimatorTrigger("Hit");
             SetAnimatorBool("Stagger", IsStagger);
 
         }
-        if (CharacterState != CharacterState.Damage && IsStagger)
+        if (!IsDamaged && IsStagger)
         {
             IsStagger = false;
             SetAnimatorBool("Stagger", IsStagger);
@@ -125,7 +125,7 @@ public class EnemyCharacter : Character
     void OnAttackEnd()
     {
         IsAttacking = false;
-        CharacterState = CharacterState.Idle;
+        IsEnableMove = true;
     }
 
 }

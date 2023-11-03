@@ -44,6 +44,9 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
     [SerializeField] protected float _attackDelay;
     protected float _attackTime;
 
+    public bool IsDone { get; set; }
+
+
     public virtual void Init()
     {
         _character = GetComponent<Character>();
@@ -53,7 +56,9 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
         {
             StartCoroutine(CorSendMovePacket());
         }
-        _animatorHandler.AttackEndHandler += () => { _character.CharacterState = CharacterState.Idle; };
+        _animatorHandler.AttackEndHandler += () => { _character.IsEnableMove = true; };
+
+        IsDone = true;
     }
 
     protected void OnDrawGizmosSelected()
@@ -64,6 +69,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
 
     private void Update()
     {
+        if (!IsDone) return;
         AI();
     }
 
@@ -74,42 +80,42 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
         if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.IsAttacking) return;
 
-        if (_character.CharacterState == CharacterState.Idle)
+        if (_character.IsDamaged)
         {
-            _attackTime += Time.deltaTime;
-            if (_target == null)
-            {
-                Search();
-            }
-            else
-            {
+            _character.SetCharacterDirection(Vector2.zero);
+            return;
+        }
 
-                Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
-                Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
-
-                if (character != null || building != null)
-                {
-                    _character.StopMove();
-                    _character.SetCharacterDirection(Vector2.zero);
-
-                    if (_attackDelay < _attackTime)
-                    {
-                        _attackTime = 0;
-                        _character.IsAttacking = true;
-                        _character.CharacterState = CharacterState.Attack;
-                        Client.Instance.SendCharacterInfo(_character);
-                    }
-
-                    return;
-                }
-                _character.SetCharacterDirection(_target.transform.position - transform.position);
-                _character.Turn((_target.transform.position - transform.position).x);
-            }
+        _attackTime += Time.deltaTime;
+        if (_target == null)
+        {
+            Search();
         }
         else
         {
-            _character.SetCharacterDirection(Vector2.zero);
+
+            Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
+            Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
+
+            if (character != null || building != null)
+            {
+                _character.StopMove();
+                _character.SetCharacterDirection(Vector2.zero);
+
+                if (_attackDelay < _attackTime)
+                {
+                    _attackTime = 0;
+                    _character.IsAttacking = true;
+                    _character.IsEnableMove = false;
+                    Client.Instance.SendCharacterInfo(_character);
+                }
+
+                return;
+            }
+            _character.SetCharacterDirection(_target.transform.position - transform.position);
+            _character.Turn((_target.transform.position - transform.position).x);
         }
+      
     }
 
 
@@ -142,5 +148,13 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
                 Client.Instance.SendCharacterInfo(_character);
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
+    }
+
+    public void DataSerialize()
+    {
+    }
+
+    public void DataDeserialize()
+    {
     }
 }

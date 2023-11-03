@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,10 +11,10 @@ public class HelperAI : MonoBehaviour, ICharacterOption
 
     protected Character _target;
 
-    [SerializeField]protected Vector3 _mainPoint;
+    [SerializeField] protected Vector3 _mainPoint;
     [SerializeField] protected float _aroundRange;
     [SerializeField] protected Range _searchRange;
-    [SerializeField]protected Range _attackRange;
+    [SerializeField] protected Range _attackRange;
     protected virtual Range AttackRange
     {
         get
@@ -37,7 +38,7 @@ public class HelperAI : MonoBehaviour, ICharacterOption
 
     protected float _time = 0;
     protected float _searchRenewTime = 1f;
-    
+
     protected float _idleDuration = 3;
     protected float _idleElapsed = 0;
     protected Vector3 _movePoint;
@@ -45,6 +46,9 @@ public class HelperAI : MonoBehaviour, ICharacterOption
     public Action AttackHanlder;
 
     protected bool _mainPointAlter;
+
+    public bool IsDone { get; set; }
+
 
     public virtual void Init()
     {
@@ -54,6 +58,8 @@ public class HelperAI : MonoBehaviour, ICharacterOption
             StartCoroutine(CorSendMovePacket());
         }
         _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
+
+        IsDone = true;
     }
     protected void OnDrawGizmosSelected()
     {
@@ -65,6 +71,7 @@ public class HelperAI : MonoBehaviour, ICharacterOption
     }
     private void Update()
     {
+        if (!IsDone) return;
         if (!Client.Instance.IsMain && !Client.Instance.IsSingle) return;
         AI();
     }
@@ -85,48 +92,47 @@ public class HelperAI : MonoBehaviour, ICharacterOption
             _time = 0;
             Search();
         }
-        if (_character.CharacterState == CharacterState.Idle)
+        if (_character.IsDamaged)
         {
-            if(_mainPointAlter)
+            _character.SetCharacterDirection(Vector2.zero);
+            return;
+        }
+        if (_mainPointAlter)
+        {
+            _movePoint = _mainPoint;
+            _mainPointAlter = false;
+        }
+        if (_target == null)
+        {
+            if (Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
             {
-                _movePoint = _mainPoint;
-                _mainPointAlter = false;
-            }
-            if (_target == null)
-            {
-                if(Mathf.Abs(_movePoint.x - transform.position.x) <= 0.1f)
+                _character.SetCharacterDirection(Vector3.zero);
+                _idleElapsed += Time.deltaTime;
+                if (_idleElapsed >= _idleDuration)
                 {
-                    _character.SetCharacterDirection(Vector3.zero);
-                    _idleElapsed += Time.deltaTime;
-                    if(_idleElapsed >= _idleDuration)
-                    {
-                        _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
-                        _idleElapsed = 0;
-                    }
-                }
-                else
-                {
-                    _character.SetCharacterDirection(_movePoint - transform.position);
+                    _movePoint = _mainPoint + Vector3.right * Random.Range(-_aroundRange, _aroundRange);
+                    _idleElapsed = 0;
                 }
             }
             else
             {
-                if (Util.GetIsInRange(_character.gameObject,_target.gameObject,AttackRange))
-                {
-                    _character.SetCharacterDirection(Vector3.zero);
-                    AttackHanlder?.Invoke();
-                    Client.Instance.SendCharacterInfo(_character);
-                }
-                else
-                {
-                    _character.SetCharacterDirection(_target.transform.position - transform.position);
-                }
+                _character.SetCharacterDirection(_movePoint - transform.position);
             }
         }
         else
         {
-            _character.SetCharacterDirection(Vector2.zero);
+            if (Util.GetIsInRange(_character.gameObject, _target.gameObject, AttackRange))
+            {
+                _character.SetCharacterDirection(Vector3.zero);
+                AttackHanlder?.Invoke();
+                Client.Instance.SendCharacterInfo(_character);
+            }
+            else
+            {
+                _character.SetCharacterDirection(_target.transform.position - transform.position);
+            }
         }
+
     }
 
 
@@ -147,7 +153,7 @@ public class HelperAI : MonoBehaviour, ICharacterOption
             {
                 _target = character;
             }
-            
+
         }
     }
 
@@ -162,5 +168,13 @@ public class HelperAI : MonoBehaviour, ICharacterOption
             }
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
+    }
+
+    public void DataSerialize()
+    {
+    }
+
+    public void DataDeserialize()
+    {
     }
 }

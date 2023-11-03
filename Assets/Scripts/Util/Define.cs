@@ -122,14 +122,3 @@ public static class Define
     }
 }
 
-
-public interface ICharacterOption
-{
-    public void Init();
-}
-
-public interface IBuildingOption
-{
-    public void Init();
-}
-

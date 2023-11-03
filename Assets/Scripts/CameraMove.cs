@@ -45,7 +45,8 @@ public class CameraMove : MonoBehaviour
 
             lerpPosition.z = -10;
 
-            lerpPosition += (Vector3)Random.insideUnitCircle * Mathf.Log(power, 10000);
+            if(power != 0)
+                lerpPosition += (Vector3)Random.insideUnitCircle * Mathf.Log(power, 10000);
 
             transform.position = lerpPosition;
             yield return new WaitForFixedUpdate();

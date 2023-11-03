@@ -9,13 +9,13 @@ public class HammerPlayerCharacter : Character
     {
         base.Awake();
         _animatorHandler = GetComponent<AnimatorHandler>();
-        _animatorHandler.DodgeEndHandler += () => { CharacterState = CharacterState.Idle; };
+        _animatorHandler.DodgeEndHandler += () => { IsEnableMove = true; IsDodge = false; };
     }
     protected override void ControlAnimation()
     {
         base.ControlAnimation();
 
-        if(CharacterState == CharacterState.Idle)
+        if(!IsDamaged && !IsAttacking)
         {
             if(_rigidBody.velocity.x != 0)
             {
@@ -27,20 +27,15 @@ public class HammerPlayerCharacter : Character
             }
         }
 
-        if (CharacterState == CharacterState.Dodge && !IsDodge)
-        {
-            SetAnimatorBool("Dodge", true);
-            IsDodge = true;
-        }
         if (IsDodge)
         {
+            SetAnimatorBool("Dodge", true);
             _rigidBody.velocity = new Vector2(_maxSpeed * (transform.localScale.x > 0 ? 1 : -1)
                 , _rigidBody.velocity.y);
         }
-        if (CharacterState != CharacterState.Dodge && IsDodge)
+        if (!IsDodge)
         {
             SetAnimatorBool("Dodge", false);
-            IsDodge = false;
         }
 
         SetAnimatorInteger("AttackType", AttackType);

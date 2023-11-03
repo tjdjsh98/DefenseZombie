@@ -9,13 +9,13 @@ public class SpannerPlayerCharacter : Character
     {
         base.Awake();
         _animatorHandler = GetComponent<AnimatorHandler>();
-        _animatorHandler.DodgeEndHandler += () => { CharacterState = CharacterState.Idle; };
+        
     }
     protected override void ControlAnimation()
     {
         base.ControlAnimation();
 
-        if (CharacterState == CharacterState.Idle)
+        if (!IsDamaged && (IsAttacking && IsEnableMoveWhileAttack))
         {
             if (_rigidBody.velocity.x != 0)
             {
@@ -25,22 +25,21 @@ public class SpannerPlayerCharacter : Character
             {
                 SetAnimatorBool("Walk", false);
             }
-        }   
+        }
+        else
+        {
+            SetAnimatorBool("Walk", false);
+        }
 
-        if(CharacterState == CharacterState.Dodge && !IsDodge) 
+        if (IsDodge)
         {
             SetAnimatorBool("Dodge", true);
-            IsDodge = true;
-        }
-        if(IsDodge)
-        {
-            _rigidBody.velocity = new Vector2(_maxSpeed * (transform.localScale.x > 0? 1 : -1)
+            _rigidBody.velocity = new Vector2(_maxSpeed * (transform.localScale.x > 0 ? 1 : -1)
                 , _rigidBody.velocity.y);
         }
-        if (CharacterState != CharacterState.Dodge && IsDodge)
+        if (!IsDodge)
         {
             SetAnimatorBool("Dodge", false);
-            IsDodge = false;
         }
 
         SetAnimatorInteger("AttackType", AttackType);

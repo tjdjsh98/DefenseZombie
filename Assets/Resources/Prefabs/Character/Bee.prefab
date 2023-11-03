@@ -12,10 +12,11 @@ GameObject:
   - component: {fileID: 5174228485356815167}
   - component: {fileID: 1806347717848255089}
   - component: {fileID: 3357414734694569056}
-  - component: {fileID: 2568397472024035436}
+  - component: {fileID: 4093095771664881556}
   - component: {fileID: 283819561722909353}
   - component: {fileID: 8369726237632214378}
   - component: {fileID: -2031427806179921648}
+  - component: {fileID: 3621120706271963552}
   m_Layer: 7
   m_Name: Bee
   m_TagString: Enemy
@@ -123,7 +124,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &2568397472024035436
+--- !u!114 &4093095771664881556
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -132,7 +133,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6320919963363865342}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d5c221f7ef9ad14a8569b9736954000, type: 3}
+  m_Script: {fileID: 11500000, guid: b4326f0764f05ad4e8bafe3d626fb3e0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   <CharacterId>k__BackingField: -1
@@ -141,11 +142,10 @@ MonoBehaviour:
     center: {x: 0, y: 0.55, z: 0}
     size: {x: 0.54, y: 1.2, z: 0}
   _isEnableFly: 1
-  _currentYSpeed: 0
   _maxHp: 2
   _isSuperArmerWhenAttack: 0
   _standing: 20
-  _accelSpeed: 20.1
+  _accelSpeed: 20
   _groundBreakSpeed: 40
   _airBreakSpeed: 10
   _maxSpeed: 2
@@ -153,23 +153,6 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
-  _attack:
-    attackEffectName: 0
-    attackEffectPoint: {x: 0, y: 0, z: 0}
-    projectile: {fileID: 0}
-    firePos: {x: 0, y: 0, z: 0}
-    hitEffectName: 1
-    attackRange:
-      center: {x: 0.66, y: 0.83, z: 0}
-      size: {x: 1.5, y: 2.84, z: 0}
-    AttackDirection: {x: 2, y: 0.8, z: 0}
-    attacKShape: 0
-    damage: 1
-    power: 5.67
-    stagger: 0.5
-    penetrationPower: 1
-  _injectPosition: {x: 0, y: 0, z: 0}
-  _projectile: {fileID: 0}
 --- !u!114 &283819561722909353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -216,6 +199,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   data: 01000000
+--- !u!114 &3621120706271963552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6320919963363865342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3ccf3440234273459b555400a439ac8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _character: {fileID: 4093095771664881556}
+  _customCharacter: {fileID: 0}
+  _attackType: 0
+  _defaultAttack:
+    attackEffectName: 0
+    attackEffectPoint: {x: 0, y: 0, z: 0}
+    projectile: {fileID: 0}
+    firePos: {x: 0, y: 0, z: 0}
+    hitEffectName: 1
+    attackRange:
+      center: {x: 0.68, y: 0.55, z: 0}
+      size: {x: 1.42, y: 1.51, z: 0}
+    AttackDirection: {x: 0, y: 0, z: 0}
+    attacKShape: 0
+    damage: 1
+    power: 1
+    stagger: 1
+    penetrationPower: 3
+    actualAttackEffectName: 0
+    isTargeting: 0
+  _frontWeapon: {fileID: 0}
+  _frontfirePoint: {fileID: 0}
+  _behindWeapon: {fileID: 0}
+  _behindfirePoint: {fileID: 0}
+  _enableAttackLayer: Player
 --- !u!1 &8159587531208646984
 GameObject:
   m_ObjectHideFlags: 0

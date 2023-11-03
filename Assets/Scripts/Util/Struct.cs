@@ -41,8 +41,23 @@ public interface IEnableInsertItem
 public interface IDataSerializable
 {
     public string SerializeData();
- 
-
     public void DeserializeData(string stringData);
 
 }
+
+
+public interface ICharacterOption
+{
+    public bool IsDone { set; get; }
+    public void Init();
+
+    public void DataSerialize();
+
+    public void DataDeserialize();
+}
+
+public interface IBuildingOption
+{
+    public void Init();
+}
+

@@ -1,17 +1,18 @@
 using TMPro.EditorUtilities;
-using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class Weapon : MonoBehaviour,ICharacterOption
 {
-    [SerializeField]protected CustomCharacter _character;
+    [SerializeField]protected Character _character;
+    [SerializeField]protected CustomCharacter _customCharacter;
     protected PlayerController _playerController;
     protected HelperAI _helperAi;
     protected AnimatorHandler _animatorHandler;
 
     [SerializeField] protected int _attackType;
     [SerializeField] protected AttackData _defaultAttack;
-
+    
     [SerializeField] GameObject _frontWeapon;
     [SerializeField] GameObject _frontfirePoint;
 
@@ -21,29 +22,36 @@ public class Weapon : MonoBehaviour,ICharacterOption
     {
         get 
         {
-            if (_character == null)
+            if(_customCharacter != null)
             {
-                return _defaultAttack;
+                return _customCharacter.WeaponData.AttackList[_attackType];
             }
-            return _character.WeaponData.AttackList[_attackType];
+
+          
+            return _defaultAttack;
+          
         }
     }
     public WeaponData WeaponData
     {
         get
         {
-            return _character.WeaponData;
+            return _customCharacter.WeaponData;
         }
     }
     [SerializeField] protected string _enableAttackLayer = "Enemy";
     
     public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
 
+    public bool IsDone { get; set; }
+
     float _attackTime;
 
     public virtual void Init()
     {
-        _character = GetComponent<CustomCharacter>();
+        _character = GetComponent<Character>();
+        _customCharacter = GetComponent<CustomCharacter>();
+
         _playerController = GetComponent<PlayerController>();
         _helperAi = GetComponent<HelperAI>();
         _animatorHandler = GetComponent<AnimatorHandler>();
@@ -63,10 +71,13 @@ public class Weapon : MonoBehaviour,ICharacterOption
             _animatorHandler.AttackHandler += Attack;
         }
         _animatorHandler.AttackEndHandler += OnAttackEnd;
+
+        IsDone = true;
     }
 
     public void Update()
     {
+        if (!IsDone) return;
         if (!_character.IsAttacking!)
             _attackTime += Time.deltaTime;
     }
@@ -75,51 +86,75 @@ public class Weapon : MonoBehaviour,ICharacterOption
     {
         Gizmos.color = Color.red;
 
-        WeaponData weaponData = _character.PreTakenWeaponData == null ? WeaponData : _character.PreTakenWeaponData;
+        WeaponData weaponData = null;
+        if (_customCharacter != null)
+            weaponData = _customCharacter.PreHoldingWeaponData == null ? WeaponData : _customCharacter.PreHoldingWeaponData;
 
-        Range attackRange = weaponData.AttackList[0].attackRange;
+        AttackData attackData = weaponData == null ? _defaultAttack : weaponData.AttackList[0];
 
-        Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
-        Gizmos.matrix = rotationMatrix;
+        if (_customCharacter != null)
+        {
+            Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
+            Gizmos.matrix = rotationMatrix;
+        }
 
         if (_character != null)
-            attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackRange.center.x : -attackRange.center.x);
+            attackData.attackRange.center.x = (_character?.gameObject.transform.localScale.x > 0 ? attackData.attackRange.center.x : -attackData.attackRange.center.x);
 
-        Vector3 point = weaponData.AttackList[0].attackEffectPoint;
+        Vector3 point = attackData.attackEffectPoint;
 
-        Gizmos.DrawWireSphere( point, 0.1f);
+        Gizmos.DrawWireSphere(point, 0.1f);
 
-        if(weaponData.AttackList[0].projectile)
+        if (attackData.projectile)
         {
-            Gizmos.DrawWireSphere( WeaponAttackData.firePos, 0.1f);
+            Gizmos.DrawWireSphere(attackData.firePos, 0.1f);
         }
 
-        switch (weaponData.AttackList[0].attacKShape)
+        if (_customCharacter != null)
         {
-            case Define.AttacKShape.Rectagle:
-                Gizmos.DrawWireCube( attackRange.center, attackRange.size);
-                break;
-            case Define.AttacKShape.Circle:
-                Gizmos.DrawWireSphere(_frontWeapon.transform.position + attackRange.center, attackRange.size.x);
-                break;
-            case Define.AttacKShape.Raycast:
-                Gizmos.DrawRay(attackRange.center, (_character == null ? Vector3.right : _character.transform.localPosition.x> 0 ? Vector3.right : Vector3.left) * attackRange.size.x );
-                break;
+            switch (attackData.attacKShape)
+            {
+                case Define.AttacKShape.Rectagle:
+                    Gizmos.DrawWireCube(attackData.attackRange.center, attackData.attackRange.size);
+                    break;
+                case Define.AttacKShape.Circle:
+                    Gizmos.DrawWireSphere(_frontWeapon.transform.position + attackData.attackRange.center, attackData.attackRange.size.x);
+                    break;
+                case Define.AttacKShape.Raycast:
+                    Gizmos.DrawRay(attackData.attackRange.center, (_character == null ? Vector3.right : _character.transform.localPosition.x > 0 ? Vector3.right : Vector3.left) * attackData.attackRange.size.x);
+                    break;
+            }
+        }
+        else
+        {
+            switch (attackData.attacKShape)
+            {
+                case Define.AttacKShape.Rectagle:
+                    Gizmos.DrawWireCube(transform.position + attackData.attackRange.center, attackData.attackRange.size);
+                    break;
+                case Define.AttacKShape.Circle:
+                    Gizmos.DrawWireSphere(transform.position + attackData.attackRange.center, attackData.attackRange.size.x);
+                    break;
+                case Define.AttacKShape.Raycast:
+                    Gizmos.DrawRay(transform.position, (_character == null ? Vector3.right : _character.transform.localPosition.x > 0 ? Vector3.right : Vector3.left) * attackData.attackRange.size.x);
+                    break;
+            }
         }
         Gizmos.color = Color.green;
-        Gizmos.DrawRay(transform.position, weaponData.AttackList[0].AttackDirection.normalized);
+        Gizmos.DrawRay(transform.position, attackData.AttackDirection.normalized);
 
     }
 
     protected virtual void OnAttackKeyDown()
     {
         if (Manager.Building.IsDrawing) return;
-        if (_character.IsLift) return;
+        if (_customCharacter != null && (_customCharacter.HoldingItem != null&&!_customCharacter.IsEquipWeapon)|| _customCharacter.HoldingBuilding != null) return;
         if (_character.IsAttacking) return;
         if (WeaponData.AttackDelay > _attackTime) return;
 
         _attackTime = 0;
         _character.IsAttacking = true;
+        _character.IsEnableMoveWhileAttack = true;
         _character.AttackType = _attackType;
 
         GameObject attackEffect = Manager.Data.GetEffect(WeaponAttackData.attackEffectName);
@@ -161,21 +196,41 @@ public class Weapon : MonoBehaviour,ICharacterOption
             attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? WeaponAttackData.attackRange.center.x : -WeaponAttackData.attackRange.center.x);
 
             int layerMask = LayerMask.GetMask(_enableAttackLayer) | Define.BuildingLayerMask;
-            RaycastHit2D[] hits;
-            Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
-            Vector3 pos = rotationMatrix.MultiplyVector(attackRange.center);
-            switch (WeaponAttackData.attacKShape)
+            RaycastHit2D[] hits = null ;
+            if (_customCharacter != null)
             {
-                case Define.AttacKShape.Rectagle:
-                   
-                    hits = Physics2D.BoxCastAll(_frontWeapon.transform.position + pos, attackRange.size, _frontWeapon.transform.eulerAngles.z, Vector2.zero, 0, layerMask);
-                    break;
-                case Define.AttacKShape.Raycast:
-                    hits = Physics2D.RaycastAll(_frontWeapon.transform.position + pos, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
-                    break;
-                default:
-                    hits = Physics2D.BoxCastAll(_frontWeapon.transform.position + pos, attackRange.size, _frontWeapon.transform.eulerAngles.z, Vector2.zero, 0, layerMask);
-                    break;
+                Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
+                Vector3 pos = rotationMatrix.MultiplyVector(attackRange.center);
+
+                switch (WeaponAttackData.attacKShape)
+                {
+                    case Define.AttacKShape.Rectagle:
+
+                        hits = Physics2D.BoxCastAll(_frontWeapon.transform.position + pos, attackRange.size, _frontWeapon.transform.eulerAngles.z, Vector2.zero, 0, layerMask);
+                        break;
+                    case Define.AttacKShape.Raycast:
+                        hits = Physics2D.RaycastAll(_frontWeapon.transform.position + pos, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
+                        break;
+                    default:
+                        hits = Physics2D.BoxCastAll(_frontWeapon.transform.position + pos, attackRange.size, _frontWeapon.transform.eulerAngles.z, Vector2.zero, 0, layerMask);
+                        break;
+                }
+            }
+            else if(_character != null)
+            {
+                switch (WeaponAttackData.attacKShape)
+                {
+                    case Define.AttacKShape.Rectagle:
+
+                        hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size,0, Vector2.zero, 0, layerMask);
+                        break;
+                    case Define.AttacKShape.Raycast:
+                        hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
+                        break;
+                    default:
+                        hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, 0, Vector2.zero, 0, layerMask);
+                        break;
+                }
             }
 
             int penetration = 0;
@@ -232,21 +287,24 @@ public class Weapon : MonoBehaviour,ICharacterOption
         }
         else
         {
-            if ((_character.WeaponData != null && _character.WeaponData.IsFrontWeapon) ||_character.WeaponData == null)
+            if (_customCharacter != null)
             {
-                _frontfirePoint.transform.localPosition = WeaponAttackData.firePos;
-                Projectile projectile = Instantiate(WeaponAttackData.projectile);
-                projectile.transform.position = _frontfirePoint.transform.position;
-                projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
-                    gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
-            }
-            else if (_character.WeaponData != null && !_character.WeaponData.IsFrontWeapon)
-            {
-                _behindfirePoint.transform.localPosition = WeaponAttackData.firePos;
-                Projectile projectile = Instantiate(WeaponAttackData.projectile);
-                projectile.transform.position = _behindfirePoint.transform.position;
-                projectile.Fire(transform.localScale.x, _behindfirePoint.transform.eulerAngles,
-                    gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+                if ((_customCharacter.WeaponData != null && _customCharacter.WeaponData.IsFrontWeapon) || _customCharacter.WeaponData == null)
+                {
+                    _frontfirePoint.transform.localPosition = WeaponAttackData.firePos;
+                    Projectile projectile = Instantiate(WeaponAttackData.projectile);
+                    projectile.transform.position = _frontfirePoint.transform.position;
+                    projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
+                        gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+                }
+                else if (_customCharacter.WeaponData != null && !_customCharacter.WeaponData.IsFrontWeapon)
+                {
+                    _behindfirePoint.transform.localPosition = WeaponAttackData.firePos;
+                    Projectile projectile = Instantiate(WeaponAttackData.projectile);
+                    projectile.transform.position = _behindfirePoint.transform.position;
+                    projectile.Fire(transform.localScale.x, _behindfirePoint.transform.eulerAngles,
+                        gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+                }
             }
         }
     }
@@ -254,6 +312,16 @@ public class Weapon : MonoBehaviour,ICharacterOption
     protected virtual void OnAttackEnd()
     {
         Client.Instance.SendCharacterInfo(_character);
+    }
+
+    public void DataSerialize()
+    {
+
+    }
+
+    public void DataDeserialize()
+    {
+
     }
 }
 
