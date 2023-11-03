@@ -50,7 +50,7 @@ public class EnemyCharacter : Character
 
         if(CharacterState == CharacterState.Idle)
         {
-            if(_currentSpeed != 0)
+            if(_rigidBody.velocity.x != 0)
             {
                 SetAnimatorBool("Walk", true);
             }

@@ -37,3 +37,12 @@ public interface IEnableInsertItem
     public bool InsertItem(ItemName itemName);
     public bool CheckIsFinish();
 }
+
+public interface IDataSerializable
+{
+    public string SerializeData();
+ 
+
+    public void DeserializeData(string stringData);
+
+}

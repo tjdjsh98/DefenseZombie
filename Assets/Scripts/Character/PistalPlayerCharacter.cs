@@ -28,15 +28,15 @@ public class PistalPlayerCharacter : Character
         {
             bool walk, backWalk = false;
 
-            if(_currentSpeed== 0)
+            if(_rigidBody.velocity.x == 0)
             {
                 walk = false;
                 backWalk = false;
             }
             else if(IsAttacking)
             {
-                if((_currentSpeed > 0 && transform.localScale.x > 0) ||
-                    (_currentSpeed < 0 && transform.localScale.x < 0))
+                if((_rigidBody.velocity.x > 0 && transform.localScale.x > 0) ||
+                    (_rigidBody.velocity.x < 0 && transform.localScale.x < 0))
                 {
                     walk = true;
                     backWalk = false;

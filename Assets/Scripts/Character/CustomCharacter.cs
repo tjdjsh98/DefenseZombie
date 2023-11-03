@@ -75,76 +75,145 @@ public class CustomCharacter : Character
     protected override void MoveCharacter()
     {
         if (IsHide || !IsEnableMove) return;
-        _currentSpeed = _rigidBody.velocity.x;
         if (CharacterState != CharacterState.Idle)
         {
-            if (_currentSpeed < 0)
+            if (_rigidBody.velocity.x < 0)
             {
-                _currentSpeed += BreakSpeed * Time.deltaTime;
-                if (_currentSpeed > 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
+
+                if (_rigidBody.velocity.x > 0)
+                    SetXVelocity(0 * Time.deltaTime);
             }
-            if (_currentSpeed > 0)
+            if (_rigidBody.velocity.x > 0)
             {
-                _currentSpeed -= BreakSpeed * Time.deltaTime;
-                if (_currentSpeed < 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
+                if (_rigidBody.velocity.x < 0)
+                    SetXVelocity(0);
+            }
+
+            if (_isEnableFly)
+            {
+                if (_rigidBody.velocity.y < 0)
+                {
+                    SetYVelocity(_rigidBody.velocity.y + BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y > 0)
+                        SetYVelocity(0);
+                }
+                if (_rigidBody.velocity.y > 0)
+                {
+                    SetYVelocity(_rigidBody.velocity.y - BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y < 0)
+                        SetYVelocity(0);
+                }
             }
             return;
         }
 
+        // 속도 줄이기, 브레이크
         if (_characterMoveDirection.x == 0)
         {
-            if (_currentSpeed < 0)
+            if (_rigidBody.velocity.x < 0)
             {
-                _currentSpeed += BreakSpeed * Time.deltaTime;
-                if (_currentSpeed > 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
+                if (_rigidBody.velocity.x > 0)
+                    SetXVelocity(0 * Time.deltaTime);
             }
-            if (_currentSpeed > 0)
+            if (_rigidBody.velocity.x > 0)
             {
-                _currentSpeed -= BreakSpeed * Time.deltaTime;
-                if (_currentSpeed < 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
+                if (_rigidBody.velocity.x < 0)
+                    SetXVelocity(0);
             }
         }
         else if (_characterMoveDirection.x > 0)
         {
-            if (_currentSpeed < 0)
+            // 관성
+            if (_rigidBody.velocity.x < 0)
             {
-                _currentSpeed += BreakSpeed * Time.deltaTime;
+                SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
             }
+            // 가속
             else
             {
-               
-                _currentSpeed += _accelSpeed * Time.deltaTime;
+                SetXVelocity(_rigidBody.velocity.x + _accelSpeed * Mathf.Clamp01(_characterMoveDirection.x) * Time.deltaTime);
             }
 
-            if (_currentSpeed > _maxSpeed)
-                _currentSpeed = _maxSpeed;
+            if (_rigidBody.velocity.x > _maxSpeed)
+                SetXVelocity(_maxSpeed);
         }
         else if (_characterMoveDirection.x < 0)
         {
-            if (_currentSpeed > 0)
+            // 관성
+            if (_rigidBody.velocity.x > 0)
             {
-                _currentSpeed -= BreakSpeed * Time.deltaTime;
+                SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
             }
+            // 가속
             else
             {
-               
-                _currentSpeed -= _accelSpeed * Time.deltaTime;
+                SetXVelocity(_rigidBody.velocity.x - _accelSpeed * Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime);
             }
 
-            if (_currentSpeed < -_maxSpeed)
-                _currentSpeed = -_maxSpeed;
+            if (_rigidBody.velocity.x < -_maxSpeed)
+                SetXVelocity(-_maxSpeed);
         }
-        if (_jumpCount == 0 && IsJumping)
+
+
+        if (_isEnableFly)
+        {
+            if (_characterMoveDirection.y == 0)
+            {
+                if (_rigidBody.velocity.y < 0)
+                {
+                    SetYVelocity(_rigidBody.velocity.y + BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y > 0)
+                        SetYVelocity(0);
+                }
+                if (_rigidBody.velocity.y > 0)
+                {
+                    SetYVelocity(_rigidBody.velocity.y - BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y < 0)
+                        SetYVelocity(0);
+                }
+            }
+            else if (_characterMoveDirection.y > 0)
+            {
+                if (_rigidBody.velocity.y < 0)
+                {
+                    SetYVelocity(_rigidBody.velocity.y + BreakSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    SetYVelocity(_rigidBody.velocity.y + _accelSpeed * Time.deltaTime);
+                }
+
+                if (_rigidBody.velocity.y > _maxSpeed)
+                    SetYVelocity(_maxSpeed);
+            }
+            else if (_characterMoveDirection.y < 0)
+            {
+                if (_rigidBody.velocity.y > 0)
+                {
+                    SetYVelocity(_rigidBody.velocity.y - BreakSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    SetYVelocity(_rigidBody.velocity.y - _accelSpeed * Time.deltaTime);
+                }
+
+                if (_rigidBody.velocity.y < -_maxSpeed)
+                    SetYVelocity(-_maxSpeed);
+            }
+        }
+
+
+        if (!_isEnableFly && _jumpCount == 0 && IsJumping)
         {
             _rigidBody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
             IsJumping = false;
             _jumpCount++;
         }
-        _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
+
     }
 
 
@@ -228,7 +297,7 @@ public class CustomCharacter : Character
 
         if (CharacterState == CharacterState.Idle)
         {
-            if (_currentSpeed != 0)
+            if (_rigidBody.velocity.x != 0)
             {
                 SetAnimatorBool("Walk", true);
             }

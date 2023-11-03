@@ -46,11 +46,7 @@ public class BuildingManager : MonoBehaviour
             }
         }
 
-
         GenerateBuilding(BuildingName.CommandCenter, new Vector2Int(0, -3));
-        
-
-
     }
 
     private void Update()

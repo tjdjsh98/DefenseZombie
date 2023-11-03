@@ -1,12 +1,22 @@
+using System;
+using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using Unity.VisualScripting;
 using UnityEditor.Tilemaps;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UIElements;
 
 public static class Util
 {
+    static MemoryStream memoryStream = new MemoryStream();
+    static int offset = 0;
+    static byte[] buffer = new byte[1024];
     public static GameObject GetGameObjectByPhysics(Vector3 position, Range range, int layerMask = -1)
     {
         RaycastHit2D hit2D;
@@ -20,7 +30,6 @@ public static class Util
 
         return null;
     }
-
     public static T GetGameObjectByPhysics<T>(Vector3 position, Range range, int layerMask = -1) 
     {
         RaycastHit2D[] hits;
@@ -69,7 +78,6 @@ public static class Util
         range.center.x = (transform.localScale.x > 0 ? range.center.x : -range.center.x);
         hits = Physics2D.BoxCastAll(transform.position + range.center, range.size, 0, Vector2.zero, 0, layerMask);
     }
-
     public static void GetHItsByPhysics(Transform transform, AttackData attack, int layerMask , out RaycastHit2D[] hits)
     {
         Range attackRange = attack.attackRange;
@@ -89,7 +97,6 @@ public static class Util
                 break;
         }
     }
-
     public static bool GetIsInRange(GameObject me, GameObject you, Range range)
     {
         if(you.transform.position.x < me.transform.position.x + range.center.x + range.size.x/2)
@@ -108,7 +115,6 @@ public static class Util
 
         return false;
     }
-
     public static GameObject Raycast(Vector3 position,string tag , int layerMask = -1)
     {
         RaycastHit2D[] hits;
@@ -128,7 +134,6 @@ public static class Util
 
         return null;
     }
-
     public static List<GameObject> Raycast(Vector3 position,Vector3 direction, float distance, int layerMask = -1 , string tag = null)
     {
         RaycastHit2D[] hits;
@@ -153,13 +158,73 @@ public static class Util
 
         return result;
     }
-
-
     public static void DrawRangeGizmo(GameObject target, Range range, Color color)
     {
         Gizmos.color = color;
 
         Gizmos.DrawWireCube(target.transform.position + range.center, range.size);
+    }
+
+
+    public static void StartWriteSerializedData()
+    {
+        memoryStream.Position = 0;
+        offset = 0;
+    }
+
+    public static void WriteSerializedData(int data)
+    {
+        byte[] buffer = BitConverter.GetBytes(data);
+        memoryStream.Write(buffer, 0, sizeof(int));
+    }
+    public static void WriteSerializedData(float data)
+    {
+        byte[] buffer = BitConverter.GetBytes(data);
+        memoryStream.Write(buffer, 0, sizeof(float));
+        Debug.Log(buffer[0]);
+        Debug.Log(buffer[1]);
+        Debug.Log(buffer[2]);
+        Debug.Log(buffer[3]);
+    }
+    public static void WriteSerializedData(bool data)
+    {
+        byte[] buffer = BitConverter.GetBytes(data);
+        memoryStream.Write(buffer, 0, sizeof(bool));
+    }
+    public static string EndWriteSerializeData()
+    {
+        byte[] data = memoryStream.GetBuffer();
+        return Convert.ToBase64String(data);
+    }
+
+    public static void StartReadSerializedData(string stringData)
+    {
+        offset = 0;
+        buffer = Convert.FromBase64String(stringData);
+    }
+
+    public static int ReadSerializedDataToInt()
+    {
+        ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(buffer, offset, sizeof(int));
+        int result = BitConverter.ToInt32(bytes);
+        offset += sizeof(int);
+        return result;
+    }
+    public static float ReadSerializedDataToFloat()
+    {
+        
+        ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(buffer, offset, sizeof(float));
+        float result = BitConverter.ToSingle(bytes);
+        offset += sizeof(float);
+        return result;
+    }
+    public static bool ReadSerializedDataToBoolean()
+    {
+        ReadOnlySpan<byte> bytes = new ReadOnlySpan<byte>(buffer, offset, sizeof(bool));
+        bool result = BitConverter.ToBoolean(bytes);
+        offset += sizeof(bool);
+
+        return result;
     }
 }
 

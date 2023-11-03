@@ -1,10 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using static Define;
 
-public class Character : MonoBehaviour,IHp
+public class Character : MonoBehaviour,IHp, IDataSerializable
 {
     [field:SerializeField]public int CharacterId { set; get; } = -1;
     protected Rigidbody2D _rigidBody;
@@ -17,8 +18,7 @@ public class Character : MonoBehaviour,IHp
     [SerializeField] protected Range _characterSize;
     public Range CharacterSize => _characterSize;
 
-    [SerializeField] bool _isEnableFly;
-    [SerializeField] float _currentYSpeed;
+    [SerializeField]protected bool _isEnableFly;
 
     public CharacterState CharacterState { set; get; }
     protected Vector2 _characterMoveDirection;
@@ -36,11 +36,9 @@ public class Character : MonoBehaviour,IHp
 
     public int AttackType { get; set; } = 0;
     // 加档
-    protected float _currentSpeed;
     [SerializeField]protected float _accelSpeed = 2.0f;
     [SerializeField] protected float _groundBreakSpeed;
     [SerializeField] protected float _airBreakSpeed;
-    public float CurrentSpeed => _currentSpeed;
     protected float BreakSpeed => IsContactGround? _groundBreakSpeed : _airBreakSpeed;
     [SerializeField]protected float _maxSpeed = 5.0f;
     public float Speed { set { _maxSpeed = value; } get { return _maxSpeed; } }
@@ -143,35 +141,35 @@ public class Character : MonoBehaviour,IHp
     protected virtual void MoveCharacter()
     {
         if (IsHide || !IsEnableMove) return;
-        _currentSpeed = _rigidBody.velocity.x;
         if (CharacterState != CharacterState.Idle)
         {
-            if (_currentSpeed < 0)
+            if (_rigidBody.velocity.x < 0)
             {
-                _currentSpeed += BreakSpeed * Time.deltaTime;
-                if (_currentSpeed > 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
+                    
+                if (_rigidBody.velocity.x > 0)
+                   SetXVelocity(0 * Time.deltaTime);
             }
-            if (_currentSpeed > 0)
+            if (_rigidBody.velocity.x > 0)
             {
-                _currentSpeed -= BreakSpeed * Time.deltaTime;
-                if (_currentSpeed < 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
+                if (_rigidBody.velocity.x < 0)
+                   SetXVelocity(0);
             }
 
             if (_isEnableFly)
             {
-                if (_currentYSpeed < 0)
+                if (_rigidBody.velocity.y < 0)
                 {
-                    _currentYSpeed += BreakSpeed * Time.deltaTime;
-                    if (_currentYSpeed > 0)
-                        _currentYSpeed = 0;
+                    SetYVelocity(_rigidBody.velocity.y + BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y > 0)
+                        SetYVelocity(0);
                 }
-                if (_currentYSpeed > 0)
+                if (_rigidBody.velocity.y > 0)
                 {
-                    _currentYSpeed -= BreakSpeed * Time.deltaTime;
-                    if (_currentYSpeed < 0)
-                        _currentYSpeed = 0;
+                    SetYVelocity(_rigidBody.velocity.y - BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y < 0)
+                        SetYVelocity(0);
                 }
             }
             return;
@@ -180,52 +178,52 @@ public class Character : MonoBehaviour,IHp
         // 加档 临捞扁, 宏饭捞农
         if (_characterMoveDirection.x == 0)
         {
-            if (_currentSpeed < 0)
+            if (_rigidBody.velocity.x < 0)
             {
-                _currentSpeed += BreakSpeed * Time.deltaTime;
-                if (_currentSpeed > 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
+                if (_rigidBody.velocity.x > 0)
+                    SetXVelocity(0 * Time.deltaTime);
             }
-            if (_currentSpeed > 0)
+            if (_rigidBody.velocity.x > 0)
             {
-                _currentSpeed -= BreakSpeed * Time.deltaTime;
-                if (_currentSpeed < 0)
-                    _currentSpeed = 0;
+                SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
+                if (_rigidBody.velocity.x < 0)
+                    SetXVelocity(0);
             }
         }
         else if (_characterMoveDirection.x > 0)
         {
             // 包己
-            if (_currentSpeed < 0)
+            if (_rigidBody.velocity.x < 0)
             {
-                _currentSpeed += BreakSpeed * Time.deltaTime;
+                SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
             }
             // 啊加
             else
             {
-                Turn(_currentSpeed);
-                _currentSpeed += _accelSpeed* Mathf.Clamp01(_characterMoveDirection.x) * Time.deltaTime;
+                Turn(_rigidBody.velocity.x);
+                SetXVelocity(_rigidBody.velocity.x + _accelSpeed * Mathf.Clamp01(_characterMoveDirection.x) * Time.deltaTime);
             }
 
-            if (_currentSpeed > _maxSpeed)
-                _currentSpeed = _maxSpeed;
+            if (_rigidBody.velocity.x > _maxSpeed)
+                SetXVelocity(_maxSpeed);
         }
         else if (_characterMoveDirection.x < 0)
         {
             // 包己
-            if (_currentSpeed > 0)
+            if (_rigidBody.velocity.x > 0)
             {
-                _currentSpeed -= BreakSpeed * Time.deltaTime;
+                SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
             }
             // 啊加
             else
             {
-                Turn(_currentSpeed);
-                _currentSpeed -= _accelSpeed* Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime;
+                Turn(_rigidBody.velocity.x);
+                SetXVelocity(_rigidBody.velocity.x - _accelSpeed* Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime);
             }
 
-            if (_currentSpeed < -_maxSpeed)
-                _currentSpeed = -_maxSpeed;
+            if (_rigidBody.velocity.x < -_maxSpeed)
+                SetXVelocity(-_maxSpeed);
         }
 
 
@@ -233,46 +231,46 @@ public class Character : MonoBehaviour,IHp
         {
             if (_characterMoveDirection.y == 0)
             {
-                if (_currentYSpeed < 0)
+                if (_rigidBody.velocity.y < 0)
                 {
-                    _currentYSpeed += BreakSpeed * Time.deltaTime;
-                    if (_currentYSpeed > 0)
-                        _currentYSpeed = 0;
+                    SetYVelocity(_rigidBody.velocity.y + BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y > 0)
+                        SetYVelocity(0);
                 }
-                if (_currentYSpeed > 0)
+                if (_rigidBody.velocity.y > 0)
                 {
-                    _currentYSpeed -= BreakSpeed * Time.deltaTime;
-                    if (_currentYSpeed < 0)
-                        _currentYSpeed = 0;
+                    SetYVelocity(_rigidBody.velocity.y - BreakSpeed * Time.deltaTime);
+                    if (_rigidBody.velocity.y < 0)
+                        SetYVelocity(0);
                 }
             }
             else if (_characterMoveDirection.y > 0)
             {
-                if (_currentYSpeed < 0)
+                if (_rigidBody.velocity.y < 0)
                 {
-                    _currentYSpeed += BreakSpeed * Time.deltaTime;
+                    SetYVelocity(_rigidBody.velocity.y + BreakSpeed * Time.deltaTime);
                 }
                 else
                 {
-                    _currentYSpeed += _accelSpeed * Time.deltaTime;
+                    SetYVelocity(_rigidBody.velocity.y + _accelSpeed * Time.deltaTime);
                 }
 
-                if (_currentYSpeed > _maxSpeed)
-                    _currentYSpeed = _maxSpeed;
+                if (_rigidBody.velocity.y > _maxSpeed)
+                    SetYVelocity(_maxSpeed);
             }
             else if (_characterMoveDirection.y < 0)
             {
-                if (_currentYSpeed > 0)
+                if (_rigidBody.velocity.y > 0)
                 {
-                    _currentYSpeed -= BreakSpeed * Time.deltaTime;
+                    SetYVelocity(_rigidBody.velocity.y - BreakSpeed * Time.deltaTime);
                 }
                 else
                 {
-                    _currentYSpeed -= _accelSpeed * Time.deltaTime;
+                    SetYVelocity(_rigidBody.velocity.y - _accelSpeed * Time.deltaTime);
                 }
 
-                if (_currentYSpeed < -_maxSpeed)
-                    _currentYSpeed = -_maxSpeed;
+                if (_rigidBody.velocity.y < -_maxSpeed)
+                    SetYVelocity(-_maxSpeed);
             }
         }
         
@@ -283,11 +281,16 @@ public class Character : MonoBehaviour,IHp
             IsJumping = false;
             _jumpCount++;
         }
+     
+    }
 
-        if(!_isEnableFly)
-            _rigidBody.velocity = new Vector2(_currentSpeed, _rigidBody.velocity.y);
-        else
-            _rigidBody.velocity = new Vector2(_currentSpeed, _currentYSpeed);
+    protected void SetXVelocity(float x)
+    {
+        _rigidBody.velocity = new Vector3(x,_rigidBody.velocity.y);
+    }
+    protected void SetYVelocity(float y)
+    {
+        _rigidBody.velocity = new Vector3(_rigidBody.velocity.x,y);
     }
 
     protected void CheckGround()
@@ -334,8 +337,6 @@ public class Character : MonoBehaviour,IHp
     public void StopMove()
     {
         _rigidBody.velocity = new Vector2(0, _isEnableFly?0:_rigidBody.velocity.y);
-        _currentSpeed = 0;
-        _currentYSpeed = 0;
     }
     public virtual void Turn(float direction)
     {
@@ -445,10 +446,7 @@ public class Character : MonoBehaviour,IHp
     {
         _rigidBody.velocity = velocity;
     }
-    public void SetCurrentSpeed(float speed)
-    {
-        _currentSpeed = speed;
-    }
+    
     public void Dodge()
     {
         if (!IsContactGround) return;
@@ -477,7 +475,7 @@ public class Character : MonoBehaviour,IHp
         _time = 0;
 
         SetCharacterDirection(new Vector2(packet.characterMoveDirection, 0));
-        SetCurrentSpeed(packet.xSpeed);
+        SetXVelocity(packet.xSpeed);
         SetVelocity(new Vector2(packet.xSpeed, packet.ySpeed));
         Hp = packet.hp;
         AttackType = packet.attackType;
@@ -508,6 +506,15 @@ public class Character : MonoBehaviour,IHp
         _rigidBody.isKinematic = false;
     }
 
+    public virtual string SerializeData()
+    {
+        return string.Empty;
+    }
+
+    public virtual void DeserializeData(string stringData)
+    {
+
+    }
 }
 
 public enum CharacterState
