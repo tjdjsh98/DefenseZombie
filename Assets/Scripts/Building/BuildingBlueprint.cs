@@ -20,11 +20,13 @@ public class BlueprintItem
         currentCount = blueprintItem.currentCount;
     }
     public ItemName name;
+    public List<int> itemIdList =new List<int>();
     public int requireCount;
     public int currentCount;
 
-    public void AddCount()
+    public void AddCount(int id)
     {
+        itemIdList.Add(id);
         currentCount++;
     }
 }

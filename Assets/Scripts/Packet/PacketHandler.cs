@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using static Define;
 using Debug = UnityEngine.Debug;
 
 class PacketHandler
@@ -38,9 +39,8 @@ class PacketHandler
     public static void S_BroadcastNewClientHandler(PacketSession session, IPacket packet)
     {
         S_BroadcastNewClient pkt = packet as S_BroadcastNewClient;
-
-        Debug.Log(pkt.clientId);
-
+        UI_Debug ui = Manager.UI.GetUI(UIName.Debug) as UI_Debug;
+        ui.AddText($"#{pkt.ToString()}");
         Client.Instance.EnterNewOtherClinet(pkt.clientId);
     }
     
@@ -76,8 +76,11 @@ class PacketHandler
     public static void S_EnterSyncInfosHandler(PacketSession session, IPacket packet)
     {
         S_EnterSyncInfos pkt = packet as S_EnterSyncInfos;
-
+        UI_Debug ui = Manager.UI.GetUI(UIName.Debug) as UI_Debug;
+        ui.AddText($"#{pkt.ToString()}");
         Manager.Character.GeneratePacketCharacter(pkt);
+        Manager.Item.GenerateItemByPacket(pkt);
+        Manager.Building.GenerateBuildingByPacket(pkt);
     }
 
     public static void C_SuccessToEnterServerHandler(PacketSession session, IPacket packet)
@@ -106,6 +109,10 @@ class PacketHandler
     public static void S_BroadcastGenerateCharacterHandler(PacketSession session, IPacket packet)
     {
         S_BroadcastGenerateCharacter pkt = packet as S_BroadcastGenerateCharacter;
+
+
+        UI_Debug ui = Manager.UI.GetUI(UIName.Debug) as UI_Debug;
+        ui.AddText($"#{pkt.ToString()}");
 
         Manager.Character.GenerateCharacterByPacket(pkt);
     }
@@ -198,8 +205,14 @@ class PacketHandler
     public static void C_RequestRemoveItemHandler(PacketSession session, IPacket packet)
     {
         C_RequestRemoveItem pkt = packet as C_RequestRemoveItem;
+        ClientSession clientSession = session as ClientSession;    
 
         if (pkt == null) return;
+        if (clientSession == null) return;
+
+        GameRoom room = clientSession.Room;
+
+        room?.Push(() => { room.RemoveItem(pkt); });
     }
 
     public static void S_BroadcastRemoveItemHandler(PacketSession session, IPacket packet)
@@ -207,6 +220,81 @@ class PacketHandler
         S_BroadcastRemoveItem pkt = packet as S_BroadcastRemoveItem;
 
         if (pkt == null) return;
+
+        Manager.Item.RemoveItemByPacket(pkt);
+    }
+    public static void C_RequestRemoveBuildingHandler(PacketSession session, IPacket packet)
+    {
+        C_RequestRemoveBuilding pkt = packet as C_RequestRemoveBuilding;
+        ClientSession clientSession = session as ClientSession;
+
+        if (pkt == null) return;
+        if (clientSession == null) return;
+
+        GameRoom room = clientSession.Room;
+
+        room?.Push(() => { room.RemoveBuilding(pkt); });
     }
 
+    public static void S_BroadcastRemoveBuildingHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastRemoveBuilding pkt = packet as S_BroadcastRemoveBuilding;
+
+        if (pkt == null) return;
+
+        Manager.Building.RemoveBuildingByPacket(pkt);
+    }
+
+    public static void C_ItemInfoHandler(PacketSession session, IPacket packet)
+    {
+        C_ItemInfo pkt = packet as C_ItemInfo;
+
+        if (pkt == null) return;
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession.Room == null)
+            return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.SyncItemInfo(clientSession, pkt));
+    }
+
+    public static void C_BuildingInfoHandler(PacketSession session, IPacket packet)
+    {
+        C_BuildingInfo pkt = packet as C_BuildingInfo;
+
+        if (pkt == null) return;
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession.Room == null)
+            return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.SyncBuildingInfo(clientSession, pkt));
+    }
+
+    public static void S_BroadcastItemInfoHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastItemInfo pkt = packet as S_BroadcastItemInfo;
+
+        if (pkt == null) return;
+
+        Item item = Manager.Item.GetItem(pkt.itemId);
+        if(item != null)
+        {
+            item.SyncItemInfo(pkt);
+        }
+    }
+
+    public static void S_BroadcastBuildingInfoHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastBuildingInfo pkt = packet as S_BroadcastBuildingInfo;
+
+        if (pkt == null) return;
+        Building building = Manager.Building.GetBuilding(pkt.buildingId);
+        if (building != null)
+        {
+            building.SyncBuildingInfo(pkt);
+        }
+    }
 }

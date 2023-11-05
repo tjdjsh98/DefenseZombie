@@ -34,6 +34,20 @@ public class GameManager : MonoBehaviour
 
     public void Init()
     {
+        if (Client.Instance.IsSingle || (!Client.Instance.IsSingle && Client.Instance.IsMain))
+        {
+            Building building = null;
+            for (int x = -5; x <= 5; x++)
+            {
+                Manager.Building.GenerateBuilding(BuildingName.GrassTile, new Vector2Int(x, -2), ref building);
+                for (int y = -3; y >= -5; y--)
+                {
+                    Manager.Building.GenerateBuilding(BuildingName.GroundTile, new Vector2Int(x, y), ref building);
+                }
+            }
+        }
+
+
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);
         Manager.Character.ReciveGenPacket += SetDiscountSummonCount;
         StartCoroutine(CorStartLevel());
@@ -121,39 +135,41 @@ public class GameManager : MonoBehaviour
 
                 // 일정 갯수의 나무와 바위 지속 생성
 
-                if(_rockMaxCount > _rockCount)
-                {
-                    Building building = Manager.Data.GetBuilding(BuildingName.Rock);
-                    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
+                //if(_rockMaxCount > _rockCount)
+                //{
+                //    Building building = Manager.Data.GetBuilding(BuildingName.Rock);
+                //    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
 
-                    if(cellPos.x != -999)
-                    {
-                        Building rock = Manager.Building.GenerateBuilding(BuildingName.Rock,cellPos);
+                //    if(cellPos.x != -999)
+                //    {
+                //        Building rock = null;
+                //        int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Rock,cellPos, ref rock);
 
-                        if(rock != null)
-                        {
-                            _rockCount++;
-                            rock.DestroyedHandler += ()=> { _rockCount--; } ;
-                        }
-                    }
-                }
+                //        if(rock != null)
+                //        {
+                //            _rockCount++;
+                //            rock.DestroyedHandler += ()=> { _rockCount--; } ;
+                //        }
+                //    }
+                //}
 
-                if(_treeMaxCount > _treeCount)
-                {
-                    Building building = Manager.Data.GetBuilding(BuildingName.Tree);
-                    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
+                //if(_treeMaxCount > _treeCount)
+                //{
+                //    Building building = Manager.Data.GetBuilding(BuildingName.Tree);
+                //    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
 
-                    if (cellPos.x != -999)
-                    {
-                        Building tree = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos);
+                //    if (cellPos.x != -999)
+                //    {
+                //        Building tree = null;
+                //        int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos, ref tree);
 
-                        if (tree != null)
-                        {
-                            _treeCount++;
-                            tree.DestroyedHandler += () => { _treeCount--; };
-                        }
-                    }
-                }
+                //        if (tree != null)
+                //        {
+                //            _treeCount++;
+                //            tree.DestroyedHandler += () => { _treeCount--; };
+                //        }
+                //    }
+                //}
 
 
             }

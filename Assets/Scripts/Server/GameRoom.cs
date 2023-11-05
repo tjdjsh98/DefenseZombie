@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using static Define;
 using CharacterInfo = S_EnterSyncInfos.CharacterInfo;
+using BuildingInfo = S_EnterSyncInfos.BuildingInfo;
+using ItemInfo = S_EnterSyncInfos.ItemInfo;
+using TMPro;
+using Unity.VisualScripting;
+using UnityEditor.Rendering;
 
 public class GameRoom : IJobQueue
 {
@@ -54,36 +59,67 @@ public class GameRoom : IJobQueue
             {
                 characterId = c.characterId,
                 characterName = c.characterName,
-                hp= c.hp,
+                hp = c.hp,
                 posX = c.posX,
                 posY = c.posY,
-                posZ = c.posZ,
-                xSpeed = c.xSpeed,
-                ySpeed = c.ySpeed,
-                characterState = c.characterState,
-                characterMoveDirection = c.characterMoveDirection,
-                attackType = c.attackType,
-                isAttacking = c.isAttacking,
-                isJumping = c.isJumping,
-                isContactGround = c.isContactGround,
-                isConnectCombo = c.isConnectCombo,
-                etcData = c.etcData
+                data = c.data
             });
+
+            if (string.IsNullOrEmpty(packet.characterInfos[packet.characterInfos.Count - 1].data))
+            {
+                packet.characterInfos[packet.characterInfos.Count - 1].data = string.Empty;
+            }
         }
 
-        
+        foreach(var i in _itemDictionary.Values)
+        {
+            packet.itemInfos.Add(new ItemInfo()
+            {
+                itemId = i.itemId,
+                itemName = i.itemName,
+                posX = i.posX,
+                posY = i.posY,
+                data = i.data
+            });
+            if (string.IsNullOrEmpty(packet.itemInfos[packet.itemInfos.Count - 1].data))
+            {
+                packet.itemInfos[packet.itemInfos.Count - 1].data = string.Empty;
+            }
+        }
+
+        foreach(var b in _buildingDictionary.Values)
+        {
+            packet.buildingInfos.Add(new BuildingInfo()
+            {
+                buildingId = b.buildingId,
+                buildingName = b.buildingName,
+                cellPosX= b.cellPosX,
+                cellPosY= b.cellPosY,
+                hp= b.hp,
+                posX = b.posX,
+                posY = b.posY,
+                data= b.data,
+            });
+            if (string.IsNullOrEmpty(packet.buildingInfos[packet.buildingInfos.Count - 1].data))
+            {
+                packet.buildingInfos[packet.buildingInfos.Count - 1].data = string.Empty;
+            }
+        }
+
+
         session.Send(packet.Write());
+
 
         // 다른 플레이어들에게 새로운 플레이어의 입장을 알립니다.
         S_BroadcastNewClient broadcastPkt = new S_BroadcastNewClient();
         broadcastPkt.clientId = session.SessionId;
 
+        session.Send(broadcastPkt.Write());
         Broadcast(broadcastPkt.Write());
 
         // 모두에게 새로운 클라이언트의 캐릭터 생성을 알립니다.
         if (!_characterDictionary.ContainsKey(session.SessionId))
         {
-
             S_BroadcastGenerateCharacter gen = new S_BroadcastGenerateCharacter();
 
             Define.CharacterName characterName = (Define.CharacterName.CustomCharacter);
@@ -93,8 +129,7 @@ public class GameRoom : IJobQueue
             gen.requestNumber = 0;
             gen.characterName = (int)characterName;
             gen.posX = 0;
-            gen.posY = 0;
-            gen.posZ = 0;
+            gen.posY = -2;
 
             CharacterInfo info = new CharacterInfo()
             {
@@ -102,10 +137,11 @@ public class GameRoom : IJobQueue
                 characterName = gen.characterName,
                 posX = gen.posX,
                 posY = gen.posY,
-                posZ = gen.posZ,
+                data = string.Empty
             };
             _characterDictionary.Add(info.characterId, info);
 
+            session.Send(gen.Write());
             Broadcast(gen.Write());
         }
     }
@@ -134,17 +170,7 @@ public class GameRoom : IJobQueue
             info.hp = packet.hp;
             info.posX = packet.posX;
             info.posY = packet.posY;
-            info.posZ = packet.posZ;
-            info.xSpeed = packet.xSpeed;
-            info.ySpeed = packet.ySpeed;
-            info.characterState = packet.characterState;
-            info.characterMoveDirection = packet.characterMoveDirection;
-            info.attackType = packet.attackType;
-            info.isAttacking = packet.isAttacking;
-            info.isJumping = packet.isJumping;
-            info.isContactGround = packet.isContactGround;
-            info.isConnectCombo = packet.isConnectCombo;
-            info.etcData = packet.etcData;
+            info.data = packet.data;
 
             // 모두에게 알린다
             S_BroadcastCharacterInfo pkt = new S_BroadcastCharacterInfo();
@@ -152,53 +178,96 @@ public class GameRoom : IJobQueue
             pkt.hp = packet.hp;
             pkt.posX = packet.posX;
             pkt.posY = packet.posY;
-            pkt.posZ = packet.posZ;
-            pkt.xSpeed = packet.xSpeed;
-            pkt.ySpeed = packet.ySpeed;
-            pkt.characterState = packet.characterState;
-            pkt.characterMoveDirection = packet.characterMoveDirection;
-            pkt.attackType = packet.attackType;
-            pkt.isAttacking = packet.isAttacking;
-            pkt.isJumping = packet.isJumping;
-            pkt.isContactGround = packet.isContactGround;
-            pkt.isConnectCombo = packet.isConnectCombo;
-            pkt.etcData = packet.etcData;
+            pkt.data = packet.data;
 
             Broadcast(pkt.Write());
         }
     }
 
+    public void SyncItemInfo(ClientSession session, C_ItemInfo packet)
+    {
+        // 아이템의 정보를 갱신해줍니다.
+        ItemInfo info = null;
+
+        _itemDictionary.TryGetValue(packet.itemId, out info);
+
+        if (info != null)
+        {
+            info.posX = packet.posX;
+            info.posY = packet.posY;
+            info.data = packet.data;
+
+            // 모두에게 알린다
+            S_BroadcastItemInfo pkt = new S_BroadcastItemInfo();
+            pkt.itemId = packet.itemId;
+            pkt.posX = packet.posX;
+            pkt.posY = packet.posY;
+            pkt.data = packet.data;
+
+            Broadcast(pkt.Write());
+        }
+    }
+    public void SyncBuildingInfo(ClientSession session, C_BuildingInfo packet)
+    {
+        // 건물의 정보를 갱신해줍니다.
+        BuildingInfo info = null;
+
+        _buildingDictionary.TryGetValue(packet.buildingId, out info);
+
+        if (info != null)
+        {
+            info.hp= packet.hp;
+            info.posX = packet.posX;
+            info.posY = packet.posY;
+            info.cellPosX= packet.cellPosX;
+            info.cellPosY = packet.cellPosY;
+            info.data = packet.data;
+
+            // 모두에게 알린다
+            S_BroadcastBuildingInfo pkt = new S_BroadcastBuildingInfo();
+            pkt.buildingId = packet.buildingId;
+            pkt.hp= packet.hp;
+            pkt.posX = packet.posX;
+            pkt.posY = packet.posY;
+            pkt.cellPosX = packet.cellPosX;
+            pkt.cellPosY = packet.cellPosY;
+            pkt.data = packet.data;
+
+            Broadcast(pkt.Write());
+        }
+    }
+
+
     public void GenerateCharacter(ClientSession clientSession, C_RequestGenerateCharacter packet)
     {
-        S_BroadcastGenerateCharacter gen = new S_BroadcastGenerateCharacter();
+        S_BroadcastGenerateCharacter sendPacket = new S_BroadcastGenerateCharacter();
 
         Define.CharacterName characterName = (Define.CharacterName)packet.characterName;
-
-        gen.isSuccess = true;
+        
+        sendPacket.isSuccess = true;
 
         if (packet.isPlayerableChracter && _characterDictionary.ContainsKey(clientSession.SessionId))
-            gen.isSuccess = false;
+            sendPacket.isSuccess = false;
         
-        if (packet.isPlayerableChracter) gen.characterId = clientSession.SessionId;
-        else gen.characterId = ++_characterId;
+        if (packet.isPlayerableChracter) sendPacket.characterId = clientSession.SessionId;
+        else sendPacket.characterId = ++_characterId;
 
-        gen.requestNumber = packet.requestNumber;
-        gen.characterName = packet.characterName;
-        gen.posX = packet.posX;
-        gen.posY = packet.posY;
-        gen.posZ = packet.posZ;
+        sendPacket.requestNumber = packet.requestNumber;
+        sendPacket.characterName = packet.characterName;
+        sendPacket.posX = packet.posX;
+        sendPacket.posY = packet.posY;
 
         CharacterInfo info = new CharacterInfo()
         {
-            characterId = gen.characterId,
-            characterName = gen.characterName,
+            characterId = sendPacket.characterId,
+            characterName = sendPacket.characterName,
             posX = packet.posX,
             posY = packet.posY,
-            posZ = packet.posZ,
+            data = string.Empty
         };
         _characterDictionary.Add(info.characterId,info);
 
-        Broadcast(gen.Write());
+        Broadcast(sendPacket.Write());
     }
 
     public void RemoveCharacter(C_RequestRemoveCharacter packet)
@@ -212,34 +281,16 @@ public class GameRoom : IJobQueue
 
         S_BroadcastRemoveCharacter sendPacket = new S_BroadcastRemoveCharacter();
         sendPacket.characterId = packet.characterId;
+        sendPacket.requestNumber = packet.requestNumber;
 
         Broadcast(sendPacket.Write());
     }
 
-    public void Damage(C_Damage packet)
-    {
-        S_BroadcastDamage sendPacket = new S_BroadcastDamage();
-
-        sendPacket.characterId = packet.characterId;
-        sendPacket.directionX = packet.directionX;
-        sendPacket.directionY = packet.directionY;
-        sendPacket.characterId = packet.characterId;
-        sendPacket.power = packet.power;
-        sendPacket.stagger = packet.stagger;
-
-        foreach(var s in _sessions)
-        {
-            if(s.SessionId == sendPacket.characterId)
-            {
-                s.Send(sendPacket.Write());
-                return;
-            }
-        }
-    }
-
+   
     public void GenerateBuilding(C_RequestGenerateBuilding packet)
     {
         bool isSucess = true;
+
         Building buildingOrigin = Manager.Data.GetBuilding((Define.BuildingName)packet.buildingName);
 
         Vector2Int cellPos = new Vector2Int(packet.posX, packet.posY);
@@ -269,8 +320,10 @@ public class GameRoom : IJobQueue
                 info = new BuildingInfo()
                 {
                     buildingId = ++_buildingId,
-                    buildingName = (BuildingName)packet.buildingName,
-                    cellPos = new Vector2Int(packet.posX, packet.posY),
+                    buildingName = packet.buildingName,
+                    cellPosX = packet.posX,
+                    cellPosY = packet.posY,
+                    data = string.Empty,
                 };
 
                 _buildingDictionary.Add(info.buildingId, info);
@@ -305,18 +358,49 @@ public class GameRoom : IJobQueue
         sendPacket.isSuccess = isSucess;
         sendPacket.posX= packet.posX;
         sendPacket.posY = packet.posY;
+        sendPacket.requestNumber= packet.requestNumber;
 
 
         Broadcast(sendPacket.Write());
+    }
+    public void RemoveBuilding(C_RequestRemoveBuilding packet)
+    {
+        BuildingInfo info = null;
+        if(_buildingDictionary.TryGetValue(packet.buildingId, out info))
+        {
+            Building buildingOrigin = Manager.Data.GetBuilding((Define.BuildingName)info.buildingName);
+
+            Vector2Int cellPos = new Vector2Int(info.cellPosX, info.cellPosY);
+
+            for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+            {
+                if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+                Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width, i / buildingOrigin.BuildingSize.width);
+
+                _buildingCoordiate[pos.x][pos.y] = null;
+            }
+
+            _buildingDictionary.Remove(packet.buildingId);
+
+            S_BroadcastRemoveBuilding sendPacket = new S_BroadcastRemoveBuilding();
+            sendPacket.buildingId = packet.buildingId;
+            sendPacket.requestNumber= packet.requestNumber;
+
+            Broadcast(sendPacket.Write());
+        }
     }
 
     public void GenreateItem(C_RequestGenerateItem packet)
     {
         ItemInfo itemInfo = new ItemInfo();
 
-        itemInfo.itemName = (ItemName)packet.itemName;
-        itemInfo.pos = new Vector3(packet.posX,packet.posY, packet.posZ);
+        itemInfo.itemName = packet.itemName;
         itemInfo.itemId = ++_itemId;
+        itemInfo.posX = packet.posX;
+        itemInfo.posY = packet.posY;
+        itemInfo.data = string.Empty;
+
         _itemDictionary.Add(itemInfo.itemId,itemInfo);
 
         S_BroadcastGenerateItem sendPacket = new S_BroadcastGenerateItem();
@@ -325,23 +409,45 @@ public class GameRoom : IJobQueue
         sendPacket.isSuccess = true;
         sendPacket.itemId = itemInfo.itemId;
         sendPacket.itemName = (int)itemInfo.itemName;
-        sendPacket.posX = itemInfo.pos.x;
-        sendPacket.posY = itemInfo.pos.y;
+        sendPacket.posX = itemInfo.posX;
+        sendPacket.posY = itemInfo.posY;
 
         Broadcast(sendPacket.Write());
     }
-}
+    public void RemoveItem(C_RequestRemoveItem packet)
+    {
+        ItemInfo itemInfo = null;
 
-public class BuildingInfo
-{
-    public BuildingName buildingName;
-    public int buildingId;
-    public Vector2Int cellPos;
-}
+        if(_itemDictionary.TryGetValue(packet.itemId, out itemInfo))
+        {
+            _itemDictionary.Remove(packet.itemId);
 
-public class ItemInfo
-{
-    public ItemName itemName;
-    public int itemId;
-    public Vector3 pos;
+            S_BroadcastRemoveItem sendPacket = new S_BroadcastRemoveItem();
+            sendPacket.requestNumber= packet.requestNumber;
+            sendPacket.isSuccess = true;
+        }
+    }
+
+    public void Damage(C_Damage packet)
+    {
+        S_BroadcastDamage sendPacket = new S_BroadcastDamage();
+
+        sendPacket.characterId = packet.characterId;
+        sendPacket.directionX = packet.directionX;
+        sendPacket.directionY = packet.directionY;
+        sendPacket.characterId = packet.characterId;
+        sendPacket.power = packet.power;
+        sendPacket.stagger = packet.stagger;
+
+        foreach (var s in _sessions)
+        {
+            if (s.SessionId == sendPacket.characterId)
+            {
+                s.Send(sendPacket.Write());
+                return;
+            }
+        }
+    }
+
+
 }

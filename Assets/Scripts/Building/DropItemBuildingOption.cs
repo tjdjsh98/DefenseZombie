@@ -8,6 +8,15 @@ public class DropItemBuildingOption : MonoBehaviour, IBuildingOption
     Building _building;
 
     [SerializeField] List<ItemName> data;
+
+    public void DataDeserialize()
+    {
+    }
+
+    public void DataSerialize()
+    {
+    }
+
     public void Init()
     {
         _building = GetComponent<Building>();
@@ -17,8 +26,11 @@ public class DropItemBuildingOption : MonoBehaviour, IBuildingOption
 
     void OnDestroyed()
     {
-        Item item = null;
-        Manager.Item.GenerateItem(data.GetRandom(), transform.position,ref item);
-        _building.DestroyedHandler -= OnDestroyed;
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            Item item = null;
+            Manager.Item.GenerateItem(data.GetRandom(), transform.position, ref item);
+            _building.DestroyedHandler -= OnDestroyed;
+        }
     }
 }

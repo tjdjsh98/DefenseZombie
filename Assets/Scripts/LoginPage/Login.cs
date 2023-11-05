@@ -55,6 +55,11 @@ public class Login : MonoBehaviour
             Client client = temp.AddComponent<Client>();
             string ip = _inputField.text.TrimEnd();
             ip = ip.Remove(ip.Length - 1, 1);
+
+            IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
+            IPAddress[] addr = ipEntry.AddressList;
+
+            ip = addr[1].ToString();
             client.Init(ip);
         }
     }

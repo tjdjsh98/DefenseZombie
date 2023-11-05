@@ -65,5 +65,13 @@ public class Cannon : MonoBehaviour, IBuildingOption
         }
     }
 
- 
+    public void DataSerialize()
+    {
+        
+    }
+
+    public void DataDeserialize()
+    {
+        
+    }
 }

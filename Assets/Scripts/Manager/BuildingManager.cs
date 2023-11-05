@@ -1,10 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using static Define;
+using Random = UnityEngine.Random;
 
 public class BuildingManager : MonoBehaviour
 {
@@ -27,6 +29,7 @@ public class BuildingManager : MonoBehaviour
 
     GameObject _tileFolder;
 
+    public Action<int> ReciveRemoveBuildingPacketHandler;
     public void Init()
     {
         _blankBox = Resources.Load<GameObject>("BlankBox");
@@ -36,17 +39,11 @@ public class BuildingManager : MonoBehaviour
             _tileFolder = new GameObject("TileFolder");
             _tileFolder.AddComponent<CompositeCollider2D>();
         }
-
-        for(int x = -20;  x <= 20; x++)
+        if (!Client.Instance.IsSingle && Client.Instance.IsMain)
         {
-            GenerateBuilding(BuildingName.GrassTile,new Vector2Int(x,-2));
-            for(int y = -3; y >= -10; y--)
-            {
-                GenerateBuilding(BuildingName.GroundTile, new Vector2Int(x, y));
-            }
+            StartCoroutine(SendPacketCor());
         }
 
-        GenerateBuilding(BuildingName.CommandCenter, new Vector2Int(0, -3));
     }
 
     private void Update()
@@ -105,67 +102,6 @@ public class BuildingManager : MonoBehaviour
 
         }
     }
-    public Building GenerateBuilding(BuildingName name, Vector2Int cellPos)
-    {
-        Building buildingOrigin = Manager.Data.GetBuilding(name);
-        if (buildingOrigin == null) return null;
-
-        // 겹치는 곳이 있는지 확인
-        for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
-        {
-            if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
-
-            Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width , i / buildingOrigin.BuildingSize.width);
-
-            if (_buildingCoordiate.ContainsKey(pos.x))
-            {
-                if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
-                {
-                    if (_buildingCoordiate[pos.x][pos.y] != null)
-                        return null;
-                }
-            }
-        }
-
-        // 건물 생성
-        Building building = Instantiate(buildingOrigin);
-        if(building._isTile)
-        {
-            building.transform.parent = _tileFolder.transform;
-        }
-        building.BuildingId = ++_buildingId;
-        Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
-        buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
-        building.transform.position = buildingPos;
-
-        _buildingDictionary.Add(building.BuildingId, building);
-
-
-        // 생성 좌표 입력
-        for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
-        {
-            if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
-
-            Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width , i / buildingOrigin.BuildingSize.width);
-
-
-            if (!_buildingCoordiate.ContainsKey(pos.x))
-            {
-                _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
-            }
-            if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
-            {
-                _buildingCoordiate[pos.x].Add(pos.y, building);
-            }
-            else
-            {
-                _buildingCoordiate[pos.x][pos.y] = building;
-            }
-            building.AddCoordinate(pos);
-        }
-
-        return building;
-    }
 
     public int PlayerRequestBuilding()
     {
@@ -178,12 +114,11 @@ public class BuildingManager : MonoBehaviour
                 cellPos.x -= darwBuilding.BuildingSize.width - 1;
         cellPos.y = Mathf.CeilToInt(_builder.transform.position.y);
 
-        if (Client.Instance.ClientId != -1)
-            return RequestGeneratingBuilding(_drawingBuildingName, cellPos);
-        else
-            GenerateBuilding(_drawingBuildingName, cellPos);
 
-        return -1;
+        Building building = null;
+
+        return GenerateBuilding(_drawingBuildingName, cellPos, ref building);
+
     }
 
     public bool SetBuilding(GameObject builder, Vector3 initPos, Building building)
@@ -242,13 +177,152 @@ public class BuildingManager : MonoBehaviour
         building.transform.position = buildingPos;
         return true;
     }
-    public int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos)
+
+    // 혼용으로 건물 생성
+    public int GenerateBuilding(BuildingName name, Vector2Int cellPos, ref Building building)
+    {
+        int requestNumber = -1;
+        if(Client.Instance.IsSingle)
+        {
+            building = GenerateBuilding(name, cellPos);
+        }
+        else
+        {
+            requestNumber = RequestGeneratingBuilding(name, cellPos);
+        }
+
+        return requestNumber;
+    }
+
+    // 멀티 일 때 서버에 건물 생성을 요청
+    private int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos)
     {
         int requestNumber = UnityEngine.Random.Range(100, 1000);
 
         Client.Instance.SendRequestGeneratingBuilding(name, cellPos, requestNumber);
 
         return requestNumber;
+    }
+
+    // 싱글 일 때 건물을 생성
+    private Building GenerateBuilding(BuildingName name, Vector2Int cellPos)
+    {
+        Building buildingOrigin = Manager.Data.GetBuilding(name);
+        if (buildingOrigin == null) return null;
+
+        // 겹치는 곳이 있는지 확인
+        for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+        {
+            if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+            Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width, i / buildingOrigin.BuildingSize.width);
+
+            if (_buildingCoordiate.ContainsKey(pos.x))
+            {
+                if (_buildingCoordiate[pos.x].ContainsKey(pos.y))
+                {
+                    if (_buildingCoordiate[pos.x][pos.y] != null)
+                        return null;
+                }
+            }
+        }
+
+        // 건물 생성
+        Building building = Instantiate(buildingOrigin,_tileFolder.transform);
+        if (building._isTile)
+        {
+            building.transform.parent = _tileFolder.transform;
+        }
+        building.BuildingId = ++_buildingId;
+        Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
+        buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
+        building.transform.position = buildingPos;
+
+        building.Init();
+
+        _buildingDictionary.Add(building.BuildingId, building);
+
+
+        // 생성 좌표 입력
+        for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+        {
+            if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+            Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width, i / buildingOrigin.BuildingSize.width);
+
+
+            if (!_buildingCoordiate.ContainsKey(pos.x))
+            {
+                _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
+            }
+            if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
+            {
+                _buildingCoordiate[pos.x].Add(pos.y, building);
+            }
+            else
+            {
+                _buildingCoordiate[pos.x][pos.y] = building;
+            }
+            building.AddCoordinate(pos);
+        }
+
+        return building;
+    }
+
+
+    // 혼용으로 건물 삭제
+    public int RemoveBuilding(int buildingId)
+    {
+        int requsetNumber = -1;
+        if(Client.Instance.IsSingle)
+        {
+            SingleRemoveBuilding(buildingId);
+        }
+        else
+        {
+            requsetNumber = RequestRemoveBuilding(buildingId);
+        }
+
+        return requsetNumber;
+    }
+
+    // 멀티일 때 서버에 건물 삭제 요청
+    private int RequestRemoveBuilding(int buildingId)
+    {
+        int requestNumber = Random.Range(10, 1000);
+
+        Client.Instance.SendRequestRemoveBuilding(buildingId, requestNumber);
+
+        return requestNumber;
+    }
+
+    // 싱글일 떄 건물 삭제
+    private void SingleRemoveBuilding(int buildingId)
+    {
+        Building building = null;
+
+        if(_buildingDictionary.TryGetValue(buildingId, out building))
+        {
+            RemoveBuildingCoordinate(building);
+
+            _buildingDictionary.Remove(buildingId);
+            Destroy(building.gameObject);
+        }
+    }
+
+
+    // 좌표만 삭제
+    public void RemoveBuildingCoordinate(Building building)
+    {
+        List<Vector2Int> list = building.GetCoordinate();
+        foreach (var pos in list)
+        {
+            if (_buildingCoordiate[pos.x][pos.y] == building)
+            {
+                _buildingCoordiate[pos.x][pos.y] = null;
+            }
+        }
+        building.ClearCoordinate();
     }
 
     // 서버에서 받은 패킷으로 빌딩 설치
@@ -266,10 +340,15 @@ public class BuildingManager : MonoBehaviour
             if (buildingOrigin == null)
                 isSucess = false;
 
-            building = Instantiate(buildingOrigin);
+            building = Instantiate(buildingOrigin, _tileFolder.transform);
             building.BuildingId = packet.buildingId;
-            Vector3 buildingPos = new Vector3(cellPos.x + (buildingOrigin.BuildingSize.width - 1) / 2f - 0.5f, cellPos.y - 1f);
+            Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
+            buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
             building.transform.position = buildingPos;
+
+            Debug.Log(building.transform.position);
+
+            building.Init();
 
             // 겹치는 부분에 좌표 설정
             for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
@@ -293,10 +372,78 @@ public class BuildingManager : MonoBehaviour
                 }
                 building.AddCoordinate(pos);
             }
+
+            _buildingDictionary.Add(building.BuildingId, building);
         }
 
         ReciveGenPacket?.Invoke(packet.requestNumber, building);
         return isSucess;
+    }
+
+    public void GenerateBuildingByPacket(S_EnterSyncInfos packet)
+    {
+        foreach (var info in packet.buildingInfos)
+        {
+            BuildingName name = (BuildingName)info.buildingName;
+            Vector2Int cellPos = new Vector2Int(info.cellPosX, info.cellPosY);
+
+            Building buildingOrigin = Manager.Data.GetBuilding(name);
+            if (buildingOrigin == null) continue;
+
+            if(_buildingDictionary.ContainsKey(info.buildingId))
+            {
+                Destroy(_buildingDictionary[info.buildingId]);
+                _buildingDictionary.Remove(info.buildingId);
+            }
+
+            Building building = null;
+            building = Instantiate(buildingOrigin, _tileFolder.transform);
+            building.BuildingId = info.buildingId;
+            Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
+            buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
+            building.transform.position = buildingPos;
+
+            building.Init();
+
+            // 겹치는 부분에 좌표 설정
+            for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
+            {
+                if (!buildingOrigin.BuildingSize.isPlace[i]) continue;
+
+                Vector2Int pos = cellPos + new Vector2Int(i % buildingOrigin.BuildingSize.width, i / buildingOrigin.BuildingSize.width);
+
+
+                if (!_buildingCoordiate.ContainsKey(pos.x))
+                {
+                    _buildingCoordiate.Add(pos.x, new Dictionary<int, Building>());
+                }
+                if (!_buildingCoordiate[pos.x].ContainsKey(pos.y))
+                {
+                    _buildingCoordiate[pos.x].Add(pos.y, building);
+                }
+                else
+                {
+                    _buildingCoordiate[pos.x][pos.y] = building;
+                }
+                building.AddCoordinate(pos);
+            }
+
+            _buildingDictionary.Add(building.BuildingId,building);
+        }
+    }
+
+
+    // 받은 패킷으로 건물 삭제
+    public void RemoveBuildingByPacket(S_BroadcastRemoveBuilding packet)
+    {
+        int id = packet.buildingId;
+        Building building = null;
+        if(_buildingDictionary.TryGetValue(id,out building))
+        {
+            SingleRemoveBuilding(id);
+
+            ReciveRemoveBuildingPacketHandler?.Invoke(packet.requestNumber);
+        }
     }
 
     public bool StartBuildingDraw(GameObject builder, BuildingName name)
@@ -326,18 +473,7 @@ public class BuildingManager : MonoBehaviour
         HidePreviewBuilding();
     }
 
-    public void RemoveBuilding(Building building)
-    {
-        List<Vector2Int> list = building.GetCoordinate();
-        foreach (var pos in list)
-        {
-            if(_buildingCoordiate[pos.x][pos.y] == building)
-            {
-                _buildingCoordiate[pos.x][pos.y] = null;
-            }
-        }
-        building.ClearCoordinate();
-    }
+ 
 
     public bool GetIsExistBuilding(Vector2Int cellPos)
     {
@@ -428,5 +564,18 @@ public class BuildingManager : MonoBehaviour
         }
 
         return Vector2Int.one * -999;
+    }
+
+    IEnumerator SendPacketCor()
+    {
+        while (true)
+        {
+            foreach (var building in _buildingDictionary.Values)
+            {
+                if(!building._isTile && building.InitDone) 
+                    Client.Instance.SendBuildingInfo(building);
+            }
+            yield return new WaitForSeconds(0.25f);
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using static Define;
 
-public class Building : MonoBehaviour, IHp, IEnableInsertItem
+public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
 {
     List<SpriteRenderer> _spriteRenderers;
     BoxCollider2D _boxCollider;
@@ -43,7 +43,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem
     //원래 가지고 있는 레이어
     int _originLayer;
 
-    private void Awake()
+    public bool InitDone { get; private set; } = false; 
+    public void Init()
     {
         _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
         SpriteRenderer sr = transform.Find("Model").GetComponent<SpriteRenderer>();
@@ -65,6 +66,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem
             foreach (var s in _spriteRenderers)
                 s.color = color;
         }
+
+        InitDone= true;
     }
 
     private void OnDrawGizmosSelected()
@@ -95,9 +98,11 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem
         Hp -= dmg;
         if(Hp <=0)
         {
-            DestroyedHandler?.Invoke();
-            Manager.Building.RemoveBuilding(this);
-            Destroy(gameObject);
+            if (Client.Instance.IsSingle || Client.Instance.IsMain)
+            {
+                DestroyedHandler?.Invoke();
+                Manager.Building.RemoveBuilding(BuildingId);
+            }
         }
     }
 
@@ -122,17 +127,17 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem
     // 건축 중인 건물에 재료 아이템을 넣음
     // 건축이 완료된 건물이거나 해당 아이템이 필요없다면 false를 반환
     // 해당 아이템을 추가 완료된다면 아이템을 없애지 않고 내용물에 추가만 합니다.
-    public bool InsertItem(ItemName itemName)
+    public bool InsertItem(Item item)
     {
         if (IsConstructDone) return false;
 
         for(int i =0; i < Blueprint.BlueprintItemList.Count; i++)
         {
-            if (Blueprint.BlueprintItemList[i].name == itemName)
+            if (Blueprint.BlueprintItemList[i].name == item.ItemData.ItemName)
             {
                 if (Blueprint.BlueprintItemList[i].requireCount > Blueprint.BlueprintItemList[i].currentCount)
                 {
-                    Blueprint.BlueprintItemList[i].AddCount();
+                    Blueprint.BlueprintItemList[i].AddCount(item.ItemId);
                     bool isFinish = CheckIsFinish();
                     ItemChangedHandler?.Invoke(isFinish);
                     return true;    
@@ -158,6 +163,17 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem
 
         if(isSuccess)
         {
+            foreach(var blueprint in Blueprint.BlueprintItemList)
+            {
+                foreach (var id in blueprint.itemIdList)
+                {
+                    Manager.Item.RemoveItem(id);
+                }
+
+                blueprint.itemIdList.Clear();
+            }
+
+
             foreach (var s in _spriteRenderers)
                 s.color = Color.white;
             if (_circleSlider != null)
@@ -167,5 +183,37 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem
         }
 
         return isSuccess;
+    }
+
+    public string SerializeData()
+    {
+        Util.StartWriteSerializedData();
+
+        for (int i = 0; i < Blueprint.BlueprintItemList.Count; i++)
+        {
+            int name = (int)Blueprint.BlueprintItemList[i].name;
+            int requireCount = Blueprint.BlueprintItemList[i].requireCount;
+            int currentCount = Blueprint.BlueprintItemList[i].currentCount;
+            for(int j = 0; j < Blueprint.BlueprintItemList[i].itemIdList.Count; j++)
+            {
+                int id =  Blueprint.BlueprintItemList[i].itemIdList[j];
+            }
+            
+        }
+
+        return "";
+    }
+
+    public void DeserializeData(string stringData)
+    {
+    }
+
+    public void SyncBuildingInfo(S_BroadcastBuildingInfo packet)
+    {
+        if (packet == null) return;
+
+        transform.position = new Vector3(packet.posX,packet.posY);
+        Hp = packet.hp;
+        DeserializeData(packet.data);
     }
 }

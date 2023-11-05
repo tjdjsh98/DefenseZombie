@@ -411,7 +411,7 @@ public class CustomCharacter : Character
         {
             if (building.BuildingSize.width == 1)
             {
-                Manager.Building.RemoveBuilding(building);
+                Manager.Building.RemoveBuildingCoordinate(building);
 
                 _holdingItemId = building.BuildingId;
                 building.transform.parent = _liftPos.transform;
@@ -533,6 +533,17 @@ public class CustomCharacter : Character
     {
         Util.StartWriteSerializedData();
 
+        Util.WriteSerializedData(transform.localScale.x);
+        Util.WriteSerializedData(_rigidBody.velocity.x);
+        Util.WriteSerializedData(_rigidBody.velocity.y);
+        Util.WriteSerializedData(_characterMoveDirection.x);
+        Util.WriteSerializedData(AttackType);
+        Util.WriteSerializedData(IsAttacking);
+        Util.WriteSerializedData(IsJumping);
+        Util.WriteSerializedData(IsContactGround);
+        Util.WriteSerializedData(IsConncetCombo);
+        Util.WriteSerializedData(IsHide);
+
         Util.WriteSerializedData(_holdingItemId);
         Util.WriteSerializedData(_holdingBuildingId);
         Util.WriteSerializedData(_frontHandPos.transform.localRotation.z);
@@ -553,7 +564,23 @@ public class CustomCharacter : Character
 
     public override void DeserializeData(string stringData)
     {
+        if (string.IsNullOrEmpty(stringData)) return;
         Util.StartReadSerializedData(stringData);
+
+        Turn(Util.ReadSerializedDataToFloat());
+        SetXVelocity(Util.ReadSerializedDataToFloat());
+        SetYVelocity(Util.ReadSerializedDataToFloat());
+        SetCharacterDirection(new Vector3(Util.ReadSerializedDataToFloat(),0,0));
+        AttackType = Util.ReadSerializedDataToInt();
+        IsAttacking = Util.ReadSerializedDataToBoolean();
+        IsJumping = Util.ReadSerializedDataToBoolean();
+        IsContactGround = Util.ReadSerializedDataToBoolean();
+        IsConncetCombo = Util.ReadSerializedDataToBoolean();
+        bool isHide = Util.ReadSerializedDataToBoolean();
+        if (!IsHide && isHide)
+            HideCharacter();
+        if (IsHide && !isHide)
+            ShowCharacter();
 
         int holdingItemId = Util.ReadSerializedDataToInt();
         int holdingBuildingId = Util.ReadSerializedDataToInt();

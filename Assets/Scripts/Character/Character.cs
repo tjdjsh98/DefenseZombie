@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using static Define;
 
@@ -77,11 +78,10 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     Coroutine _damageCoroutine;
  
     //캐릭터가 더미라면 필요한 변수
-    Vector3 _prePos;
-    S_BroadcastCharacterInfo _currentPacket;
+    protected Vector3 _currentPos;
 
     float _time = 0;
-    float _interval = 0.02f;
+    float _interval = 0.1f;
 
 
     // 캐릭터의 옵션
@@ -121,24 +121,17 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     }
     private void FixedUpdate()
     {
-        if (Client.Instance.ClientId == CharacterId) return;
+        //if (Client.Instance.IsSingle) return;
+        //if (Client.Instance.ClientId == CharacterId) return;
+        //if(CharacterId > 100 && Client.Instance.IsMain) return;
 
-        _time += Time.fixedDeltaTime;
+        //_time += Time.fixedDeltaTime;
 
-        if (_currentPacket != null)
-        {
-            if (_interval > _time)
-            {
-                Vector3 currentPos = new Vector3(_currentPacket.posX, _currentPacket.posY, _currentPacket.posZ);
-                Vector3 distanceInterval = new Vector3(currentPos.x - _prePos.x, currentPos.y - _prePos.y, 0);
-                distanceInterval /= _interval * 60;
-                transform.position += distanceInterval;
-            }
-            else
-            {
-                _currentPacket = null;
-            }
-        }
+        
+        //Vector3 distanceInterval = new Vector3(_currentPos.x - transform.position.x, _currentPos.y - transform.position.y, 0);
+        //distanceInterval /= (10f / _interval);
+        //transform.position += distanceInterval;
+        
     }
     protected virtual void ControlAnimation()
     {
@@ -507,30 +500,14 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         if (packet.characterId == Client.Instance.ClientId) return;
         if (packet.characterId > 100 && Client.Instance.IsMain) return;
 
+        transform.position = new Vector3(packet.posX, packet.posY, 0);
+        _hp = packet.hp;
+
         _interval = _time;
         _time = 0;
 
-        SetCharacterDirection(new Vector2(packet.characterMoveDirection, 0));
-        SetXVelocity(packet.xSpeed);
-        SetVelocity(new Vector2(packet.xSpeed, packet.ySpeed));
-        Hp = packet.hp;
-        AttackType = packet.attackType;
-        IsJumping = packet.isJumping;
-        IsAttacking = packet.isAttacking;
-        IsConncetCombo = packet.isConnectCombo;
+        DeserializeData(packet.data);
         
-        if (_interval == 0)
-        {
-            Vector3 currentPos = new Vector3(packet.posX, packet.posY, packet.posZ);
-            transform.position = currentPos;
-        }
-        else
-        {
-            _prePos = transform.position;
-            _currentPacket = packet;
-        }
-
-        DeserializeData(packet.etcData);
     }
 
     public void FreezeRigidbody()
@@ -545,16 +522,20 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     public virtual string SerializeData()
     {
+        _interval = _time;
         Util.StartWriteSerializedData();
 
-        Util.WriteSerializedData(_hp);
-        Util.WriteSerializedData(transform.position.x);
-        Util.WriteSerializedData(transform.position.y);
+        Util.WriteSerializedData(transform.localScale.x);
         Util.WriteSerializedData(_rigidBody.velocity.x);
         Util.WriteSerializedData(_rigidBody.velocity.y);
+        Util.WriteSerializedData(_characterMoveDirection.x);
+        Util.WriteSerializedData(AttackType);
+        Util.WriteSerializedData(IsAttacking);
+        Util.WriteSerializedData(IsJumping);
+        Util.WriteSerializedData(IsContactGround);
+        Util.WriteSerializedData(IsConncetCombo);
+        Util.WriteSerializedData(IsHide);
         
-
-
         foreach (var option in _optionList)
         {
             option.DataSerialize();
@@ -568,9 +549,27 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     public virtual void DeserializeData(string stringData)
     {
+        if (string.IsNullOrEmpty(stringData)) return;
+
         Util.StartReadSerializedData(stringData);
 
-        foreach(var option in _optionList)
+        Turn(Util.ReadSerializedDataToFloat());
+        SetXVelocity(Util.ReadSerializedDataToFloat());
+        SetYVelocity(Util.ReadSerializedDataToFloat());
+        SetCharacterDirection(new Vector3(Util.ReadSerializedDataToFloat(),0,0));
+        AttackType = Util.ReadSerializedDataToInt();
+        IsAttacking = Util.ReadSerializedDataToBoolean();
+        IsJumping = Util.ReadSerializedDataToBoolean();
+        IsContactGround= Util.ReadSerializedDataToBoolean();
+        IsConncetCombo = Util.ReadSerializedDataToBoolean();
+        bool isHide = Util.ReadSerializedDataToBoolean();
+        if (!IsHide && isHide)
+            HideCharacter();
+        if (IsHide && !isHide)
+            ShowCharacter();
+
+
+        foreach (var option in _optionList)
         {
             option.DataDeserialize();
         }

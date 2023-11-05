@@ -36,18 +36,18 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_CharacterInfo, PacketHandler.C_CharacterInfoHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastCharacterInfo, MakePacket<S_BroadcastCharacterInfo>);
         _handler.Add((ushort)PacketID.S_BroadcastCharacterInfo, PacketHandler.S_BroadcastCharacterInfoHandler);
+      _makeFunc.Add((ushort)PacketID.C_ItemInfo, MakePacket<C_ItemInfo>);
+        _handler.Add((ushort)PacketID.C_ItemInfo, PacketHandler.C_ItemInfoHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastItemInfo, MakePacket<S_BroadcastItemInfo>);
+        _handler.Add((ushort)PacketID.S_BroadcastItemInfo, PacketHandler.S_BroadcastItemInfoHandler);
+      _makeFunc.Add((ushort)PacketID.C_BuildingInfo, MakePacket<C_BuildingInfo>);
+        _handler.Add((ushort)PacketID.C_BuildingInfo, PacketHandler.C_BuildingInfoHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastBuildingInfo, MakePacket<S_BroadcastBuildingInfo>);
+        _handler.Add((ushort)PacketID.S_BroadcastBuildingInfo, PacketHandler.S_BroadcastBuildingInfoHandler);
       _makeFunc.Add((ushort)PacketID.C_Damage, MakePacket<C_Damage>);
         _handler.Add((ushort)PacketID.C_Damage, PacketHandler.C_DamageHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastDamage, MakePacket<S_BroadcastDamage>);
         _handler.Add((ushort)PacketID.S_BroadcastDamage, PacketHandler.S_BroadcastDamageHandler);
-      _makeFunc.Add((ushort)PacketID.C_RequestGenerateItem, MakePacket<C_RequestGenerateItem>);
-        _handler.Add((ushort)PacketID.C_RequestGenerateItem, PacketHandler.C_RequestGenerateItemHandler);
-      _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateItem, MakePacket<S_BroadcastGenerateItem>);
-        _handler.Add((ushort)PacketID.S_BroadcastGenerateItem, PacketHandler.S_BroadcastGenerateItemHandler);
-      _makeFunc.Add((ushort)PacketID.C_RequestRemoveItem, MakePacket<C_RequestRemoveItem>);
-        _handler.Add((ushort)PacketID.C_RequestRemoveItem, PacketHandler.C_RequestRemoveItemHandler);
-      _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveItem, MakePacket<S_BroadcastRemoveItem>);
-        _handler.Add((ushort)PacketID.S_BroadcastRemoveItem, PacketHandler.S_BroadcastRemoveItemHandler);
       _makeFunc.Add((ushort)PacketID.C_RequestGenerateCharacter, MakePacket<C_RequestGenerateCharacter>);
         _handler.Add((ushort)PacketID.C_RequestGenerateCharacter, PacketHandler.C_RequestGenerateCharacterHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateCharacter, MakePacket<S_BroadcastGenerateCharacter>);
@@ -56,10 +56,22 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_RequestRemoveCharacter, PacketHandler.C_RequestRemoveCharacterHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveCharacter, MakePacket<S_BroadcastRemoveCharacter>);
         _handler.Add((ushort)PacketID.S_BroadcastRemoveCharacter, PacketHandler.S_BroadcastRemoveCharacterHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestGenerateItem, MakePacket<C_RequestGenerateItem>);
+        _handler.Add((ushort)PacketID.C_RequestGenerateItem, PacketHandler.C_RequestGenerateItemHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateItem, MakePacket<S_BroadcastGenerateItem>);
+        _handler.Add((ushort)PacketID.S_BroadcastGenerateItem, PacketHandler.S_BroadcastGenerateItemHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestRemoveItem, MakePacket<C_RequestRemoveItem>);
+        _handler.Add((ushort)PacketID.C_RequestRemoveItem, PacketHandler.C_RequestRemoveItemHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveItem, MakePacket<S_BroadcastRemoveItem>);
+        _handler.Add((ushort)PacketID.S_BroadcastRemoveItem, PacketHandler.S_BroadcastRemoveItemHandler);
       _makeFunc.Add((ushort)PacketID.C_RequestGenerateBuilding, MakePacket<C_RequestGenerateBuilding>);
         _handler.Add((ushort)PacketID.C_RequestGenerateBuilding, PacketHandler.C_RequestGenerateBuildingHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateBuilding, MakePacket<S_BroadcastGenerateBuilding>);
         _handler.Add((ushort)PacketID.S_BroadcastGenerateBuilding, PacketHandler.S_BroadcastGenerateBuildingHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestRemoveBuilding, MakePacket<C_RequestRemoveBuilding>);
+        _handler.Add((ushort)PacketID.C_RequestRemoveBuilding, PacketHandler.C_RequestRemoveBuildingHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveBuilding, MakePacket<S_BroadcastRemoveBuilding>);
+        _handler.Add((ushort)PacketID.S_BroadcastRemoveBuilding, PacketHandler.S_BroadcastRemoveBuildingHandler);
 
     }
 

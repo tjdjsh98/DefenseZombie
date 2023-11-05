@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Net;
 using UnityEngine;
-using ServerCore;
 
 public class Listener 
 {
@@ -51,5 +48,10 @@ public class Listener
             Console.WriteLine(args.SocketError.ToString());
 
         RegisterAccpet(args);
+    }
+
+    public void Close()
+    {
+        _listenSocket.Close();
     }
 }

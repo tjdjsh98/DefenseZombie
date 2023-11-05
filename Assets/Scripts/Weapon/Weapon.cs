@@ -1,6 +1,4 @@
-using TMPro.EditorUtilities;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 public class Weapon : MonoBehaviour,ICharacterOption
 {

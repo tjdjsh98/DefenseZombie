@@ -118,11 +118,9 @@ public class PlayerController : MonoBehaviour
                 {
                     foreach(var insertable in insertableList)
                     {
-                        if (insertable.InsertItem(_character.HoldingItem.ItemData.ItemName))
+                        if (insertable.InsertItem(_character.HoldingItem))
                         {
-                            Item item = _character.HoldingItem;
                             _character.Putdown();
-                            Manager.Item.DestroyItem(item.ItemId);
                             isSucess = true;
                             break;
                         }

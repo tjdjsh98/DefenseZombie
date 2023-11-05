@@ -67,4 +67,9 @@ public class Server : MonoBehaviour
             }
         }
     }
+
+    private void OnApplicationQuit()
+    {
+        _listener.Close();
+    }
 }

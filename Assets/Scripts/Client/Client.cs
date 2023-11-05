@@ -11,18 +11,21 @@ public class Client : MonoBehaviour
     static Client _clinet;
 
     public string ip;
-    public static Client Instance { get 
+    public static Client Instance
+    {
+        get
         {
-            if(_clinet == null )
+            if (_clinet == null)
             {
                 GameObject g = new GameObject("Clinet");
                 _clinet = g.AddComponent<Client>();
                 DontDestroyOnLoad(g);
-                
+
             }
-            return _clinet; 
-        
-        } }
+            return _clinet;
+
+        }
+    }
     public bool IsEnterStart { get; private set; }
 
     static ServerSession _session = new ServerSession();
@@ -34,7 +37,7 @@ public class Client : MonoBehaviour
     bool _successEnterGame = false;
     bool _isSendSuccessEnter = false;
     public bool IsSingle { get { return ClientId == -1; } }
-    [field:SerializeField]public float Delay = 0;
+    [field: SerializeField] public float Delay = 0;
 
     public static float SendPacketInterval = 0.1f;
     public bool IsMain => (ClientId == 1);
@@ -59,7 +62,7 @@ public class Client : MonoBehaviour
 
         ip = ipAddress;
 
-        connecter.Connect(endPoint, () => { return _session; },EnterGame);
+        connecter.Connect(endPoint, () => { return _session; }, EnterGame);
 
     }
 
@@ -67,9 +70,9 @@ public class Client : MonoBehaviour
     {
         if (IsEnterStart && !_successEnterGame)
         {
-            if(_recvAnswer)
+            if (_recvAnswer)
             {
-                if(_isEnableEnterGame)
+                if (_isEnableEnterGame)
                 {
                     SceneManager.LoadScene("InGame");
                     _successEnterGame = true;
@@ -82,7 +85,7 @@ public class Client : MonoBehaviour
             }
         }
 
-        if(_successEnterGame && !_isSendSuccessEnter && IsFinishLoadScene)
+        if (_successEnterGame && !_isSendSuccessEnter && IsFinishLoadScene)
         {
             _isSendSuccessEnter = true;
             C_SuccessToEnterServer packet = new C_SuccessToEnterServer();
@@ -97,7 +100,7 @@ public class Client : MonoBehaviour
             PacketManager.Instance.HandlePacket(_session, packet);
         }
     }
-    
+
     public void EnterNewOtherClinet(int clientId)
     {
         _clientList.Add(clientId);
@@ -118,7 +121,7 @@ public class Client : MonoBehaviour
         C_RequestEnterGame packet = new C_RequestEnterGame();
         Send(packet.Write());
     }
-    public void SendDamage(int characterId,Vector2 attackDirection, float power, float staggerTime)
+    public void SendDamage(int characterId, Vector2 attackDirection, float power, float staggerTime)
     {
         if (ClientId == -1) return;
 
@@ -137,24 +140,48 @@ public class Client : MonoBehaviour
         if (ClientId == -1) return;
         C_CharacterInfo packet = new C_CharacterInfo();
         packet.characterId = character.CharacterId;
-        packet.hp = character.Hp;
         packet.posX = character.transform.position.x;
         packet.posY = character.transform.position.y;
-        packet.posZ = character.transform.position.z;
-        packet.xSpeed = character.GetVelocity.x;
-        packet.ySpeed = character.GetVelocity.y;
-        packet.characterMoveDirection = character.CharacterMoveDirection.x;
-        packet.attackType = character.AttackType;
-        packet.isAttacking = character.IsAttacking;
-        packet.isJumping = character.IsJumping;
-        packet.isContactGround = character.IsContactGround;
-        packet.isConnectCombo = character.IsConncetCombo;
-        packet.etcData = character.SerializeData();
+        packet.hp = character.Hp;
+        packet.data = character.SerializeData();
 
         Send(packet.Write());
     }
 
-    public void SendRequestGenreateCharacter(CharacterName name ,Vector3 position ,int requestNumber ,bool isPlayerCharacter)
+    public void SendItemInfo(Item item)
+    {
+        if(Client.Instance.IsSingle) return;
+
+        C_ItemInfo packet = new C_ItemInfo();
+
+        packet.itemId= item.ItemId;
+        packet.posX = item.transform.position.x;
+        packet.posY = item.transform.position.y;
+        packet.data = item.SerializeData();
+
+        Send(packet.Write());
+    }
+
+    public void SendBuildingInfo(Building building)
+    {
+        if (Client.Instance.IsSingle) return;
+
+        C_BuildingInfo packet = new C_BuildingInfo();
+
+        packet.buildingId= building.BuildingId;
+        packet.hp = building.Hp;
+        Vector2Int cellPos = building.GetCoordinate()[0];
+        packet.cellPosX= cellPos.x;
+        packet.cellPosY = cellPos.y;
+        packet.posX = building.transform.position.x;
+        packet.posY = building.transform.position.y;
+        packet.data = building.SerializeData();
+
+        Send(packet.Write());
+    }
+
+
+    public void SendRequestGenreateCharacter(CharacterName name, Vector3 position, int requestNumber, bool isPlayerCharacter)
     {
         if (ClientId == -1) return;
 
@@ -166,7 +193,6 @@ public class Client : MonoBehaviour
         packet.characterName = (int)name;
         packet.posX = position.x;
         packet.posY = position.y;
-        packet.posZ = position.z;
 
         Send(packet.Write());
     }
@@ -202,6 +228,16 @@ public class Client : MonoBehaviour
         Send(packet.Write());
     }
 
+    public void SendRequestRemoveBuilding(int buildingId, int requestNumber)
+    {
+        C_RequestRemoveBuilding packet = new C_RequestRemoveBuilding();
+
+        packet.buildingId = buildingId;
+        packet.requestNumber = requestNumber;
+
+        Send(packet.Write());
+    }
+
     internal void SendRequestGeneratingItem(ItemName itemName, Vector3 position, int requestNumber)
     {
         C_RequestGenerateItem packet = new C_RequestGenerateItem();
@@ -210,8 +246,17 @@ public class Client : MonoBehaviour
         packet.requestNumber = requestNumber;
         packet.posX = position.x;
         packet.posY = position.y;
-        packet.posZ = position.z;
-        
+
+        Send(packet.Write());
+    }
+
+    public void SendRequestRemoveItem(int itemId, int requestNumber)
+    {
+        C_RequestRemoveItem packet = new C_RequestRemoveItem();
+
+        packet.itemId = itemId;
+        packet.requestNumber = requestNumber;
+
         Send(packet.Write());
     }
 }

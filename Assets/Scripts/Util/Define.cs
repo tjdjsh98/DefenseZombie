@@ -110,7 +110,8 @@ public static class Define
         Commander,
         Item,
         Build,
-        Smithy
+        Smithy,
+        Debug
     }
     public enum EffectName
     {

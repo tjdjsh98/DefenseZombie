@@ -76,15 +76,15 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
         MainBlueprintSetHandler?.Invoke();
     }
 
-    public bool InsertItem(ItemName itemName)
+    public bool InsertItem(Item item)
     {
         if (_mainBlueprint == null) return false;
 
         for (int i = 0; i < _mainBlueprint.BlueprintItemList.Count; i++)
         {
-            if (_mainBlueprint.BlueprintItemList[i].name == itemName)
+            if (_mainBlueprint.BlueprintItemList[i].name == item.ItemData.ItemName)
             {
-                _mainBlueprint.BlueprintItemList[i].AddCount();
+                _mainBlueprint.BlueprintItemList[i].AddCount(item.ItemId);
                 ItemChangedHandler?.Invoke(CheckIsFinish());
                 return true;
             }
@@ -110,11 +110,29 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 
         if (isSuccess)
         {
+            foreach (var blueprint in _mainBlueprint.BlueprintItemList)
+            {
+                foreach (var id in blueprint.itemIdList)
+                {
+                    Manager.Item.RemoveItem(id);
+                }
+
+                blueprint.itemIdList.Clear();
+            }
+
             Item item = null;
             Manager.Item.GenerateItem(MainBlueprint.ResultItemName, transform.position,ref item);
             _mainBlueprint = null;
         }
 
         return isSuccess;
+    }
+
+    public void DataSerialize()
+    {
+    }
+
+    public void DataDeserialize()
+    {
     }
 }

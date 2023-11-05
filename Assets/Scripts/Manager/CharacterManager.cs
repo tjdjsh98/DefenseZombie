@@ -136,44 +136,50 @@ public class CharacterManager : MonoBehaviour
     // 자신의 캐릭터의 ID와 맞는 캐릭터와 맞으면 조작 가능 캐릭터가 나옵니다.
     public bool GenerateCharacterByPacket(S_BroadcastGenerateCharacter packet)
     {
-        bool isSuccess = true;
-        if (!packet.isSuccess)
-            isSuccess = false;
+        if (!packet.isSuccess) return false;
 
         if (_characterDictionary.ContainsKey(packet.characterId))
-            isSuccess = false;
+        {
+            Destroy(_characterDictionary[packet.characterId].gameObject);
+            _characterDictionary.Remove(packet.characterId);
+        }
                 
         Character characterOrigin = Manager.Data.GetCharacter((CharacterName)packet.characterName);
-        if (characterOrigin == null) isSuccess = false;
+        if (characterOrigin == null) return false;
+
+        UI_Debug ui = Manager.UI.GetUI(UIName.Debug) as UI_Debug;
+        ui.AddText(packet.characterId.ToString());
 
         Character character = null;
-        if (isSuccess)
-        {
-            character = Instantiate(characterOrigin);
+       
+        character = Instantiate(characterOrigin);
+            
+        character.CharacterId = packet.characterId;
+        character.transform.position = new Vector3(packet.posX, packet.posY, 0);
 
-            character.CharacterId = packet.characterId;
-            character.transform.position = new Vector3(packet.posX, packet.posY, packet.posZ);
-
-            _characterDictionary.Add(packet.characterId, character);
-        }
+        _characterDictionary.Add(packet.characterId, character);
 
         ReciveGenPacket?.Invoke(packet.requestNumber, character);
-        return isSuccess;
+
+        return true;
     }
 
     public void GeneratePacketCharacter(S_EnterSyncInfos packet)
     {
         foreach (var pkt in packet.characterInfos)
         {
+            if (_characterDictionary.ContainsKey(pkt.characterId))
+            {
+                Destroy(_characterDictionary[pkt.characterId].gameObject);
+                _characterDictionary.Remove(pkt.characterId);
+            }
             Character characterOrigin = Manager.Data.GetCharacter((CharacterName)pkt.characterName);
             if (characterOrigin == null) continue;
 
             Character character = Instantiate(characterOrigin);
-
-            character.Hp = pkt.hp;
-
             character.CharacterId = pkt.characterId;
-            character.transform.position = new Vector3(pkt.posX, pkt.posY, pkt.posZ);
+
+            character.DeserializeData(pkt.data);
 
             _characterDictionary.Add(pkt.characterId, character);
         }

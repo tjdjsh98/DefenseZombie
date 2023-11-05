@@ -34,7 +34,7 @@ public interface IEnableInsertItem
 {
     // 캐릭터가 아이템을 넣거나 빼거나 하는 행위를 하면 실행
     public Action<bool> ItemChangedHandler { get; set; }  
-    public bool InsertItem(ItemName itemName);
+    public bool InsertItem(Item item);
     public bool CheckIsFinish();
 }
 
@@ -59,5 +59,8 @@ public interface ICharacterOption
 public interface IBuildingOption
 {
     public void Init();
+    public void DataSerialize();
+
+    public void DataDeserialize();
 }
 
