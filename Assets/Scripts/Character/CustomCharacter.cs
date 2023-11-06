@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.TextCore.Text;
 using UnityEngine.U2D.Animation;
 using static Define;
 
@@ -17,7 +20,9 @@ public class CustomCharacter : Character
     [SerializeField] GameObject _behindHand;
 
     [SerializeField] GameObject _liftPos;
+    public GameObject LiftPos => _liftPos;
 
+    // 캐릭터 상태
 
     int _holdingBuildingId;
     int _holdingItemId;
@@ -38,21 +43,21 @@ public class CustomCharacter : Character
             return Manager.Data.GetWeaponData(_equipWeaponName);
         }
     }
-
     public bool IsEquipWeapon => _equipWeaponName != WeaponName.None;
 
     public int attackType = 0;
-
-
 
     // 건물이 안 돌아가게 하기 위해서 필요
     Vector3 _preLiftBuildingCharacterScale;
     Vector3 _preLiftBuildingBuildingScale;
 
 
-    protected override void Awake()
+    bool _isThrow;
+    Vector2 _throwDirection;
+
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
         _animatorHandler = GetComponent<AnimatorHandler>();
         _chanager = GetComponent<SpriteChanager>();
 
@@ -76,10 +81,7 @@ public class CustomCharacter : Character
         }
     }
 
-    protected override void Update()
-    {
-        base.Update();
-    }
+  
     protected override void MoveCharacter()
     {
         if (IsDamaged || !IsEnableMove || IsHide)
@@ -222,8 +224,6 @@ public class CustomCharacter : Character
         }
 
     }
-
-
     public bool EquipWeapon(WeaponName name)
     {
         _equipWeaponName = name;
@@ -266,7 +266,6 @@ public class CustomCharacter : Character
 
         return true;
     }
-
     public bool TakeOffWeapon()
     {
         WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
@@ -351,8 +350,91 @@ public class CustomCharacter : Character
             SetAnimatorTrigger("ConnectCombo");
             IsConncetCombo = false;
         }
+
+      
     }
 
+    public void ItemInteract()
+    {
+        if (!Client.Instance.IsSingle && CharacterId != Client.Instance.ClientId) return;
+        // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
+        if (HoldingItem != null && !IsEquipWeapon)
+        {
+            List<IEnableInsertItem> insertableList = GetOverrapGameObjects<IEnableInsertItem>();
+
+            bool isSucess = false;
+            if (insertableList.Count > 0)
+            {
+                foreach (var insertable in insertableList)
+                {
+                    if (insertable.InsertItem(HoldingItem))
+                    {
+                        Putdown();
+                        isSucess = true;
+                        break;
+                    }
+                }
+            }
+            if (!isSucess)
+            {
+                Putdown();
+            }
+        }
+        else
+        {
+            if (!HoldingItem && !HoldingBuilding)
+            {
+                GrapSomething();
+            }
+            else
+            {
+                Putdown();
+            }
+
+        }
+    }
+
+    public bool ThrowItem()
+    {
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            if (HoldingItem && !IsEquipWeapon)
+            {
+                Item item = HoldingItem;
+                ReleaseItem();
+                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                mousePos.z = 0;
+                item.GetComponent<Projectile>()?.Throw(mousePos - transform.position, 5);
+
+                Client.Instance.SendItemInfo(item);
+                Client.Instance.SendCharacterInfo(this);
+                return true;
+            }
+        }
+        else
+        {
+            
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePos.z = 0;
+            _isThrow = true;
+            _holdingItemId = 0;
+            _throwDirection = mousePos - transform.position;
+
+            Client.Instance.SendCharacterInfo(this);
+        }
+
+        return false;
+    }
+
+    public void ThrowItem(Vector3 direction)
+    {
+        Item item = HoldingItem;
+        ReleaseItem();
+        item.GetComponent<Projectile>()?.Throw(direction, 5);
+
+        _isThrow = false;
+        _throwDirection = Vector3.zero;
+    }
 
     public GameObject GrapSomething()
     {
@@ -375,11 +457,9 @@ public class CustomCharacter : Character
         if (HoldingItem || HoldingBuilding || IsEquipWeapon) return false;
 
         bool isSuccess = true;
-        if (item.ItemData.ItemType == ItemType.Etc)
+        if (!item.IsGraped && item.ItemData.ItemType == ItemType.Etc)
         {
-            item.FreezeRigidBody();
-            item.transform.parent = _liftPos.transform;
-            item.transform.localPosition = Vector3.zero;
+            item.GrapItem(this);
             _holdingItemId = item.ItemId;
         }
         else if (item.ItemData.ItemType == ItemType.Equipment)
@@ -393,19 +473,22 @@ public class CustomCharacter : Character
             {
                 item.Hide();
                 _holdingItemId = item.ItemId;
+                item.IsGraped = true;
             }
             else
                 isSuccess = false;
 
         }
 
+
         return isSuccess;
     }
 
     public bool GrapBuilding(Building building)
     {
-        if (building == null) return false;
-        if (HoldingItem || HoldingBuilding || IsEquipWeapon) return false;
+        bool success = false;   
+        if (building == null) return success;
+        if (HoldingItem || HoldingBuilding || IsEquipWeapon) return success;
 
         if ( !building._isTile)
         {
@@ -420,10 +503,12 @@ public class CustomCharacter : Character
                 _preLiftBuildingBuildingScale = building.transform.localScale;
                 _preLiftBuildingCharacterScale = transform.transform.localScale;
 
-                return true;    
+                success = true;
             }
         }
-        return false;
+
+
+        return success;
     }
 
     // 아이템의 강체 고정을 해제
@@ -432,8 +517,7 @@ public class CustomCharacter : Character
         if (_holdingItemId != 0)
         {
             Item holdingItem = HoldingItem;
-            holdingItem.ReleaseRigidBody();
-            holdingItem.transform.parent = transform.parent;
+            holdingItem.ReleaseItem();
             _holdingItemId = 0;
         }
     }
@@ -446,21 +530,18 @@ public class CustomCharacter : Character
             Item holdingItem = HoldingItem;
             if (holdingItem.ItemData.ItemType == ItemType.Etc)
             {
-                holdingItem.ReleaseRigidBody();
-                holdingItem.transform.parent = transform.parent;
-                holdingItem.transform.position = transform.position;
+                _isThrow = false;
+                holdingItem.ReleaseItem(this,true);
             }
             else if(holdingItem.ItemData.ItemType == ItemType.Equipment)
             {
                 if (TakeOffWeapon())
                 {
-                    holdingItem.ReleaseRigidBody();
-                    holdingItem.transform.parent = transform.parent;
-                    holdingItem.transform.position = transform.position;
+                    _isThrow = false;
                     holdingItem.Show();
+                    holdingItem.ReleaseItem(this, true);
                 }
             }
-
             _holdingItemId = 0;
         }
         if(HoldingBuilding) {
@@ -469,6 +550,7 @@ public class CustomCharacter : Character
                 _holdingBuildingId = 0;
             }
         }
+
     }
 
     public override void Turn(float direction)
@@ -543,6 +625,11 @@ public class CustomCharacter : Character
         Util.WriteSerializedData(IsContactGround);
         Util.WriteSerializedData(IsConncetCombo);
         Util.WriteSerializedData(IsHide);
+        Util.WriteSerializedData(_isThrow);
+        Util.WriteSerializedData(_throwDirection.x);
+        Util.WriteSerializedData(_throwDirection.y);
+
+
 
         Util.WriteSerializedData(_holdingItemId);
         Util.WriteSerializedData(_holdingBuildingId);
@@ -567,7 +654,8 @@ public class CustomCharacter : Character
         if (string.IsNullOrEmpty(stringData)) return;
         Util.StartReadSerializedData(stringData);
 
-        Turn(Util.ReadSerializedDataToFloat());
+        float scale = Util.ReadSerializedDataToFloat();
+        Turn(scale);
         SetXVelocity(Util.ReadSerializedDataToFloat());
         SetYVelocity(Util.ReadSerializedDataToFloat());
         SetCharacterDirection(new Vector3(Util.ReadSerializedDataToFloat(),0,0));
@@ -582,38 +670,64 @@ public class CustomCharacter : Character
         if (IsHide && !isHide)
             ShowCharacter();
 
+        bool isThrow = Util.ReadSerializedDataToBoolean();
+        float throwDirectionX = Util.ReadSerializedDataToFloat();
+        float throwDirectionY = Util.ReadSerializedDataToFloat();
+
         int holdingItemId = Util.ReadSerializedDataToInt();
         int holdingBuildingId = Util.ReadSerializedDataToInt();
         float frontHandRotationZ = Util.ReadSerializedDataToFloat();
         float frontHandRotationW = Util.ReadSerializedDataToFloat();
         float behindHandRotationZ = Util.ReadSerializedDataToFloat();
         float behindHandRotationW = Util.ReadSerializedDataToFloat();
+       
 
-        if(holdingItemId != _holdingItemId)
+        if (Client.Instance.IsMain)
         {
-            // 아이템 장착
-            if(holdingItemId != 0)
+            if (holdingItemId != _holdingItemId)
             {
-                GrapItem(Manager.Item.GetItem(holdingItemId));
+                // 아이템 장착
+                if (holdingItemId != 0)
+                {
+                    GrapItem(Manager.Item.GetItem(holdingItemId));
+                    Item item = HoldingItem;
+
+                    Client.Instance.SendItemInfo(item);
+
+                }
+                // 아이템 버리기
+                else
+                {
+                    Item item = HoldingItem;
+                    if (isThrow)
+                    {
+                        ThrowItem(new Vector3(throwDirectionX,throwDirectionY,0));
+                    }
+                    else
+                    {
+                        Putdown();
+                    }
+                    Client.Instance.SendItemInfo(item);
+                }
             }
-            // 아이템 버리기
-            else
+            if (holdingBuildingId != _holdingBuildingId)
             {
-                Putdown();
+                // 건물 들기
+                if (holdingBuildingId != 0)
+                {
+                    GrapBuilding(Manager.Building.GetBuilding(holdingBuildingId));
+                }
+                // 건물 내려놓기
+                else
+                {
+                    Putdown();
+                }
             }
         }
-        if (holdingBuildingId != _holdingBuildingId)
+        else
         {
-            // 건물 들기
-            if(holdingBuildingId != 0)
-            {
-                GrapBuilding(Manager.Building.GetBuilding(holdingBuildingId));
-            }
-            // 건물 내려놓기
-            else
-            {
-                Putdown();
-            }
+            _holdingItemId = holdingItemId;
+            _holdingBuildingId = holdingBuildingId;
         }
         _frontHandPos.transform.localRotation = new Quaternion(0, 0, frontHandRotationZ, frontHandRotationW);
         _behindHandPos.transform.localRotation = new Quaternion(0, 0, behindHandRotationZ, behindHandRotationW);

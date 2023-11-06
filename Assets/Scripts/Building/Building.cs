@@ -189,14 +189,21 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
     {
         Util.StartWriteSerializedData();
 
+        Util.WriteSerializedData(Blueprint.BlueprintItemList.Count);
         for (int i = 0; i < Blueprint.BlueprintItemList.Count; i++)
         {
             int name = (int)Blueprint.BlueprintItemList[i].name;
+            Util.WriteSerializedData(name);
             int requireCount = Blueprint.BlueprintItemList[i].requireCount;
+            Util.WriteSerializedData(requireCount);
             int currentCount = Blueprint.BlueprintItemList[i].currentCount;
-            for(int j = 0; j < Blueprint.BlueprintItemList[i].itemIdList.Count; j++)
+            Util.WriteSerializedData(currentCount);
+
+            Util.WriteSerializedData(Blueprint.BlueprintItemList[i].itemIdList.Count);
+            for (int j = 0; j < Blueprint.BlueprintItemList[i].itemIdList.Count; j++)
             {
                 int id =  Blueprint.BlueprintItemList[i].itemIdList[j];
+                Util.WriteSerializedData(id);
             }
             
         }
@@ -206,6 +213,39 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
 
     public void DeserializeData(string stringData)
     {
+        if (stringData.Equals(string.Empty)) return;
+
+        Util.StartReadSerializedData(stringData);
+
+        int blueprintItemCount = Util.ReadSerializedDataToInt();
+        for(int i = 0; i < blueprintItemCount; i++)
+        {
+            int name = Util.ReadSerializedDataToInt();
+            int requireCount = Util.ReadSerializedDataToInt();
+            int currentCount = Util.ReadSerializedDataToInt();
+
+            if (_blueprint.BlueprintItemList.Count <= i)
+            {
+                _blueprint.BlueprintItemList.Add(new BlueprintItem((ItemName)name, requireCount, currentCount));
+            }
+            else
+            {
+                _blueprint.BlueprintItemList[i].name = (ItemName)name;
+                _blueprint.BlueprintItemList[i].requireCount = requireCount;
+                _blueprint.BlueprintItemList[i].currentCount = currentCount;
+            }
+            int itemIdCount = Util.ReadSerializedDataToInt();
+
+            _blueprint.BlueprintItemList[i].itemIdList.Clear();
+
+            for (int j = 0; j < itemIdCount; j++)
+            {
+                int id = Util.ReadSerializedDataToInt();
+                if (_blueprint.BlueprintItemList[i].itemIdList[j] != id)
+                    _blueprint.BlueprintItemList[i].AddCount(id);
+            }
+        }
+        ItemChangedHandler?.Invoke(CheckIsFinish());
     }
 
     public void SyncBuildingInfo(S_BroadcastBuildingInfo packet)

@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Define;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, ICharacterOption
 {
     CustomCharacter _character;
     InteractableObject _interactingObject;
@@ -29,18 +30,24 @@ public class PlayerController : MonoBehaviour
 
     public bool IsControllerable { get {
             return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
-    private void Awake()
+
+    public bool IsDone { get;  set; }
+
+    public void Init()
     {
         _character = GetComponent<CustomCharacter>();
         AttackKeyDownHandler += OnAttackKeyDown;
-        if (Client.Instance.ClientId != -1)
+        if (!Client.Instance.IsSingle && Client.Instance.ClientId == _character.CharacterId)
         {
             StartCoroutine(CorSendMovePacket());
         }
+
+        IsDone = true;
     }
 
     private void Update()
     {
+        if (!IsDone) return;
         Control();
     }
 
@@ -108,41 +115,7 @@ public class PlayerController : MonoBehaviour
             CustomCharacter player = _character as CustomCharacter;
             if (player == null) return;
 
-            // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
-            if (_character.HoldingItem != null && !_character.IsEquipWeapon)
-            {
-                List<IEnableInsertItem> insertableList = _character.GetOverrapGameObjects<IEnableInsertItem>();
-
-                bool isSucess = false;
-                if (insertableList.Count > 0)
-                {
-                    foreach(var insertable in insertableList)
-                    {
-                        if (insertable.InsertItem(_character.HoldingItem))
-                        {
-                            _character.Putdown();
-                            isSucess = true;
-                            break;
-                        }
-                    }
-                }
-                if(!isSucess) 
-                {
-                    player.Putdown();
-                }
-            }
-            else
-            {
-                if (!player.HoldingItem && !player.HoldingBuilding)
-                {
-                    player.GrapSomething();
-                }
-                else
-                {
-                    player.Putdown();
-                }
-
-            }
+            player.ItemInteract();
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -158,7 +131,7 @@ public class PlayerController : MonoBehaviour
             Manager.Game.AddItem(Manager.Data.GetItemData((ItemName)num));
         }
 
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A) ||
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.E) ||
             Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyDown(KeyCode.Space))
         {
             Client.Instance.SendCharacterInfo(_character);
@@ -197,18 +170,22 @@ public class PlayerController : MonoBehaviour
 
     void OnAttackKeyDown()
     {
-        
-        if(_character.HoldingItem && !_character.IsEquipWeapon)
+        if(_character.ThrowItem())
         {
-            Item item = _character.HoldingItem;
-            _character.ReleaseItem();
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            item.GetComponent<Projectile>()?.Throw(mousePos - _character.transform.position, 20);
+            
         }
-        
         else if(Manager.Building.IsDrawing)
         {
             Manager.Building.PlayerRequestBuilding();
         }
+    }
+
+   
+    public void DataSerialize()
+    {
+    }
+
+    public void DataDeserialize()
+    {
     }
 }

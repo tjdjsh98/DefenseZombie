@@ -28,9 +28,9 @@ public class EnemyCharacter : Character
 
     public Character Target { set; get; }
 
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
         _animatorHandler = GetComponent<AnimatorHandler>();
         _animatorHandler.AttackHandler += OnAttack;
         _animatorHandler.AttackEndHandler += OnAttackEnd;

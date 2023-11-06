@@ -5,9 +5,9 @@ using UnityEngine;
 public class SpannerPlayerCharacter : Character
 {
     AnimatorHandler _animatorHandler;
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
         _animatorHandler = GetComponent<AnimatorHandler>();
         
     }

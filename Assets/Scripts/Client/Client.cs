@@ -150,7 +150,7 @@ public class Client : MonoBehaviour
 
     public void SendItemInfo(Item item)
     {
-        if(Client.Instance.IsSingle) return;
+        if (Client.Instance.IsSingle || !Client.Instance.IsMain) return;
 
         C_ItemInfo packet = new C_ItemInfo();
 

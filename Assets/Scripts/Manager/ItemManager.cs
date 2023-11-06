@@ -134,6 +134,12 @@ public class ItemManager : MonoBehaviour
 
         if (itemData == null) return null;
 
+        if(_itemDictionary.TryGetValue(packet.itemId,out var tempItem))
+        {
+            _itemDictionary.Remove(packet.itemId);
+            Destroy(tempItem.gameObject);
+        }
+
         GameObject origin = null;
 
         if (itemData.Origin == null)
@@ -223,10 +229,10 @@ public class ItemManager : MonoBehaviour
     {
         while (true)
         {
-            foreach(var item in _itemDictionary.Values)
-            {
-                Client.Instance.SendItemInfo(item);
-            }
+            //foreach(var item in _itemDictionary.Values)
+            //{
+            //    Client.Instance.SendItemInfo(item);
+            //}
             yield return new WaitForSeconds(0.25f);
         }
     }

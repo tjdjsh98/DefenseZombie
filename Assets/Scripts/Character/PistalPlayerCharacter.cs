@@ -11,9 +11,9 @@ public class PistalPlayerCharacter : Character
     SpriteRenderer _upperSpriteRenderer;
     SpriteRenderer _lowerSpriteRenderer;
 
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
 
         _upperSpriteRenderer = transform.Find("Model").Find("Upper").GetComponent<SpriteRenderer>();
         _lowerSpriteRenderer = transform.Find("Model").Find("Lower").GetComponent<SpriteRenderer>();

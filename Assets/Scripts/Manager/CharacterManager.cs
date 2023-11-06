@@ -81,8 +81,9 @@ public class CharacterManager : MonoBehaviour
 
         Character character = Instantiate(characterOrigin);
         character.transform.position = position;
-        
         character.CharacterId = ++_characterId;
+
+        character.Init();
 
         _characterDictionary.Add(character.CharacterId, character);
 
@@ -157,6 +158,8 @@ public class CharacterManager : MonoBehaviour
         character.CharacterId = packet.characterId;
         character.transform.position = new Vector3(packet.posX, packet.posY, 0);
 
+        character.Init();
+
         _characterDictionary.Add(packet.characterId, character);
 
         ReciveGenPacket?.Invoke(packet.requestNumber, character);
@@ -177,7 +180,10 @@ public class CharacterManager : MonoBehaviour
             if (characterOrigin == null) continue;
 
             Character character = Instantiate(characterOrigin);
+            character.transform.position= new Vector3(pkt.posX,pkt.posY, 0);
             character.CharacterId = pkt.characterId;
+
+            character.Init();
 
             character.DeserializeData(pkt.data);
 

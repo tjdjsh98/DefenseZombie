@@ -87,7 +87,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     // 캐릭터의 옵션
     protected List<ICharacterOption> _optionList = new List<ICharacterOption>();
 
-    protected virtual void Awake()
+    public virtual void Init()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
         _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>();
@@ -121,17 +121,16 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     }
     private void FixedUpdate()
     {
-        //if (Client.Instance.IsSingle) return;
-        //if (Client.Instance.ClientId == CharacterId) return;
-        //if(CharacterId > 100 && Client.Instance.IsMain) return;
+        if (Client.Instance.IsSingle) return;
+        if (Client.Instance.ClientId == CharacterId) return;
+        if (CharacterId > 100 && Client.Instance.IsMain) return;
 
-        //_time += Time.fixedDeltaTime;
+        _time += Time.fixedDeltaTime;
 
-        
-        //Vector3 distanceInterval = new Vector3(_currentPos.x - transform.position.x, _currentPos.y - transform.position.y, 0);
-        //distanceInterval /= (10f / _interval);
-        //transform.position += distanceInterval;
-        
+        Vector3 distanceInterval = new Vector3(_currentPos.x - transform.position.x, _currentPos.y - transform.position.y, 0);
+        distanceInterval /= (10f / _interval);
+        transform.position += distanceInterval;
+
     }
     protected virtual void ControlAnimation()
     {
@@ -500,7 +499,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         if (packet.characterId == Client.Instance.ClientId) return;
         if (packet.characterId > 100 && Client.Instance.IsMain) return;
 
-        transform.position = new Vector3(packet.posX, packet.posY, 0);
+        _currentPos = new Vector3(packet.posX, packet.posY, 0);
         _hp = packet.hp;
 
         _interval = _time;

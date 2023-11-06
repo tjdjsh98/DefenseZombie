@@ -331,6 +331,14 @@ public class BuildingManager : MonoBehaviour
         bool isSucess = packet.isSuccess;
 
         Building building = null;
+
+        if(_buildingDictionary.TryGetValue(packet.buildingId,out building))
+        {
+            _buildingDictionary.Remove(packet.buildingId);
+            Destroy(building.gameObject);
+            building = null;
+        }
+
         if (isSucess)
         {
             BuildingName name = (BuildingName)packet.buildingName;
@@ -345,8 +353,6 @@ public class BuildingManager : MonoBehaviour
             Vector3 buildingPos = new Vector3(cellPos.x, cellPos.y - 1f);
             buildingPos.x += (building.BuildingSize.width) / 2f - 0.5f;
             building.transform.position = buildingPos;
-
-            Debug.Log(building.transform.position);
 
             building.Init();
 

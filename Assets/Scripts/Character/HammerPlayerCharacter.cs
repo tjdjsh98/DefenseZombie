@@ -5,9 +5,9 @@ using UnityEngine;
 public class HammerPlayerCharacter : Character
 {
     AnimatorHandler _animatorHandler;
-    protected override void Awake()
+    public override void Init()
     {
-        base.Awake();
+        base.Init();
         _animatorHandler = GetComponent<AnimatorHandler>();
         _animatorHandler.DodgeEndHandler += () => { IsEnableMove = true; IsDodge = false; };
     }

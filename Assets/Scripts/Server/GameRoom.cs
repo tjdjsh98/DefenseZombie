@@ -12,8 +12,11 @@ using UnityEditor.Rendering;
 public class GameRoom : IJobQueue
 {
     List<ClientSession> _sessions = new List<ClientSession>();
+    List<ClientSession> _sessionsInGame = new List<ClientSession>();
+
     JobQueue _jobQueue = new JobQueue();
     List<ArraySegment<byte>> _pendingList = new List<ArraySegment<byte>>();
+    List<ArraySegment<byte>> _pendingInGameList = new List<ArraySegment<byte>>();
 
     Dictionary<int, CharacterInfo> _characterDictionary = new Dictionary<int, CharacterInfo>();
     Dictionary<int, BuildingInfo> _buildingDictionary = new Dictionary<int, BuildingInfo>();
@@ -33,14 +36,26 @@ public class GameRoom : IJobQueue
         foreach (var s in _sessions)
             s.Send(_pendingList);
 
+        foreach (var s in _sessionsInGame)
+            s.Send(_pendingInGameList);
+
         // Console.WriteLine($"Flushed {_pendingList.Count} itmes");
         _pendingList.Clear();
+        _pendingInGameList.Clear();
     }
 
     public void Broadcast(ArraySegment<byte> segment)
     {
         _pendingList.Add(segment);
     }
+
+    public void BroadcastInGame(ArraySegment<byte> segment)
+    {
+        _pendingInGameList.Add(segment);
+    }
+
+    
+
     public void Enter(ClientSession session)
     {
         // 플레이어 추가
@@ -50,7 +65,10 @@ public class GameRoom : IJobQueue
 
     public void SuccessEnter(ClientSession session)
     {
-        // 새로운 플레이어에게 모든 캐릭터의 정보를 보낸다.
+        // 새로운 플레이어를 게임 방에 넣음
+        _sessionsInGame.Add(session);
+
+        // 새로운 플레이어에게 모든 정보를 보냄
         S_EnterSyncInfos packet = new S_EnterSyncInfos();
 
         foreach (var c in _characterDictionary.Values)
@@ -109,13 +127,11 @@ public class GameRoom : IJobQueue
 
         session.Send(packet.Write());
 
-
         // 다른 플레이어들에게 새로운 플레이어의 입장을 알립니다.
         S_BroadcastNewClient broadcastPkt = new S_BroadcastNewClient();
         broadcastPkt.clientId = session.SessionId;
 
-        session.Send(broadcastPkt.Write());
-        Broadcast(broadcastPkt.Write());
+        BroadcastInGame(broadcastPkt.Write());
 
         // 모두에게 새로운 클라이언트의 캐릭터 생성을 알립니다.
         if (!_characterDictionary.ContainsKey(session.SessionId))
@@ -141,8 +157,7 @@ public class GameRoom : IJobQueue
             };
             _characterDictionary.Add(info.characterId, info);
 
-            session.Send(gen.Write());
-            Broadcast(gen.Write());
+            BroadcastInGame(gen.Write());
         }
     }
 
@@ -154,7 +169,7 @@ public class GameRoom : IJobQueue
         // 모두에게 알린다
         S_BroadcastLeaveGame leave = new S_BroadcastLeaveGame();
         leave.playerId = session.SessionId;
-        Broadcast(leave.Write());
+        BroadcastInGame(leave.Write());
     }
 
     public void SyncCharacterInfo(ClientSession session, C_CharacterInfo packet)
@@ -180,7 +195,7 @@ public class GameRoom : IJobQueue
             pkt.posY = packet.posY;
             pkt.data = packet.data;
 
-            Broadcast(pkt.Write());
+            BroadcastInGame(pkt.Write());
         }
     }
 
@@ -204,7 +219,7 @@ public class GameRoom : IJobQueue
             pkt.posY = packet.posY;
             pkt.data = packet.data;
 
-            Broadcast(pkt.Write());
+            BroadcastInGame(pkt.Write());
         }
     }
     public void SyncBuildingInfo(ClientSession session, C_BuildingInfo packet)
@@ -233,7 +248,7 @@ public class GameRoom : IJobQueue
             pkt.cellPosY = packet.cellPosY;
             pkt.data = packet.data;
 
-            Broadcast(pkt.Write());
+            BroadcastInGame(pkt.Write());
         }
     }
 
@@ -267,7 +282,7 @@ public class GameRoom : IJobQueue
         };
         _characterDictionary.Add(info.characterId,info);
 
-        Broadcast(sendPacket.Write());
+        BroadcastInGame(sendPacket.Write());
     }
 
     public void RemoveCharacter(C_RequestRemoveCharacter packet)
@@ -283,7 +298,7 @@ public class GameRoom : IJobQueue
         sendPacket.characterId = packet.characterId;
         sendPacket.requestNumber = packet.requestNumber;
 
-        Broadcast(sendPacket.Write());
+        BroadcastInGame(sendPacket.Write());
     }
 
    
@@ -361,7 +376,7 @@ public class GameRoom : IJobQueue
         sendPacket.requestNumber= packet.requestNumber;
 
 
-        Broadcast(sendPacket.Write());
+        BroadcastInGame(sendPacket.Write());
     }
     public void RemoveBuilding(C_RequestRemoveBuilding packet)
     {
@@ -387,7 +402,7 @@ public class GameRoom : IJobQueue
             sendPacket.buildingId = packet.buildingId;
             sendPacket.requestNumber= packet.requestNumber;
 
-            Broadcast(sendPacket.Write());
+            BroadcastInGame(sendPacket.Write());
         }
     }
 
@@ -412,7 +427,7 @@ public class GameRoom : IJobQueue
         sendPacket.posX = itemInfo.posX;
         sendPacket.posY = itemInfo.posY;
 
-        Broadcast(sendPacket.Write());
+        BroadcastInGame(sendPacket.Write());
     }
     public void RemoveItem(C_RequestRemoveItem packet)
     {

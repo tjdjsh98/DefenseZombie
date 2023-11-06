@@ -19,6 +19,13 @@ public class BlueprintItem
         requireCount = blueprintItem.requireCount;
         currentCount = blueprintItem.currentCount;
     }
+    public BlueprintItem(ItemName name,int requireCount, int currentCount)
+    {
+        this.name = name;
+        this.requireCount = requireCount;
+        this.currentCount = currentCount;
+    }
+
     public ItemName name;
     public List<int> itemIdList =new List<int>();
     public int requireCount;
