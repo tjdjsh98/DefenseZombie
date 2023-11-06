@@ -97,12 +97,16 @@ public class Item : MonoBehaviour, IDataSerializable
     {
         gameObject.SetActive(false);
         IsHide = true;
+
+        Client.Instance.SendItemInfo(this);
     }
 
     public void Show()
     {
         gameObject.SetActive(true);
         IsHide = false;
+
+        Client.Instance.SendItemInfo(this);
     }
 
     public void UpBound(float power)

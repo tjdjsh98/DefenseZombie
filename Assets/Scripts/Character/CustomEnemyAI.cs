@@ -52,7 +52,7 @@ public class CustomEnemyAI : EnemyAI
                 {
                     _attackTime = 0;
                     _character.IsAttacking = true;
-                    Client.Instance.SendCharacterInfo(_character);
+                    Client.Instance.SendCharacterControlInfo(_character);
                 }
 
                 return;

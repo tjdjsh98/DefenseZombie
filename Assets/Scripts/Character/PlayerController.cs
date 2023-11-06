@@ -28,6 +28,8 @@ public class PlayerController : MonoBehaviour, ICharacterOption
     public Action AttackKeyDownHandler;
     public Action AttackKeyUpHandler;
 
+    bool _isInteractItem;
+
     public bool IsControllerable { get {
             return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
 
@@ -37,7 +39,7 @@ public class PlayerController : MonoBehaviour, ICharacterOption
     {
         _character = GetComponent<CustomCharacter>();
         AttackKeyDownHandler += OnAttackKeyDown;
-        if (!Client.Instance.IsSingle && Client.Instance.ClientId == _character.CharacterId)
+        if (!Client.Instance.IsSingle)
         {
             StartCoroutine(CorSendMovePacket());
         }
@@ -110,12 +112,24 @@ public class PlayerController : MonoBehaviour, ICharacterOption
             Item item = null;
             Manager.Item.GenerateItem(Define.ItemName.Spear, transform.position + Vector3.right,ref item);
         }
+        
+        if (_character != null)
+        {
+            if (_character.IsItemInteract)
+            {
+                _character.IsItemInteract = false;
+                Client.Instance.SendCharacterControlInfo(_character);
+            }
+        }
+
+
         if (Input.GetKeyDown(KeyCode.E))
         {
-            CustomCharacter player = _character as CustomCharacter;
-            if (player == null) return;
+            
+            if (_character == null) return;
 
-            player.ItemInteract();
+            _character.IsItemInteract = true;
+            Client.Instance.SendCharacterControlInfo(_character);
         }
         if (Input.GetKeyDown(KeyCode.Escape))
         {
@@ -131,10 +145,10 @@ public class PlayerController : MonoBehaviour, ICharacterOption
             Manager.Game.AddItem(Manager.Data.GetItemData((ItemName)num));
         }
 
-        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.E) ||
+        if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A) ||
             Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyDown(KeyCode.Space))
         {
-            Client.Instance.SendCharacterInfo(_character);
+            Client.Instance.SendCharacterControlInfo(_character);
         }
     }
 
@@ -159,9 +173,13 @@ public class PlayerController : MonoBehaviour, ICharacterOption
     {
         while (true)
         {
-            if (IsControllerable)
+            if (Client.Instance.IsMain)
             {
                 Client.Instance.SendCharacterInfo(_character);
+            }
+            if (IsControllerable)
+            {
+                Client.Instance.SendCharacterControlInfo(_character);
             }
             yield return new WaitForSeconds(Client.SendPacketInterval);
            

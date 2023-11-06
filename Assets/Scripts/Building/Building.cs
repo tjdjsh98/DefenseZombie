@@ -104,6 +104,11 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
                 Manager.Building.RemoveBuilding(BuildingId);
             }
         }
+        else
+        {
+            if(Client.Instance.IsMain)
+                Client.Instance.SendBuildingInfo(this);
+        }
     }
 
     public void AddCoordinate(Vector2Int pos)
@@ -129,7 +134,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
     // 해당 아이템을 추가 완료된다면 아이템을 없애지 않고 내용물에 추가만 합니다.
     public bool InsertItem(Item item)
     {
-        if (IsConstructDone) return false;
+        bool isSuccess = false;
+        if (IsConstructDone) return isSuccess;
 
         for(int i =0; i < Blueprint.BlueprintItemList.Count; i++)
         {
@@ -138,14 +144,21 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
                 if (Blueprint.BlueprintItemList[i].requireCount > Blueprint.BlueprintItemList[i].currentCount)
                 {
                     Blueprint.BlueprintItemList[i].AddCount(item.ItemId);
+                    item.Hide();
                     bool isFinish = CheckIsFinish();
                     ItemChangedHandler?.Invoke(isFinish);
-                    return true;    
+                    isSuccess = true;
+                    break;
                 }
             }
         }
 
-        return false;
+        if(isSuccess&&Client.Instance.IsMain)
+        {
+            Client.Instance.SendBuildingInfo(this);
+        }
+
+        return isSuccess;
     }
 
     public bool CheckIsFinish()
@@ -163,16 +176,18 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
 
         if(isSuccess)
         {
-            foreach(var blueprint in Blueprint.BlueprintItemList)
+            if (Client.Instance.IsSingle || Client.Instance.IsMain)
             {
-                foreach (var id in blueprint.itemIdList)
+                foreach (var blueprint in Blueprint.BlueprintItemList)
                 {
-                    Manager.Item.RemoveItem(id);
+                    foreach (var id in blueprint.itemIdList)
+                    {
+                        Manager.Item.RemoveItem(id);
+                    }
+
+                    blueprint.itemIdList.Clear();
                 }
-
-                blueprint.itemIdList.Clear();
             }
-
 
             foreach (var s in _spriteRenderers)
                 s.color = Color.white;
@@ -208,7 +223,7 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
             
         }
 
-        return "";
+        return Util.EndWriteSerializeData();
     }
 
     public void DeserializeData(string stringData)
@@ -241,8 +256,10 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
             for (int j = 0; j < itemIdCount; j++)
             {
                 int id = Util.ReadSerializedDataToInt();
-                if (_blueprint.BlueprintItemList[i].itemIdList[j] != id)
-                    _blueprint.BlueprintItemList[i].AddCount(id);
+                if (_blueprint.BlueprintItemList[i].itemIdList.Count >= j)
+                    _blueprint.BlueprintItemList[i].itemIdList.Add(id);
+                else
+                    _blueprint.BlueprintItemList[i].itemIdList[j] = id;
             }
         }
         ItemChangedHandler?.Invoke(CheckIsFinish());
@@ -254,6 +271,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
 
         transform.position = new Vector3(packet.posX,packet.posY);
         Hp = packet.hp;
+
+        Debug.Log("Sync");
         DeserializeData(packet.data);
     }
 }

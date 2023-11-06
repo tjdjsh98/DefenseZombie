@@ -47,7 +47,7 @@ public class FlierEnemyAI : EnemyAI
                 _character.SetCharacterDirection(Vector2.zero);
                 _character.IsAttacking = true;
                 _character.IsEnableMoveWhileAttack = false;
-                Client.Instance.SendCharacterInfo(_character);
+                Client.Instance.SendCharacterControlInfo(_character);
             }
             else
             {

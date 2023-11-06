@@ -125,7 +125,7 @@ public class HelperAI : MonoBehaviour, ICharacterOption
             {
                 _character.SetCharacterDirection(Vector3.zero);
                 AttackHanlder?.Invoke();
-                Client.Instance.SendCharacterInfo(_character);
+                Client.Instance.SendCharacterControlInfo(_character);
             }
             else
             {
@@ -163,6 +163,7 @@ public class HelperAI : MonoBehaviour, ICharacterOption
         {
             if (Client.Instance.IsMain)
             {
+                Client.Instance.SendCharacterControlInfo(_character);
                 Client.Instance.SendCharacterInfo(_character);
 
             }

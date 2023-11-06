@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using static Define;
 using Debug = UnityEngine.Debug;
 
@@ -35,6 +36,29 @@ class PacketHandler
         character?.SetCharacterInfoPacket(pkt);
     }
 
+    public static void C_CharacterControlInfoHandler(PacketSession session, IPacket packet)
+    {
+        C_CharacterControlInfo pkt = packet as C_CharacterControlInfo;
+
+        if (pkt == null) return;
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession.Room == null)
+            return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.SyncCharacterControlInfo(clientSession, pkt));
+    }
+
+    public static void S_BroadcastCharacterControlInfoHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastCharacterControlInfo pkt = packet as S_BroadcastCharacterControlInfo;
+
+        Character character = Manager.Character.GetCharacter(pkt.characterId);
+
+        character?.SetCharacterControlInfoPacket(pkt);
+
+    }
 
     public static void S_BroadcastNewClientHandler(PacketSession session, IPacket packet)
     {
@@ -296,5 +320,34 @@ class PacketHandler
         {
             building.SyncBuildingInfo(pkt);
         }
+    }
+
+    public static void C_RequestGenerateEffectHandler(PacketSession session, IPacket packet)
+    {
+
+        C_RequestGenerateEffect pkt = packet as C_RequestGenerateEffect;
+
+        if (pkt == null) return;
+        ClientSession clientSession = session as ClientSession;
+        if (clientSession.Room == null) return;
+
+        S_BroadcastGenerateEffect sendPacket = new S_BroadcastGenerateEffect();
+
+        sendPacket.effectName = pkt.effectName;
+        sendPacket.posX = pkt.posX;
+        sendPacket.posY = pkt.posY;
+        sendPacket.requestNumber = pkt.requestNumber;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.Broadcast(sendPacket.Write()));
+    }
+
+    public static void S_BroadcastGenerateEffectHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastGenerateEffect pkt = packet as S_BroadcastGenerateEffect;
+
+        if (pkt == null) return;
+
+        Manager.Effect.GenerateEffectByPacket(pkt);
     }
 }

@@ -32,6 +32,10 @@ public class PacketManager
         _handler.Add((ushort)PacketID.S_BroadcastLeaveGame, PacketHandler.S_BroadcastLeaveGameHandler);
       _makeFunc.Add((ushort)PacketID.S_EnterSyncInfos, MakePacket<S_EnterSyncInfos>);
         _handler.Add((ushort)PacketID.S_EnterSyncInfos, PacketHandler.S_EnterSyncInfosHandler);
+      _makeFunc.Add((ushort)PacketID.C_CharacterControlInfo, MakePacket<C_CharacterControlInfo>);
+        _handler.Add((ushort)PacketID.C_CharacterControlInfo, PacketHandler.C_CharacterControlInfoHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastCharacterControlInfo, MakePacket<S_BroadcastCharacterControlInfo>);
+        _handler.Add((ushort)PacketID.S_BroadcastCharacterControlInfo, PacketHandler.S_BroadcastCharacterControlInfoHandler);
       _makeFunc.Add((ushort)PacketID.C_CharacterInfo, MakePacket<C_CharacterInfo>);
         _handler.Add((ushort)PacketID.C_CharacterInfo, PacketHandler.C_CharacterInfoHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastCharacterInfo, MakePacket<S_BroadcastCharacterInfo>);
@@ -72,6 +76,10 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_RequestRemoveBuilding, PacketHandler.C_RequestRemoveBuildingHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveBuilding, MakePacket<S_BroadcastRemoveBuilding>);
         _handler.Add((ushort)PacketID.S_BroadcastRemoveBuilding, PacketHandler.S_BroadcastRemoveBuildingHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestGenerateEffect, MakePacket<C_RequestGenerateEffect>);
+        _handler.Add((ushort)PacketID.C_RequestGenerateEffect, PacketHandler.C_RequestGenerateEffectHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateEffect, MakePacket<S_BroadcastGenerateEffect>);
+        _handler.Add((ushort)PacketID.S_BroadcastGenerateEffect, PacketHandler.S_BroadcastGenerateEffectHandler);
 
     }
 

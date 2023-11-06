@@ -107,7 +107,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
                     _attackTime = 0;
                     _character.IsAttacking = true;
                     _character.IsEnableMove = false;
-                    Client.Instance.SendCharacterInfo(_character);
+                    Client.Instance.SendCharacterControlInfo(_character);
                 }
 
                 return;
@@ -145,7 +145,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
         while (true)
         {
             if (Client.Instance.IsMain)
-                Client.Instance.SendCharacterInfo(_character);
+                Client.Instance.SendCharacterControlInfo(_character);
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
     }

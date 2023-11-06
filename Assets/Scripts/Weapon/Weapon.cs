@@ -169,7 +169,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
             scale.x = _character.transform.localScale.x > 0 ? 1 : -1;
             effect.transform.localScale = scale;
         }
-        Client.Instance.SendCharacterInfo(_character);
+        Client.Instance.SendCharacterControlInfo(_character);
     }
     protected virtual void OnAttackKeyUp()
     {
@@ -184,8 +184,8 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
             if(character != null)
             {
-                GameObject g = Manager.Data.GetEffect(WeaponAttackData.actualAttackEffectName);
-                Instantiate(g).transform.position = character.transform.position;
+                GameObject effect = null;
+                Manager.Effect.GenerateEffect(WeaponAttackData.actualAttackEffectName, character.transform.position, ref effect);
             }
         }
         else if (WeaponAttackData.projectile == null)
@@ -252,12 +252,8 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
                             Vector3 point = hit.point;
 
-                            GameObject hitEffect = Manager.Data.GetEffect(WeaponAttackData.hitEffectName).gameObject;
-                            if (hitEffect)
-                            {
-                                GameObject g = Instantiate(hitEffect);
-                                g.transform.position = point;
-                            }
+                            GameObject effect = null;
+                            Manager.Effect.GenerateEffect(WeaponAttackData.hitEffectName, point, ref effect);
                         }
                         penetration++;
                         if (penetration > WeaponAttackData.penetrationPower) break;
@@ -269,12 +265,9 @@ public class Weapon : MonoBehaviour,ICharacterOption
                             building.Damage(WeaponAttackData.damage);
 
                             Vector3 point = hit.point;
-                            GameObject hitEffect = Manager.Data.GetEffect(WeaponAttackData.hitEffectName).gameObject;
-                            if (hitEffect)
-                            {
-                                GameObject g = Instantiate(hitEffect);
-                                g.transform.position = point;
-                            }
+
+                            GameObject effect = null;
+                            Manager.Effect.GenerateEffect(WeaponAttackData.hitEffectName, point, ref effect);
                         }
                         penetration++;
                         if (penetration > WeaponAttackData.penetrationPower) break;
@@ -309,7 +302,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
     protected virtual void OnAttackEnd()
     {
-        Client.Instance.SendCharacterInfo(_character);
+        Client.Instance.SendCharacterControlInfo(_character);
     }
 
     public void DataSerialize()

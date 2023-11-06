@@ -4,6 +4,7 @@ using System.Net;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.TextCore.Text;
 using static Define;
 
 public class Client : MonoBehaviour
@@ -137,23 +138,31 @@ public class Client : MonoBehaviour
 
     public void SendCharacterInfo(Character character)
     {
-        if (ClientId == -1) return;
+        if (!Client.Instance.IsMain) return;
+
         C_CharacterInfo packet = new C_CharacterInfo();
         packet.characterId = character.CharacterId;
-        packet.posX = character.transform.position.x;
-        packet.posY = character.transform.position.y;
         packet.hp = character.Hp;
         packet.data = character.SerializeData();
 
         Send(packet.Write());
     }
+    public void SendCharacterControlInfo(Character character)
+    {
+        if (ClientId == -1) return;
+        C_CharacterControlInfo packet = new C_CharacterControlInfo();
+        packet.characterId = character.CharacterId;
+        packet.posX = character.transform.position.x;
+        packet.posY = character.transform.position.y;
+        packet.data = character.SeralizeControlData();
 
+        Send(packet.Write());
+    }
     public void SendItemInfo(Item item)
     {
         if (Client.Instance.IsSingle || !Client.Instance.IsMain) return;
 
         C_ItemInfo packet = new C_ItemInfo();
-
         packet.itemId= item.ItemId;
         packet.posX = item.transform.position.x;
         packet.posY = item.transform.position.y;
@@ -191,6 +200,20 @@ public class Client : MonoBehaviour
         packet.requestNumber = requestNumber;
         packet.isPlayerableChracter = isPlayerCharacter;
         packet.characterName = (int)name;
+        packet.posX = position.x;
+        packet.posY = position.y;
+
+        Send(packet.Write());
+    }
+
+    public void SendRequestGenreateEffect(EffectName name, Vector3 position, int requestNumber)
+    {
+        if (IsSingle) return;
+
+        C_RequestGenerateEffect packet = new C_RequestGenerateEffect();
+
+        packet.requestNumber = requestNumber;
+        packet.effectName = (int)name;
         packet.posX = position.x;
         packet.posY = position.y;
 

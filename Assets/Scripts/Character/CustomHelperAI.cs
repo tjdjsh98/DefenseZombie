@@ -98,7 +98,7 @@ public class CustomHelperAI : HelperAI
                 {
                     _character.SetCharacterDirection(Vector3.zero);
                     AttackHanlder?.Invoke();
-                    Client.Instance.SendCharacterInfo(_character);
+                    Client.Instance.SendCharacterControlInfo(_character);
                 }
                 else
                 {

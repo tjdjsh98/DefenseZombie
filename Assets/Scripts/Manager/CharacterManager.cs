@@ -185,7 +185,8 @@ public class CharacterManager : MonoBehaviour
 
             character.Init();
 
-            character.DeserializeData(pkt.data);
+            character.DeserializeData(pkt.data1);
+            character.DeserializeControlData(pkt.data2);
 
             _characterDictionary.Add(pkt.characterId, character);
         }

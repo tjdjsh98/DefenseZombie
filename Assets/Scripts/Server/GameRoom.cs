@@ -5,9 +5,6 @@ using static Define;
 using CharacterInfo = S_EnterSyncInfos.CharacterInfo;
 using BuildingInfo = S_EnterSyncInfos.BuildingInfo;
 using ItemInfo = S_EnterSyncInfos.ItemInfo;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 
 public class GameRoom : IJobQueue
 {
@@ -80,12 +77,17 @@ public class GameRoom : IJobQueue
                 hp = c.hp,
                 posX = c.posX,
                 posY = c.posY,
-                data = c.data
+                data1 = c.data1,
+                data2 = c.data2
             });
 
-            if (string.IsNullOrEmpty(packet.characterInfos[packet.characterInfos.Count - 1].data))
+            if (string.IsNullOrEmpty(packet.characterInfos[packet.characterInfos.Count - 1].data1))
             {
-                packet.characterInfos[packet.characterInfos.Count - 1].data = string.Empty;
+                packet.characterInfos[packet.characterInfos.Count - 1].data1 = string.Empty;
+            }
+            if (string.IsNullOrEmpty(packet.characterInfos[packet.characterInfos.Count - 1].data2))
+            {
+                packet.characterInfos[packet.characterInfos.Count - 1].data2 = string.Empty;
             }
         }
 
@@ -153,7 +155,8 @@ public class GameRoom : IJobQueue
                 characterName = gen.characterName,
                 posX = gen.posX,
                 posY = gen.posY,
-                data = string.Empty
+                data1 = string.Empty,
+                data2 = string.Empty
             };
             _characterDictionary.Add(info.characterId, info);
 
@@ -172,6 +175,8 @@ public class GameRoom : IJobQueue
         BroadcastInGame(leave.Write());
     }
 
+    // data1 = 일반 정보
+    // data2 = 컨트롤 정보
     public void SyncCharacterInfo(ClientSession session, C_CharacterInfo packet)
     {
         // 캐릭터의 정보를 갱신해줍니다.
@@ -183,14 +188,34 @@ public class GameRoom : IJobQueue
         {
             info.characterId = packet.characterId;
             info.hp = packet.hp;
-            info.posX = packet.posX;
-            info.posY = packet.posY;
-            info.data = packet.data;
+            info.data1 = packet.data;
 
             // 모두에게 알린다
             S_BroadcastCharacterInfo pkt = new S_BroadcastCharacterInfo();
             pkt.characterId = packet.characterId;
             pkt.hp = packet.hp;
+            pkt.data = packet.data;
+
+            BroadcastInGame(pkt.Write());
+        }
+    }
+    public void SyncCharacterControlInfo(ClientSession session, C_CharacterControlInfo packet)
+    {
+        // 캐릭터의 정보를 갱신해줍니다.
+        CharacterInfo info = null;
+
+        _characterDictionary.TryGetValue(packet.characterId, out info);
+
+        if (info != null)
+        {
+            info.characterId = packet.characterId;
+            info.posX = packet.posX;
+            info.posY = packet.posY;
+            info.data2 = packet.data;
+
+            // 모두에게 알린다
+            S_BroadcastCharacterControlInfo pkt = new S_BroadcastCharacterControlInfo();
+            pkt.characterId = packet.characterId;
             pkt.posX = packet.posX;
             pkt.posY = packet.posY;
             pkt.data = packet.data;
@@ -198,7 +223,6 @@ public class GameRoom : IJobQueue
             BroadcastInGame(pkt.Write());
         }
     }
-
     public void SyncItemInfo(ClientSession session, C_ItemInfo packet)
     {
         // 아이템의 정보를 갱신해줍니다.
@@ -278,7 +302,8 @@ public class GameRoom : IJobQueue
             characterName = sendPacket.characterName,
             posX = packet.posX,
             posY = packet.posY,
-            data = string.Empty
+            data1 = string.Empty,
+            data2 = string.Empty
         };
         _characterDictionary.Add(info.characterId,info);
 

@@ -494,20 +494,33 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     {
         RegisterAttackHandler?.Invoke();
     }
-    public void SetCharacterInfoPacket(S_BroadcastCharacterInfo packet)
+
+    // 각 클라이언트가 보낸 정보를 메인 클라이언트에서 취합한다.
+    public void SetCharacterControlInfoPacket(S_BroadcastCharacterControlInfo packet)
     {
-        if (packet.characterId == Client.Instance.ClientId) return;
-        if (packet.characterId > 100 && Client.Instance.IsMain) return;
+        if (packet.characterId == Client.Instance.ClientId) return;       // 자기 자신 캐릭터 제외
+        if (packet.characterId > 100 && Client.Instance.IsMain) return;   // 플레이어블 캐릭터 이외 제외
 
         _currentPos = new Vector3(packet.posX, packet.posY, 0);
-        _hp = packet.hp;
 
         _interval = _time;
         _time = 0;
 
-        DeserializeData(packet.data);
-        
+        DeserializeControlData(packet.data);
     }
+
+    // 메인 클라이언트에서 보낸 정보를 각 클라리언트에서 취합한다.
+    public void SetCharacterInfoPacket(S_BroadcastCharacterInfo packet)
+    {
+        if (Client.Instance.IsMain) return;   // 메인 클라이언트는 모든 정보를 버림
+
+
+        Hp = packet.hp;
+
+        DeserializeData(packet.data);
+    }
+
+
 
     public void FreezeRigidbody()
     {
@@ -524,15 +537,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         _interval = _time;
         Util.StartWriteSerializedData();
 
-        Util.WriteSerializedData(transform.localScale.x);
-        Util.WriteSerializedData(_rigidBody.velocity.x);
-        Util.WriteSerializedData(_rigidBody.velocity.y);
-        Util.WriteSerializedData(_characterMoveDirection.x);
-        Util.WriteSerializedData(AttackType);
-        Util.WriteSerializedData(IsAttacking);
-        Util.WriteSerializedData(IsJumping);
-        Util.WriteSerializedData(IsContactGround);
-        Util.WriteSerializedData(IsConncetCombo);
+       
         Util.WriteSerializedData(IsHide);
         
         foreach (var option in _optionList)
@@ -545,22 +550,13 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
         return stringData;
     }
-
     public virtual void DeserializeData(string stringData)
     {
         if (string.IsNullOrEmpty(stringData)) return;
 
         Util.StartReadSerializedData(stringData);
 
-        Turn(Util.ReadSerializedDataToFloat());
-        SetXVelocity(Util.ReadSerializedDataToFloat());
-        SetYVelocity(Util.ReadSerializedDataToFloat());
-        SetCharacterDirection(new Vector3(Util.ReadSerializedDataToFloat(),0,0));
-        AttackType = Util.ReadSerializedDataToInt();
-        IsAttacking = Util.ReadSerializedDataToBoolean();
-        IsJumping = Util.ReadSerializedDataToBoolean();
-        IsContactGround= Util.ReadSerializedDataToBoolean();
-        IsConncetCombo = Util.ReadSerializedDataToBoolean();
+        
         bool isHide = Util.ReadSerializedDataToBoolean();
         if (!IsHide && isHide)
             HideCharacter();
@@ -572,6 +568,37 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         {
             option.DataDeserialize();
         }
+    }
+
+    public virtual string SeralizeControlData()
+    {
+         Util.StartWriteSerializedData();
+        Util.WriteSerializedData(transform.localScale.x);
+        Util.WriteSerializedData(_rigidBody.velocity.x);
+        Util.WriteSerializedData(_rigidBody.velocity.y);
+        Util.WriteSerializedData(_characterMoveDirection.x);
+        Util.WriteSerializedData(AttackType);
+        Util.WriteSerializedData(IsAttacking);
+        Util.WriteSerializedData(IsJumping);
+        Util.WriteSerializedData(IsContactGround);
+        Util.WriteSerializedData(IsConncetCombo);
+
+        return Util.EndWriteSerializeData();
+    }
+
+    public virtual void DeserializeControlData(string stringData)
+    {
+        Util.StartReadSerializedData(stringData);
+
+        Turn(Util.ReadSerializedDataToFloat());
+        SetXVelocity(Util.ReadSerializedDataToFloat());
+        SetYVelocity(Util.ReadSerializedDataToFloat());
+        SetCharacterDirection(new Vector3(Util.ReadSerializedDataToFloat(), 0, 0));
+        AttackType = Util.ReadSerializedDataToInt();
+        IsAttacking = Util.ReadSerializedDataToBoolean();
+        IsJumping = Util.ReadSerializedDataToBoolean();
+        IsContactGround = Util.ReadSerializedDataToBoolean();
+        IsConncetCombo = Util.ReadSerializedDataToBoolean();
     }
 }
 

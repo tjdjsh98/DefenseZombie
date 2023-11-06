@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using static Define;
 using Random = UnityEngine.Random;
@@ -39,11 +37,6 @@ public class BuildingManager : MonoBehaviour
             _tileFolder = new GameObject("TileFolder");
             _tileFolder.AddComponent<CompositeCollider2D>();
         }
-        if (!Client.Instance.IsSingle && Client.Instance.IsMain)
-        {
-            StartCoroutine(SendPacketCor());
-        }
-
     }
 
     private void Update()
@@ -410,6 +403,7 @@ public class BuildingManager : MonoBehaviour
             building.transform.position = buildingPos;
 
             building.Init();
+            building.Hp = info.hp;
 
             // °ãÄ¡´Â ºÎºÐ¿¡ ÁÂÇ¥ ¼³Á¤
             for (int i = 0; i < buildingOrigin.BuildingSize.width * buildingOrigin.BuildingSize.height; i++)
@@ -433,6 +427,8 @@ public class BuildingManager : MonoBehaviour
                 }
                 building.AddCoordinate(pos);
             }
+
+            building.DeserializeData(info.data);
 
             _buildingDictionary.Add(building.BuildingId,building);
         }
@@ -570,18 +566,5 @@ public class BuildingManager : MonoBehaviour
         }
 
         return Vector2Int.one * -999;
-    }
-
-    IEnumerator SendPacketCor()
-    {
-        while (true)
-        {
-            foreach (var building in _buildingDictionary.Values)
-            {
-                if(!building._isTile && building.InitDone) 
-                    Client.Instance.SendBuildingInfo(building);
-            }
-            yield return new WaitForSeconds(0.25f);
-        }
     }
 }
