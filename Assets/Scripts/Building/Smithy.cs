@@ -8,6 +8,7 @@ using static Define;
 [RequireComponent(typeof(Building))]
 public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 {
+    Building _building;
     BlueprintDisplayer _itemDisplayer;
 
     [SerializeField] List<ItemBlueprintData> _itemBlueprintDataList;
@@ -28,6 +29,7 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
     public void Init()
     {
         _initDone = true;
+        _building = GetComponent<Building>();
     }
 
     public void Update()
@@ -78,19 +80,30 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 
     public bool InsertItem(Item item)
     {
-        if (_mainBlueprint == null) return false;
+        bool isSuccess = false;
+        if (_mainBlueprint == null) return isSuccess;
 
         for (int i = 0; i < _mainBlueprint.BlueprintItemList.Count; i++)
         {
             if (_mainBlueprint.BlueprintItemList[i].name == item.ItemData.ItemName)
             {
-                _mainBlueprint.BlueprintItemList[i].AddCount(item.ItemId);
-                ItemChangedHandler?.Invoke(CheckIsFinish());
-                return true;
+                if (_mainBlueprint.BlueprintItemList[i].requireCount > _mainBlueprint.BlueprintItemList[i].currentCount)
+                {
+                    _mainBlueprint.BlueprintItemList[i].AddCount(item.ItemId);
+                    item.Hide();
+                    bool isFinish = CheckIsFinish();
+                    ItemChangedHandler?.Invoke(isFinish);
+                    isSuccess = true;
+                    break;
+                }
             }
         }
+        if (isSuccess && Client.Instance.IsMain)
+        {
+            Client.Instance.SendBuildingInfo(_building);
+        }
 
-        return false;
+        return isSuccess;
     }
 
     public bool CheckIsFinish()

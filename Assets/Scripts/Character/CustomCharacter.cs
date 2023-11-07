@@ -12,6 +12,7 @@ public class CustomCharacter : Character
 {
     AnimatorHandler _animatorHandler;
     SpriteChanager _chanager;
+    CharacterEquipment _characterEquipment;
 
     [SerializeField] GameObject _frontHandPos;
     [SerializeField] GameObject _frontHand;
@@ -35,16 +36,15 @@ public class CustomCharacter : Character
     [SerializeField] WeaponData _preHoldingWeaponData;
     public WeaponData PreHoldingWeaponData => _preHoldingWeaponData;
 
-    // 현재 장착 중인 무기의 정보
-    WeaponName _equipWeaponName;
     public WeaponData WeaponData
     {
         get
         {
-            return Manager.Data.GetWeaponData(_equipWeaponName);
+            if (_characterEquipment == null) return null;
+            return Manager.Data.GetWeaponData(_characterEquipment.EquipWeaponName);
         }
     }
-    public bool IsEquipWeapon => _equipWeaponName != WeaponName.None;
+    public bool IsEquipWeapon => _characterEquipment.EquipWeaponName != WeaponName.None;
 
     public int attackType = 0;
 
@@ -61,6 +61,7 @@ public class CustomCharacter : Character
         base.Init();
         _animatorHandler = GetComponent<AnimatorHandler>();
         _chanager = GetComponent<SpriteChanager>();
+        _characterEquipment = GetComponent<CharacterEquipment>();
 
         _animatorHandler.DodgeEndHandler += () => { IsEnableMove = true; };
 
@@ -225,77 +226,41 @@ public class CustomCharacter : Character
         }
 
     }
-    public bool EquipWeapon(WeaponName name)
+
+    public void SetEnableFrontHandRotate()
     {
-        _equipWeaponName = name;
-
-        WeaponData data = Manager.Data.GetWeaponData(name);
-
-        if (data == null) return false;
-
-
-        if (data.IsFrontWeapon)
-            _chanager.ChangeSprite(CharacterParts.FrontWeapon, data.WeaponSpriteLibrary);
-        else
-            _chanager.ChangeSprite(CharacterParts.BehindWeapon, data.WeaponSpriteLibrary);
-
-        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
-
-        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
-
-        if (data.AttackAnimationClip != null)
-        {
-            if (data.IsFrontWeapon)
-                myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
-            else
-                myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
-        }
+        _frontHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
+        _frontHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
 
         SetAnimatorBool("IsEquip", true);
-        SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
-
-        if (data.IsFrontWeapon)
-        {
-            _frontHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
-            _frontHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
-        }
-        else
-        {
-            _behindHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
-            _behindHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
-        }
-
-        return true;
+        SetAnimatorBool("IsFrontWeapon", true);
     }
-    public bool TakeOffWeapon()
+    public void SetDisableFrontHandRotate()
     {
-        WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
-
-        _chanager.ChangeDefaultSprite(CharacterParts.FrontWeapon);
-        _chanager.ChangeDefaultSprite(CharacterParts.BehindWeapon);
-
-        RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
-
-        AnimatorOverrideController myOverrideController = myController as AnimatorOverrideController;
-
-        if (data.IsFrontWeapon)
-            myOverrideController["CustomCharacterFrontHandAttack"] = data.AttackAnimationClip;
-        else
-            myOverrideController["CustomCharacterBehindHandAttack"] = data.AttackAnimationClip;
-
-        SetAnimatorBool("IsEquip", false);
-        SetAnimatorBool("IsFrontWeapon", data.IsFrontWeapon);
-
         _frontHandPos.transform.localPosition = Vector3.zero;
         _frontHand.transform.localPosition = Vector3.zero;
         _frontHandPos.transform.localRotation = Quaternion.identity;
+
+        SetAnimatorBool("IsEquip", true);
+        SetAnimatorBool("IsFrontWeapon", false);
+    }
+
+    public void SetEnableBehindHandRotate()
+    {
+        _behindHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
+        _behindHandPos.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
+
+        SetAnimatorBool("IsEquip", false);
+        SetAnimatorBool("IsFrontWeapon", true);
+    }
+    public void SetDisableBehindHandRotate()
+    {
         _behindHandPos.transform.localPosition = Vector3.zero;
-        _behindHand.transform.localPosition = Vector3.zero;
+        _behindHandPos.transform.localPosition = Vector3.zero;
         _behindHandPos.transform.localRotation = Quaternion.identity;
 
-        _equipWeaponName = WeaponName.None;
-
-        return true;
+        SetAnimatorBool("IsEquip", false);
+        SetAnimatorBool("IsFrontWeapon", true);
     }
 
     protected override void ControlAnimation()
@@ -400,6 +365,11 @@ public class CustomCharacter : Character
         }
     }
 
+    public void SetHoldingItemId(int id)
+    {
+        _holdingItemId  = id;
+    }
+
     public bool ThrowItem()
     {
         if (Client.Instance.IsSingle || Client.Instance.IsMain)
@@ -468,22 +438,9 @@ public class CustomCharacter : Character
             item.GrapItem(this);
             _holdingItemId = item.ItemId;
         }
-        else if (item.ItemData.ItemType == ItemType.Equipment)
+        else if (_characterEquipment.EquipItem(item))
         {
-            string ItemName = item.ItemData.ItemName.ToString();
-
-            WeaponName weaponName = WeaponName.None;
-            Enum.TryParse(ItemName, true, out weaponName);
-
-            if (EquipWeapon(weaponName))
-            {
-                item.Hide();
-                _holdingItemId = item.ItemId;
-                item.IsGraped = true;
-            }
-            else
-                isSuccess = false;
-
+            isSuccess = true;
         }
 
         Client.Instance.SendCharacterInfo(this);
@@ -542,13 +499,17 @@ public class CustomCharacter : Character
             }
             else if (holdingItem.ItemData.ItemType == ItemType.Equipment)
             {
-                if (TakeOffWeapon())
+                if (_characterEquipment.TakeOffWeapon())
                 {
                     _isThrow = false;
                     holdingItem.Show();
                     holdingItem.ReleaseItem(this, true);
                 }
             }
+            _holdingItemId = 0;
+        }
+        else if(_holdingItemId != 0) 
+        {
             _holdingItemId = 0;
         }
         if (HoldingBuilding)
@@ -687,6 +648,7 @@ public class CustomCharacter : Character
     }
     public override void DeserializeControlData(string stringData)
     {
+        if (string.IsNullOrEmpty(stringData)) return ;
         Util.StartReadSerializedData(stringData);
 
         float scale = Util.ReadSerializedDataToFloat();
@@ -718,3 +680,4 @@ public class CustomCharacter : Character
     }
 
 }
+

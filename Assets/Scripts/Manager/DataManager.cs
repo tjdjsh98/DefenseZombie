@@ -12,15 +12,42 @@ public class DataManager : MonoBehaviour
     Dictionary<ItemName, ItemData> _itemDataDictionary = new Dictionary<ItemName, ItemData>();
     Dictionary<string, GameObject> _etcDictionary = new Dictionary<string, GameObject>();
     Dictionary<EffectName, Effect> _effectDictionary = new Dictionary<EffectName, Effect>();
-    
+    Dictionary<EquipmentName,Dictionary<CharacterParts, EquipmentData>> _equipmentDictionary = new Dictionary<EquipmentName, Dictionary<CharacterParts, EquipmentData>>();
     public void Init()
     {
+        LoadEquipmentData();
         LoadCharacter();
         LoadBuilding();
         LoadEffect();
         LoadWeaponData();
         LoadItemData();
         LoadEtc();
+    }
+
+    void LoadEquipmentData()
+    {
+        EquipmentData[] equipmentDatas = Resources.LoadAll<EquipmentData>("Datas/EquipmentData");
+
+        foreach(var data in equipmentDatas)
+        {
+            if (!_equipmentDictionary.ContainsKey(data.EquipmentName))
+                _equipmentDictionary.Add(data.EquipmentName, new Dictionary<CharacterParts, EquipmentData>());
+            _equipmentDictionary[data.EquipmentName].Add(data.CharacterParts, data);
+        }
+    }
+
+    public EquipmentData GetEquipmentData(EquipmentName equipmentName, CharacterParts characterPart)
+    {
+        EquipmentData data = null;
+        if(_equipmentDictionary.ContainsKey(equipmentName))
+        {
+            if (_equipmentDictionary[equipmentName].TryGetValue(characterPart, out data))
+            {
+                return data;
+            }
+        }
+
+        return data;
     }
 
     void LoadBuilding()
@@ -65,7 +92,6 @@ public class DataManager : MonoBehaviour
             _itemDataDictionary.Add(data.ItemName, data);
         }
     }
-
     void LoadEtc()
     {
         GameObject[] etcs = Resources.LoadAll<GameObject>("Prefabs");

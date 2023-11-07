@@ -110,7 +110,7 @@ public class PlayerController : MonoBehaviour, ICharacterOption
         if (Input.GetKeyDown(KeyCode.Z))
         {
             Item item = null;
-            Manager.Item.GenerateItem(Define.ItemName.Spear, transform.position + Vector3.right,ref item);
+            Manager.Item.GenerateItem(Define.ItemName.ZeusSpear, transform.position + Vector3.right,ref item);
         }
         
         if (_character != null)

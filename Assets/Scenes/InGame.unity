@@ -1133,6 +1133,7 @@ GameObject:
   - component: {fileID: 205916453}
   - component: {fileID: 205916452}
   - component: {fileID: 205916456}
+  - component: {fileID: 205916457}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1190,7 +1191,13 @@ MonoBehaviour:
       isRandomSpawn: 0
       isRightSpawn: 0
       nextGenDelay: 0
-    nextInterval: 1111
+    - characterName: 3
+      itemCharacterHas: {fileID: 0}
+      spawnCount: 0
+      isRandomSpawn: 0
+      isRightSpawn: 0
+      nextGenDelay: 0
+    nextInterval: 1
   - levelName: 
     levelCharacterList: []
     nextInterval: 10
@@ -1253,6 +1260,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce3bf66382568b64380590d03daaba9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &205916457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205916448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e93f9ee51c00cd4da427c7e3835d6c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &312157549

@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
         if (Client.Instance.IsSingle || (!Client.Instance.IsSingle && Client.Instance.IsMain))
         {
             Building building = null;
-            for (int x = -5; x <= 5; x++)
+            for (int x = -20; x <= 20; x++)
             {
                 Manager.Building.GenerateBuilding(BuildingName.GrassTile, new Vector2Int(x, -2), ref building);
                 for (int y = -3; y >= -5; y--)

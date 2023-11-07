@@ -227,7 +227,7 @@ MonoBehaviour:
     attacKShape: 0
     damage: 1
     power: 1
-    stagger: 1
+    stagger: 0.1
     penetrationPower: 3
     actualAttackEffectName: 0
     isTargeting: 0

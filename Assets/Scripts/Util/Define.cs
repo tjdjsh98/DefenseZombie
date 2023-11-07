@@ -78,7 +78,8 @@ public static class Define
         BeeHive,
         Supplies,
         Handgun,
-        ZeusSpear
+        ZeusSpear,
+        WorkerHat
     }
     public enum ItemType
     {
@@ -96,6 +97,16 @@ public static class Define
         BehindHand,
         FrontWeapon,
         BehindWeapon,
+        Hat
+    }
+
+    public enum EquipmentName
+    {
+        None,
+        Normal,
+        Worker,
+        Solider,
+        Bear,
     }
 
     public enum CharacterTag

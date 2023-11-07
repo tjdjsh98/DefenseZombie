@@ -36,15 +36,18 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
         _spriteLibararyDictionary[CharacterParts.BehindHand].spriteLibraryAsset = _defaultSetUpParts._behindHandSpriteLibraryAsset;
         _spriteLibararyDictionary[CharacterParts.FrontWeapon].spriteLibraryAsset = _defaultSetUpParts._frontWeaponSpriteLibraryAsset;
         _spriteLibararyDictionary[CharacterParts.BehindWeapon].spriteLibraryAsset = _defaultSetUpParts._behindWeaponSpriteLibraryAsset;
+        _spriteLibararyDictionary[CharacterParts.Hat].spriteLibraryAsset = _defaultSetUpParts._hatSpriteLibraryAsset;
     }
 
-    public void ChangeSprite(CharacterParts part, SpriteLibraryAsset asset)
+    public bool ChangeSprite(CharacterParts part, SpriteLibraryAsset asset)
     {
         if (_spriteLibararyDictionary.ContainsKey(part))
         {
             _spriteLibararyDictionary[part].spriteLibraryAsset = asset;
-
+            return true;
         }
+
+        return false;
     }
     public void ChangeDefaultSprite(CharacterParts part)
     {
@@ -107,6 +110,7 @@ class CharacterSetUpParts
     public SpriteLibraryAsset _behindHandSpriteLibraryAsset;
     public SpriteLibraryAsset _frontWeaponSpriteLibraryAsset;
     public SpriteLibraryAsset _behindWeaponSpriteLibraryAsset;
+    public SpriteLibraryAsset _hatSpriteLibraryAsset;
 
 
 }

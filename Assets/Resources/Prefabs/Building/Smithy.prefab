@@ -319,10 +319,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _itemBlueprintDataList:
-  - {fileID: 11400000, guid: 7cfce77f60ab8d94186faef73e0b5b42, type: 2}
   - {fileID: 11400000, guid: d54f40bf12036084bafa0537986e86ff, type: 2}
   - {fileID: 11400000, guid: 5cb4aaf906f3533408ef3419273e6c3b, type: 2}
   - {fileID: 11400000, guid: 0fee857bfa1b6bf4f9a76d25e8429ff6, type: 2}
+  - {fileID: 11400000, guid: bb2bddc2bea741147b1323afc3289bb3, type: 2}
 --- !u!1001 &4808508675580610301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -469,7 +469,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1039598808288293587, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
       propertyPath: m_Name
-      value: RequireItems (1)
+      value: RequireSmityItems
       objectReference: {fileID: 0}
     - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
       propertyPath: m_LocalPosition.x
