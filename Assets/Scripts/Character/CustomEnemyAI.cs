@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Build;
 using UnityEngine;
 using static Define;
 
@@ -51,7 +52,11 @@ public class CustomEnemyAI : EnemyAI
 
                 if (_attackDelay < _attackTime)
                 {
-                    Vector3 targetPos = character.transform.position + character.CharacterSize.center;
+                    Vector3 targetPos = Vector3.zero;
+                    if (character != null)
+                        targetPos = character.transform.position + character.CharacterSize.center;
+                    else if (building)
+                        targetPos = building.transform.position;
                     _attackTime = 0;
                     bool success = false;
                     if (_weapon.WeaponAttackData.projectile != null)
@@ -62,13 +67,14 @@ public class CustomEnemyAI : EnemyAI
 
                             for(int i = 90; i >= 0; i--)
                             {
-                                float x = Mathf.Cos(i * Mathf.Deg2Rad) * transform.localScale.x;
-                                float y= Mathf.Sin(i* Mathf.Deg2Rad);
-                                success = arrow.PredictTrajectory(transform.position, new Vector3(x,y, 0), targetPos);
+                                Vector3 direction = new Vector3(Mathf.Cos(i * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(i * Mathf.Deg2Rad)).normalized;
+
+                                Vector3 startPos = _customCharacter.GetFrontHandPosition();
+
+                                success = arrow.PredictTrajectory(startPos, direction, targetPos);
                                 if (success)
                                 {
-                                    _weapon.FireVector = new Vector3(x , y , 0);
-                                    _customCharacter.RotationHand(transform.position + _weapon.FireVector.normalized);
+                                    _customCharacter.RotationHand(startPos + direction);
                                     break;
                                 }
                                 if (success) break;

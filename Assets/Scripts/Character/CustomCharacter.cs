@@ -677,5 +677,14 @@ public class CustomCharacter : Character
 
     }
 
+    public float GetFrontHandRotation()
+    {
+        return _frontHandPos.transform.localRotation.eulerAngles.z;
+    }
+
+    public Vector3 GetFrontHandPosition()
+    {
+        return _frontHandPos.transform.position;
+    }
 }
 

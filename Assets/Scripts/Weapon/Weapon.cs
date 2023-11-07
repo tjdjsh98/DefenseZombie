@@ -295,7 +295,9 @@ public class Weapon : MonoBehaviour,ICharacterOption
                     else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
                     {
                         Arrow arrow = projectile as Arrow;
-                        arrow.Fire(FireVector);
+                        float rotation = _customCharacter.GetFrontHandRotation();
+                        Vector3 direction = new Vector3(Mathf.Cos( rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
+                        arrow.Fire(direction);
                     }
 
                 }
