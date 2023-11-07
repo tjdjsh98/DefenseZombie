@@ -11,6 +11,9 @@ public class Manager : MonoBehaviour
 
     static DataManager _data;
     public static DataManager Data { get { Init(); return _data ; } }
+
+    static InputManager _input;
+    public static InputManager Input { get { Init(); return _input; } }
     static EffectManager _effect;
     public static EffectManager Effect { get { Init(); return _effect; } }
 
@@ -41,6 +44,7 @@ public class Manager : MonoBehaviour
 
         _manager = GameObject.Find(_managerName).GetOrAddComponent<Manager>();
         _data = GameObject.Find(_managerName).GetOrAddComponent<DataManager>();
+        _input = GameObject.Find(_managerName).GetOrAddComponent<InputManager>();
         _effect = GameObject.Find(_managerName).GetOrAddComponent<EffectManager>();
         _character = GameObject.Find(_managerName).GetOrAddComponent<CharacterManager>();
         _building = GameObject.Find(_managerName).GetOrAddComponent<BuildingManager>();
@@ -49,6 +53,7 @@ public class Manager : MonoBehaviour
         _game = GameObject.Find(_managerName).GetOrAddComponent<GameManager>();
 
         _data.Init();
+        _input.Init();
         _effect.Init();
         _character.Init();
         _building.Init();
@@ -57,5 +62,10 @@ public class Manager : MonoBehaviour
         _game.Init();
 
         Application.runInBackground = true;
+    }
+
+    private void Update()
+    {
+        Input.ManagerUpdate();
     }
 }

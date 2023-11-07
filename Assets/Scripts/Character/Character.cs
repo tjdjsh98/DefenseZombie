@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Define;
+using Random = UnityEngine.Random;
 
 public class Character : MonoBehaviour,IHp, IDataSerializable
 {
@@ -14,6 +16,8 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     protected SpriteRenderer[] _spriteRenderers;
     protected CapsuleCollider2D _capsuleCollider;
     protected Animator _animator;
+
+    GameObject _model;
 
     [SerializeField] protected Range _characterSize;
     public Range CharacterSize => _characterSize;
@@ -76,6 +80,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public Vector2 GetVelocity => _rigidBody.velocity;
 
     Coroutine _damageCoroutine;
+    Coroutine _shakingCoroutine;
  
     //캐릭터가 더미라면 필요한 변수
     protected Vector3 _currentPos;
@@ -90,7 +95,9 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public virtual void Init()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
-        _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>();
+        _model = transform.Find("Model").gameObject;
+        _spriteRenderers = _model.GetComponentsInChildren<SpriteRenderer>();
+
 
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
         _animator = GetComponent<Animator>();
@@ -388,6 +395,9 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
         _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
 
+        if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
+        _shakingCoroutine = StartCoroutine(CorShaking());
+
         Hp -= dmg;
 
         if (Hp < 0) Hp = 0;
@@ -421,6 +431,18 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         }
     }
 
+    IEnumerator CorShaking()
+    {
+        int count = 10;
+        while (count-- > 0)
+        {
+            _model.transform.localPosition = new Vector3((count%2==0?1:-1) * Random.Range(0.01f,0.03f), 0, 0);
+
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        _model.transform.localPosition = Vector3.zero;
+    }
     public GameObject GetOverrapGameObject(int layerMask = -1)
     {
         GameObject gameObject = null;

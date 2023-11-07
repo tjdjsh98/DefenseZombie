@@ -122,7 +122,9 @@ public static class Define
         Item,
         Build,
         Smithy,
-        Debug
+        Debug,
+        GameOver,
+        Equipment
     }
     public enum EffectName
     {
@@ -131,6 +133,11 @@ public static class Define
         Dash,
         Dust,
         Thunder
+    }
+    public enum ProjectileType
+    {
+        Linear,
+        Arrow
     }
 }
 

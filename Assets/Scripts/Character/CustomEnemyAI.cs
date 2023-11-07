@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Define;
 
 public class CustomEnemyAI : EnemyAI
 {
@@ -18,13 +19,13 @@ public class CustomEnemyAI : EnemyAI
         if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.IsAttacking) return;
 
-        if(_character.IsDamaged)
+        if (_character.IsDamaged)
         {
             _character.SetCharacterDirection(Vector2.zero);
             return;
         }
 
-      
+
         _attackTime += Time.deltaTime;
         if (_target == null)
         {
@@ -37,7 +38,7 @@ public class CustomEnemyAI : EnemyAI
             Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
             // ÆÈ ¿òÁ÷ÀÓ
-            if(character != null && _weapon.WeaponAttackData.projectile != null)
+            if (character != null && _weapon.WeaponAttackData.projectile != null && _weapon.WeaponAttackData.projectile.ProjectileType == ProjectileType.Linear)
             {
                 Vector3 targetPos = character.transform.position + character.CharacterSize.center;
                 _customCharacter.RotationHand(targetPos);
@@ -50,9 +51,40 @@ public class CustomEnemyAI : EnemyAI
 
                 if (_attackDelay < _attackTime)
                 {
+                    Vector3 targetPos = character.transform.position + character.CharacterSize.center;
                     _attackTime = 0;
-                    _character.IsAttacking = true;
-                    Client.Instance.SendCharacterControlInfo(_character);
+                    bool success = false;
+                    if (_weapon.WeaponAttackData.projectile != null)
+                    {
+                        if (_weapon.WeaponAttackData.projectile.ProjectileType == ProjectileType.Arrow)
+                        {
+                            Arrow arrow = _weapon.WeaponAttackData.projectile as Arrow;
+
+                            for(int i = 90; i >= 0; i--)
+                            {
+                                float x = Mathf.Cos(i * Mathf.Deg2Rad) * transform.localScale.x;
+                                float y= Mathf.Sin(i* Mathf.Deg2Rad);
+                                success = arrow.PredictTrajectory(transform.position, new Vector3(x,y, 0), targetPos);
+                                if (success)
+                                {
+                                    _weapon.FireVector = new Vector3(x , y , 0);
+                                    _customCharacter.RotationHand(transform.position + _weapon.FireVector.normalized);
+                                    break;
+                                }
+                                if (success) break;
+
+                            }
+                        }
+                    }
+                    else
+                    {
+                        success = true;
+                    }
+                    if (success)
+                    {
+                        _character.IsAttacking = true;
+                        Client.Instance.SendCharacterControlInfo(_character);
+                    }
                 }
 
                 return;

@@ -102,12 +102,17 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
                 _character.StopMove();
                 _character.SetCharacterDirection(Vector2.zero);
 
+                
+
                 if (_attackDelay < _attackTime)
                 {
+                   
                     _attackTime = 0;
+                  
                     _character.IsAttacking = true;
                     _character.IsEnableMove = false;
                     Client.Instance.SendCharacterControlInfo(_character);
+                    
                 }
 
                 return;

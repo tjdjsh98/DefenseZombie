@@ -81,4 +81,29 @@ public class ParabolaProjectile : MonoBehaviour
         dat = (-b + Mathf.Sqrt(b * b -4 * a * c)) / (2 * a);
         vx = -(_initPosition.x - _destinationPosition.x) / dat;
     }
+
+    public Vector3 GetDirection(Vector3 destination, float speed, float height)
+    {
+        _initPosition = transform.position;
+        _destinationPosition = destination;
+        _height = height;
+        _isStart = true;
+        _speed = speed;
+
+        dh = _destinationPosition.y - _initPosition.y;
+        mh = _height;
+
+        g = 2 * mh / (mht * mht);
+
+        vy = Mathf.Sqrt(2 * g * mh);
+
+        float a = g;
+        float b = -2 * vy;
+        float c = 2 * dh;
+
+        dat = (-b + Mathf.Sqrt(b * b - 4 * a * c)) / (2 * a);
+        vx = -(_initPosition.x - _destinationPosition.x) / dat;
+
+        return new Vector3(vx, vy, 0);
+    }
 }

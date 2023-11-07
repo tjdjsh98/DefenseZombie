@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static Define;
 using Random = UnityEngine.Random;
 
@@ -32,6 +33,8 @@ public class GameManager : MonoBehaviour
     int _treeCount;
     int _treeMaxCount = 1;
 
+    public Building MainCore;
+
     public void Init()
     {
         if (Client.Instance.IsSingle || (!Client.Instance.IsSingle && Client.Instance.IsMain))
@@ -44,7 +47,10 @@ public class GameManager : MonoBehaviour
                 {
                     Manager.Building.GenerateBuilding(BuildingName.GroundTile, new Vector2Int(x, y), ref building);
                 }
-            }
+           }
+            Manager.Building.GenerateBuilding(BuildingName.Core, new Vector2Int(0, -1), ref building);
+            MainCore = building;
+
         }
 
 

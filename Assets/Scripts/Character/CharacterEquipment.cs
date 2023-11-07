@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Define;
+using static UnityEditor.Progress;
 
 public class CharacterEquipment : MonoBehaviour, ICharacterOption
 {
@@ -20,9 +21,17 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     EquipmentName _equipBehindHandName;
 
     int _hatItemId;
+    public int HatItemId => _hatItemId;
     int _bodyItemId;
+    public int BodyItemId => _bodyItemId;
     int _legsItemId;
+    public int LegsItemId => _legsItemId;
     int _handItemId;
+    public int HandItemId => _handItemId;
+    int _weaponId;
+    public int WeaponId => _weaponId;
+
+    public Action EquipmentChanged { get; set; }
 
     public bool IsDone { set; get; }
     public void Init()
@@ -39,17 +48,11 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         if (item.ItemData.EquipmentData == null)
         {
-            string ItemName = item.ItemData.ItemName.ToString();
+           
 
-            WeaponName weaponName = WeaponName.None;
-            Enum.TryParse(ItemName, true, out weaponName);
-
-            if (EquipWeapon(weaponName))
+            if (EquipWeapon(item))
             {
-                item.Hide();
                 _customCharacter.SetHoldingItemId(item.ItemId);
-                item.IsGraped = true;
-
                 return true;
             }
         }
@@ -57,9 +60,6 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         {
             if (EquipOther(item))
             {
-                item.Hide();
-                item.IsGraped = true;
-
                 return true;
             }
         }
@@ -67,8 +67,13 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         return false;
     }
-    bool EquipWeapon(WeaponName name)
+    bool EquipWeapon(Item item)
     {
+        string ItemName = item.ItemData.ItemName.ToString();
+
+        WeaponName name = WeaponName.None;
+        Enum.TryParse(ItemName, true, out name);
+
         _equipWeaponName = name;
 
         WeaponData data = Manager.Data.GetWeaponData(name);
@@ -98,9 +103,16 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         else
             _customCharacter.SetEnableBehindHandRotate();
 
+        item.IsGraped = true;
+        item.Hide();
+        _weaponId = item.ItemId;
+
+        EquipmentChanged?.Invoke();
+
+
         return true;
     }
-    public bool TakeOffWeapon()
+    public bool TakeOffWeapon(bool putDown = true)
     {
         if (_equipWeaponName == WeaponName.None) return false;
 
@@ -123,10 +135,16 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         _equipWeaponName = WeaponName.None;
 
+        Item item = Manager.Item.GetItem(_weaponId);
+
+        item.Show();
+        item.ReleaseItem(_customCharacter, putDown);
+        EquipmentChanged?.Invoke();
+
         return true;
     }
 
-    bool EquipOther(Item item)
+    public bool EquipOther(Item item)
     {
         if(item == null) return false;
 
@@ -159,17 +177,22 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
                     _hatItemId = item.ItemId;
                     break;
             }
+
+            item.Hide();
+            item.IsGraped = true;
+
         }
         else
         {
             return false;
         }
+        EquipmentChanged?.Invoke();
 
         return true;
     }
 
     // 해당파츠의 아이템번호를 반환합니다.
-    int TakeOffOther(CharacterParts part)
+    public int TakeOffOther(CharacterParts part, bool putDown = true)
     {
         int returnId = 0;
         switch (part)
@@ -205,6 +228,16 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         }
 
         _spriteChanger.ChangeDefaultSprite(part);
+
+        Item item = Manager.Item.GetItem(returnId);
+
+        if (item != null)
+        {
+            item.Show();
+            item.ReleaseItem(_customCharacter, putDown);
+        }
+        EquipmentChanged?.Invoke();
+
         return returnId;
     }
 

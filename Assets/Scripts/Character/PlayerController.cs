@@ -31,7 +31,8 @@ public class PlayerController : MonoBehaviour, ICharacterOption
     bool _isInteractItem;
 
     public bool IsControllerable { get {
-            return (Client.Instance.ClientId == -1 || Client.Instance.ClientId == _character.CharacterId); } }
+            return ((Client.Instance.ClientId == -1 && Manager.Character.MainCharacter == _character )||
+                Client.Instance.ClientId == _character.CharacterId); } }
 
     public bool IsDone { get;  set; }
 
@@ -121,8 +122,6 @@ public class PlayerController : MonoBehaviour, ICharacterOption
                 Client.Instance.SendCharacterControlInfo(_character);
             }
         }
-
-
         if (Input.GetKeyDown(KeyCode.E))
         {
             
@@ -131,6 +130,18 @@ public class PlayerController : MonoBehaviour, ICharacterOption
             _character.IsItemInteract = true;
             Client.Instance.SendCharacterControlInfo(_character);
         }
+        if(Input.GetKeyDown(KeyCode.I))
+        {
+            if (_character == null) return;
+
+            UI_Equipment ui = Manager.UI.GetUI(UIName.Equipment) as UI_Equipment;
+
+            if (!ui.gameObject.activeSelf)
+                ui.Open(_character);
+            else
+                ui.Close();
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape))
         {
             if (Manager.Building.IsDrawing)

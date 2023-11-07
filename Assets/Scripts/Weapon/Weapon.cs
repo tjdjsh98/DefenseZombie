@@ -45,6 +45,8 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
     float _attackTime;
 
+    public Vector3 FireVector;
+
     public virtual void Init()
     {
         _character = GetComponent<Character>();
@@ -284,17 +286,34 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 {
                     _frontfirePoint.transform.localPosition = WeaponAttackData.firePos;
                     Projectile projectile = Instantiate(WeaponAttackData.projectile);
-                    projectile.transform.position = _frontfirePoint.transform.position;
-                    projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
-                        gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+                    projectile.transform.position = transform.position;
+                    if (projectile.ProjectileType == Define.ProjectileType.Linear)
+                    {
+                        projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
+                            gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+                    }
+                    else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
+                    {
+                        Arrow arrow = projectile as Arrow;
+                        arrow.Fire(FireVector);
+                    }
+
                 }
                 else if (_customCharacter.WeaponData != null && !_customCharacter.WeaponData.IsFrontWeapon)
                 {
                     _behindfirePoint.transform.localPosition = WeaponAttackData.firePos;
                     Projectile projectile = Instantiate(WeaponAttackData.projectile);
                     projectile.transform.position = _behindfirePoint.transform.position;
-                    projectile.Fire(transform.localScale.x, _behindfirePoint.transform.eulerAngles,
+                    if (projectile.ProjectileType == Define.ProjectileType.Linear)
+                    { 
+                        projectile.Fire(transform.localScale.x, _behindfirePoint.transform.eulerAngles,
                         gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
+                    }
+                    else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
+                    {
+                        Arrow arrow = projectile as Arrow;
+                        arrow.Fire(FireVector);
+                    }
                 }
             }
         }

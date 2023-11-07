@@ -96,6 +96,7 @@ GameObject:
   - component: {fileID: 3922145910785994825}
   - component: {fileID: 3626349123389245126}
   - component: {fileID: 5122577863461636606}
+  - component: {fileID: 4894294294304652758}
   m_Layer: 8
   m_Name: Core
   m_TagString: Building
@@ -218,6 +219,18 @@ MonoBehaviour:
   _buildingTime: 0
   _blueprint:
     _blueprintItmeList: []
+--- !u!114 &4894294294304652758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4131646490383579979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16cd266362efdb349b63fdd8b7905e7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &3112535037402272485
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -269,6 +282,10 @@ PrefabInstance:
     - target: {fileID: 2324762365791422773, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2324762365791422773, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8879063647248961153, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Name

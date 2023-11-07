@@ -6,15 +6,19 @@ using static Define;
 
 public class Projectile : MonoBehaviour
 {
-    bool _isFire = false;
-    Rigidbody2D _rigidbody;
+    protected bool _isFire = false;
+    protected Rigidbody2D _rigidbody;
 
-    [SerializeField] bool _autoDestroy;
-    [SerializeField] float _destroyTime;
+    [SerializeField] ProjectileType _projectileType;
+    public ProjectileType ProjectileType =>_projectileType;
 
-    string _tag;
+    [SerializeField] protected bool _autoDestroy;
+    [SerializeField] protected float _destroyTime;
 
-    void Awake()
+    protected string _tag;
+
+
+    protected virtual void Awake()
     {
         _rigidbody= GetComponent<Rigidbody2D>();
         if(_autoDestroy)
@@ -45,11 +49,11 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    public void Throw(Vector3 direction, float power)
+    public virtual void Throw(Vector3 direction, float power)
     {
         _rigidbody.AddForce(direction.normalized * power,ForceMode2D.Impulse);
     }
-    public void Fire(float direction, Vector3 rotation, CharacterTag attackTag)
+    public virtual void Fire(float direction, Vector3 rotation, CharacterTag attackTag)
     {
         _isFire= true;
         _tag = attackTag.ToString();

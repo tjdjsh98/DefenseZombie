@@ -502,8 +502,6 @@ public class CustomCharacter : Character
                 if (_characterEquipment.TakeOffWeapon())
                 {
                     _isThrow = false;
-                    holdingItem.Show();
-                    holdingItem.ReleaseItem(this, true);
                 }
             }
             _holdingItemId = 0;
