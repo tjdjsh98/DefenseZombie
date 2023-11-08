@@ -1,4 +1,5 @@
 using UnityEngine;
+using static Define;
 
 public class Weapon : MonoBehaviour,ICharacterOption
 {
@@ -295,9 +296,17 @@ public class Weapon : MonoBehaviour,ICharacterOption
                     else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
                     {
                         Arrow arrow = projectile as Arrow;
-                        float rotation = _customCharacter.GetFrontHandRotation();
+                        float  rotation = _customCharacter.GetFrontHandRotation();
+
                         Vector3 direction = new Vector3(Mathf.Cos( rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
-                        arrow.Fire(direction);
+                        if (gameObject.tag == CharacterTag.Player.ToString())
+                        {
+                            arrow.Fire(direction, CharacterTag.Enemy, CharacterTag.Enemy);
+                        }
+                        else if (gameObject.tag == CharacterTag.Enemy.ToString())
+                        {
+                            arrow.Fire(direction, CharacterTag.Player, CharacterTag.Building);
+                        }
                     }
 
                 }
@@ -314,7 +323,18 @@ public class Weapon : MonoBehaviour,ICharacterOption
                     else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
                     {
                         Arrow arrow = projectile as Arrow;
-                        arrow.Fire(FireVector);
+                        float rotation = _customCharacter.GetBehindHandRotation();
+
+                        Vector3 direction = new Vector3(Mathf.Cos(rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
+
+                        if(gameObject.tag == CharacterTag.Player.ToString())
+                        {
+                            arrow.Fire(direction, CharacterTag.Enemy,CharacterTag.Enemy);
+                        }
+                        else if (gameObject.tag == CharacterTag.Enemy.ToString())
+                        {
+                            arrow.Fire(direction, CharacterTag.Player, CharacterTag.Building);
+                        }
                     }
                 }
             }

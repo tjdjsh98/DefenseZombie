@@ -63,7 +63,8 @@ public static class Define
         Sword,
         Spear,
         Handgun,
-        ZeusSpear
+        ZeusSpear,
+        Bow
     }
 
     public enum ItemName
@@ -79,7 +80,8 @@ public static class Define
         Supplies,
         Handgun,
         ZeusSpear,
-        WorkerHat
+        WorkerHat,
+        Bow
     }
     public enum ItemType
     {
@@ -112,7 +114,8 @@ public static class Define
     public enum CharacterTag
     {
         Player,
-        Enemy
+        Enemy,
+        Building
     }
 
     public enum UIName

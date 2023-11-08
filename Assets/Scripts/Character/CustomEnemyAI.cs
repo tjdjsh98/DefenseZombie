@@ -11,6 +11,10 @@ public class CustomEnemyAI : EnemyAI
     {
         base.Init();
         _customCharacter = _character as CustomCharacter;
+        _animatorHandler.AttackEndHandler += ()=>
+        {
+            _customCharacter.RotationHandZero();
+        };
     }
 
     protected override void AI()
@@ -69,7 +73,11 @@ public class CustomEnemyAI : EnemyAI
                             {
                                 Vector3 direction = new Vector3(Mathf.Cos(i * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(i * Mathf.Deg2Rad)).normalized;
 
-                                Vector3 startPos = _customCharacter.GetFrontHandPosition();
+                                Vector3 startPos = Vector3.zero;
+                                if (_weapon.WeaponData.IsFrontWeapon)
+                                    startPos = _customCharacter.GetFrontHandPosition();
+                                else
+                                    startPos = _customCharacter.GetBehindHandPosition();
 
                                 success = arrow.PredictTrajectory(startPos, direction, targetPos);
                                 if (success)

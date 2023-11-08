@@ -193,7 +193,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 885aa514b049ebe4e963465b88b0d7ac, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -201,7 +201,7 @@ SpriteRenderer:
   m_Size: {x: 4, y: 2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &8052777724473376852
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Library: []
-  m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: 5d02a2dd3302d144493e36d2791f7e48, type: 3}
+  m_SpriteLibraryAsset: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
 --- !u!114 &7042045069992236760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -230,10 +230,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed8b1ae4e4e52b34ea557c1c11e076fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_CategoryHash: 0.009161512
-  m_labelHash: 0.009161512
+  m_CategoryHash: 9.932601e-39
+  m_labelHash: 0.04247964
   m_SpriteKey: 0
-  m_SpriteHash: 866593510
+  m_SpriteHash: 325195679
 --- !u!1 &482486624971361465
 GameObject:
   m_ObjectHideFlags: 0
@@ -1250,6 +1250,7 @@ MonoBehaviour:
   _behindWeapon: {fileID: 281847820921104779}
   _behindfirePoint: {fileID: 3404647684127944724}
   _enableAttackLayer: Enemy
+  FireVector: {x: 0, y: 0, z: 0}
 --- !u!114 &8767798638352431458
 MonoBehaviour:
   m_ObjectHideFlags: 0

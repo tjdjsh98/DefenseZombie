@@ -13,17 +13,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Library:
+  - m_Name: None
+    m_Hash: 530755569
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: New Label
+      m_Hash: 259326342
+      m_Sprite: {fileID: 0}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 0}
+    m_FromMain: 1
+    m_EntryOverrideCount: 0
   - m_Name: Idle
     m_Hash: 1008081451
     m_CategoryList: []
     m_OverrideEntries:
+    - m_Name: IdleWeapon
+      m_Hash: 20791665
+      m_Sprite: {fileID: 0}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
     - m_Name: Idle
       m_Hash: 1008081451
       m_Sprite: {fileID: 1331659397, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
-      m_FromMain: 1
+      m_FromMain: 0
       m_SpriteOverride: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
     m_FromMain: 1
-    m_EntryOverrideCount: 1
+    m_EntryOverrideCount: 2
   - m_Name: Attack
     m_Hash: 7088141
     m_CategoryList: []
@@ -35,16 +51,21 @@ MonoBehaviour:
       m_SpriteOverride: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
     - m_Name: Attack2
       m_Hash: 606383768
-      m_Sprite: {fileID: 0}
+      m_Sprite: {fileID: 435866311, guid: ca9064ad5b0e18b45a3064cf741086db, type: 3}
       m_FromMain: 1
       m_SpriteOverride: {fileID: 1243579240, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
     - m_Name: Attack3
       m_Hash: 321101326
-      m_Sprite: {fileID: 0}
+      m_Sprite: {fileID: 1217398062, guid: ca9064ad5b0e18b45a3064cf741086db, type: 3}
       m_FromMain: 1
       m_SpriteOverride: {fileID: 173181258, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
+    - m_Name: Attack4
+      m_Hash: 222759853
+      m_Sprite: {fileID: 0}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: 0}
     m_FromMain: 1
     m_EntryOverrideCount: 3
   m_PrimaryLibraryGUID: ee6361db189314c498de1b624dddc024
-  m_ModificationHash: 638331663820134846
+  m_ModificationHash: 638350494287354382
   m_Version: 1

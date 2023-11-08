@@ -28,13 +28,18 @@ MonoBehaviour:
     m_Hash: 1008081451
     m_CategoryList: []
     m_OverrideEntries:
+    - m_Name: IdleWeapon
+      m_Hash: 20791665
+      m_Sprite: {fileID: 0}
+      m_FromMain: 1
+      m_SpriteOverride: {fileID: -2034105252, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
     - m_Name: Idle
       m_Hash: 1008081451
       m_Sprite: {fileID: 1331659397, guid: 59ae9de014bf9964382f72921431ab6e, type: 3}
-      m_FromMain: 1
+      m_FromMain: 0
       m_SpriteOverride: {fileID: -2034105252, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
     m_FromMain: 1
-    m_EntryOverrideCount: 1
+    m_EntryOverrideCount: 2
   - m_Name: Attack
     m_Hash: 7088141
     m_CategoryList: []
@@ -62,5 +67,5 @@ MonoBehaviour:
     m_FromMain: 1
     m_EntryOverrideCount: 4
   m_PrimaryLibraryGUID: ee6361db189314c498de1b624dddc024
-  m_ModificationHash: 638345385052849791
+  m_ModificationHash: 638350494203153365
   m_Version: 1

@@ -392,11 +392,18 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         _rigidBody.velocity = Vector2.zero;
         AddForce(attackDirection, power);
 
-        if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
-        _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
-
+        
         if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
         _shakingCoroutine = StartCoroutine(CorShaking());
+
+
+        if (staggerTime > 0)
+        {
+            if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
+            _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
+
+
+        }
 
         Hp -= dmg;
 
@@ -422,9 +429,11 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         if ( !_isSuperArmerWhenAttack)
         {
             IsDamaged = true;
+            SetAnimatorBool("Stagger", true);
             yield return new WaitForSeconds(time);
 
             IsDamaged = false;
+            SetAnimatorBool("Stagger", false);
             Client.Instance.SendCharacterInfo(this);
 
             _damageCoroutine = null;

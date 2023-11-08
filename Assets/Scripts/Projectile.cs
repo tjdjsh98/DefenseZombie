@@ -17,6 +17,7 @@ public class Projectile : MonoBehaviour
 
     protected string _tag;
 
+    protected bool _isDestroyOnGround = true;
 
     protected virtual void Awake()
     {
@@ -29,7 +30,7 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected virtual void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == _tag)
         {

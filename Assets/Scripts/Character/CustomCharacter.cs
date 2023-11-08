@@ -242,21 +242,21 @@ public class CustomCharacter : Character
         _frontHandPos.transform.localRotation = Quaternion.identity;
 
         SetAnimatorBool("IsEquip", true);
-        SetAnimatorBool("IsFrontWeapon", false);
+        SetAnimatorBool("IsFrontWeapon", true);
     }
 
     public void SetEnableBehindHandRotate()
     {
         _behindHandPos.transform.localPosition = new Vector3(-0.3125f, 0.375f, 0);
-        _behindHandPos.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
+        _behindHand.transform.localPosition = new Vector3(0.3125f, -0.375f, 0);
 
         SetAnimatorBool("IsEquip", false);
-        SetAnimatorBool("IsFrontWeapon", true);
+        SetAnimatorBool("IsFrontWeapon", false);
     }
     public void SetDisableBehindHandRotate()
     {
         _behindHandPos.transform.localPosition = Vector3.zero;
-        _behindHandPos.transform.localPosition = Vector3.zero;
+        _behindHand.transform.localPosition = Vector3.zero;
         _behindHandPos.transform.localRotation = Quaternion.identity;
 
         SetAnimatorBool("IsEquip", false);
@@ -570,7 +570,18 @@ public class CustomCharacter : Character
             _behindHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, rotation));
         }
     }
+    public void RotationHandZero()
+    {
+        if (WeaponData != null && WeaponData.IsFrontWeapon)
+        {
+            _frontHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        }
 
+        if (WeaponData != null && !WeaponData.IsFrontWeapon)
+        {
+            _behindHandPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        }
+    }
     protected override void Dead()
     {
         Putdown();
@@ -682,9 +693,20 @@ public class CustomCharacter : Character
         return _frontHandPos.transform.localRotation.eulerAngles.z;
     }
 
+    public float GetBehindHandRotation()
+    {
+        return _behindHandPos.transform.localRotation.eulerAngles.z;
+    }
+
+    
     public Vector3 GetFrontHandPosition()
     {
         return _frontHandPos.transform.position;
+    }
+
+    public Vector3 GetBehindHandPosition()
+    {
+        return _behindHandPos.transform.position;
     }
 }
 

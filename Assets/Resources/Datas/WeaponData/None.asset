@@ -30,5 +30,8 @@ MonoBehaviour:
     attacKShape: 0
     damage: 1
     power: 0.5
-    stagger: 0
+    stagger: 0.1
     penetrationPower: 0
+    actualAttackEffectName: 0
+    isTargeting: 0
+  <AttackDelay>k__BackingField: 0
