@@ -7,11 +7,11 @@ public class DataManager : MonoBehaviour
 {
     Dictionary<CharacterName, Character> _characterDictionary = new Dictionary<CharacterName, Character>();
     Dictionary<BuildingName, Building> _buildingDictionary = new Dictionary<BuildingName, Building>();
-    Dictionary<string, ParabolaProjectile> _projectileDictionary = new Dictionary<string, ParabolaProjectile>();
     Dictionary<WeaponName, WeaponData> _weaponDataDictionary = new Dictionary<WeaponName, WeaponData>();
     Dictionary<ItemName, ItemData> _itemDataDictionary = new Dictionary<ItemName, ItemData>();
     Dictionary<string, GameObject> _etcDictionary = new Dictionary<string, GameObject>();
     Dictionary<EffectName, Effect> _effectDictionary = new Dictionary<EffectName, Effect>();
+    Dictionary<ProjectileName, Projectile> _projectileDictionary = new Dictionary<ProjectileName, Projectile>();
     Dictionary<EquipmentName,Dictionary<CharacterParts, EquipmentData>> _equipmentDictionary = new Dictionary<EquipmentName, Dictionary<CharacterParts, EquipmentData>>();
     public void Init()
     {
@@ -19,9 +19,30 @@ public class DataManager : MonoBehaviour
         LoadCharacter();
         LoadBuilding();
         LoadEffect();
+        LoadProjectile();
         LoadWeaponData();
         LoadItemData();
         LoadEtc();
+    }
+
+    void LoadProjectile()
+    {
+        Projectile[] projectiles = Resources.LoadAll<Projectile>("Prefabs/Projectile");
+        foreach(var projectile in projectiles)
+        {
+            _projectileDictionary.Add(projectile.ProjectileName, projectile);
+        }
+    }
+
+    public Projectile GetProjectile(ProjectileName name)
+    {
+        Projectile projectile =null;
+        if (_projectileDictionary.TryGetValue(name, out projectile))
+        {
+            return projectile;
+        }
+
+        return projectile;
     }
 
     void LoadEquipmentData()
@@ -90,6 +111,7 @@ public class DataManager : MonoBehaviour
         foreach (ItemData data in itemDatas)
         {
             _itemDataDictionary.Add(data.ItemName, data);
+
         }
     }
     void LoadEtc()
@@ -127,23 +149,6 @@ public class DataManager : MonoBehaviour
         }
 
         return null;
-    }
-    void LoadProjectile()
-    {
-
-    }
-
-    public ParabolaProjectile GetProjectile(string name)
-    {
-        ParabolaProjectile projectile = null;
-        if (string.IsNullOrEmpty(name)) return null;
-
-        if (_projectileDictionary.TryGetValue(name, out projectile))
-        {
-            return projectile;
-        }
-
-        return null ;
     }
 
     public WeaponData GetWeaponData(WeaponName weaponName)

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Define;
-using static UnityEditor.Progress;
 
 public class CharacterEquipment : MonoBehaviour, ICharacterOption
 {
@@ -64,11 +63,18 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
             }
         }
 
+        if (!Client.Instance.IsSingle && Client.Instance.IsMain)
+        {
+            Client.Instance.SendCharacterInfo(_customCharacter);
+        }
+
 
         return false;
     }
     bool EquipWeapon(Item item)
     {
+        if (item == null) return false;
+
         string ItemName = item.ItemData.ItemName.ToString();
 
         WeaponName name = WeaponName.None;
@@ -139,6 +145,8 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         item.Show();
         item.ReleaseItem(_customCharacter, putDown);
+        _weaponId = 0;
+
         EquipmentChanged?.Invoke();
 
         return true;
@@ -240,12 +248,59 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         return returnId;
     }
+    public void DataSerialize()
+    {
+        Util.WriteSerializedData(_hatItemId);
+        Util.WriteSerializedData(_bodyItemId);
+        Util.WriteSerializedData(_legsItemId);
+        Util.WriteSerializedData(_handItemId);
+        Util.WriteSerializedData(_weaponId);
+    }
 
     public void DataDeserialize()
     {
+        int hatItemId = Util.ReadSerializedDataToInt();
+        int bodyItemId = Util.ReadSerializedDataToInt();
+        int legsItemId = Util.ReadSerializedDataToInt();
+        int handItemId = Util.ReadSerializedDataToInt();
+        int weaponId = Util.ReadSerializedDataToInt();
+
+        if(_hatItemId != hatItemId)
+        {
+            Debug.Log(hatItemId);
+            if (hatItemId != 0)
+                EquipOther(Manager.Item.GetItem(hatItemId));
+            else
+                TakeOffOther(CharacterParts.Hat);
+        }
+        if (_bodyItemId != bodyItemId)
+        {
+            if (bodyItemId != 0)
+                EquipOther(Manager.Item.GetItem(bodyItemId));
+            else
+                TakeOffOther(CharacterParts.Body);
+        }
+        if (_legsItemId != legsItemId)
+        {
+            if(legsItemId!= 0)
+                EquipOther(Manager.Item.GetItem(legsItemId));
+            else
+                TakeOffOther(CharacterParts.Legs);
+        }
+        if (_handItemId != handItemId)
+        {
+            if (handItemId != 0)
+                EquipOther(Manager.Item.GetItem(handItemId));
+            else
+                TakeOffOther(CharacterParts.FrontHand);
+        }
+        if (_weaponId != weaponId)
+        {
+            if (weaponId != 0)
+                EquipWeapon(Manager.Item.GetItem(weaponId));
+            else
+                TakeOffWeapon();
+        }
     }
 
-    public void DataSerialize()
-    {
-    }
 }

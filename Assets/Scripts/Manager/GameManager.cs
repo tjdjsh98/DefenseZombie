@@ -55,7 +55,6 @@ public class GameManager : MonoBehaviour
 
 
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);
-        Manager.Character.ReciveGenPacket += SetDiscountSummonCount;
         StartCoroutine(CorStartLevel());
     }
     IEnumerator CorStartLevel()
@@ -99,9 +98,27 @@ public class GameManager : MonoBehaviour
                             Character character = null;
                             int requsetNumber = Manager.Character.GenerateCharacter(enemyName, genPos, ref character);
 
-                            if (requsetNumber != -1)
+                            if (requsetNumber != 0)
                             {
+                                Manager.Character.AddGenerateRequset(requsetNumber, (c)
+                                    =>
+                                {
+                                    SummonCount++;
+                                    c.DeadHandler += () =>
+                                    {
+                                        SummonCount--;
+                                    };
+                                    CustomCharacter customCharacter = c as CustomCharacter;
+
+                                    if (levelCharacter.setupData != null)
+                                    {
+                                        customCharacter.SetSetup(levelCharacter.setupData);
+                                    }
+                                });
                                 _generateRequestList.Add(requsetNumber);
+
+
+
                             }
                             if (character != null)
                             {
@@ -110,17 +127,11 @@ public class GameManager : MonoBehaviour
                                 {
                                     SummonCount--;
                                 };
-                            }
-
-                            if(character != null)
-                            {
                                 CustomCharacter customCharacter = character as CustomCharacter;
 
-                                if(levelCharacter.itemCharacterHas != null)
+                                if (levelCharacter.setupData != null)
                                 {
-                                    Item item = null;
-                                    Manager.Item.GenerateItem(levelCharacter.itemCharacterHas.ItemName,character.transform.position,ref item);
-                                    customCharacter.GrapItem(item);
+                                    customCharacter.SetSetup(levelCharacter.setupData);
                                 }
                             }
                         }
@@ -184,21 +195,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void SetDiscountSummonCount(int requsetNumber,Character character)
-    {
-        if (_generateRequestList.Contains(requsetNumber))
-        {
-            _generateRequestList.Remove(requsetNumber);
-            if (character != null)
-            {
-                SummonCount++;
-                character.DeadHandler += () =>
-                {
-                    SummonCount--;
-                };
-            }
-        }
-    }
 
     public void AddItem(ItemData data)
     {
@@ -243,7 +239,7 @@ public class Level
 public class LevelCharacter
 {
     public CharacterName characterName;
-    public ItemData itemCharacterHas;
+    public SetupData setupData;
     public int spawnCount;
     public bool isRandomSpawn;
     public bool isRightSpawn;

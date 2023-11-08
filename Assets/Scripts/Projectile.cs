@@ -9,6 +9,10 @@ public class Projectile : MonoBehaviour
     protected bool _isFire = false;
     protected Rigidbody2D _rigidbody;
 
+    public int ProjectileId;
+
+    [SerializeField] ProjectileName _projectileName;
+    public ProjectileName ProjectileName => _projectileName;
     [SerializeField] ProjectileType _projectileType;
     public ProjectileType ProjectileType =>_projectileType;
 
@@ -27,7 +31,7 @@ public class Projectile : MonoBehaviour
     }
     void Destroy()
     {
-        Destroy(gameObject);
+        Manager.Projectile.RemoveProjectile(ProjectileId);
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D collision)
@@ -41,28 +45,12 @@ public class Projectile : MonoBehaviour
         }
     }
 
-
-    void Update()
-    {
-        if (_isFire)
-        {
-            transform.transform.position += transform.right * 10 * Time.deltaTime;
-        }
-    }
-
     public virtual void Throw(Vector3 direction, float power)
     {
         _rigidbody.AddForce(direction.normalized * power,ForceMode2D.Impulse);
     }
-    public virtual void Fire(float direction, Vector3 rotation, CharacterTag attackTag)
+    public virtual void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2)
     {
-        _isFire= true;
-        _tag = attackTag.ToString();
-        rotation.z -= direction< 0 ? 180 : 0;
-
-        transform.rotation = Quaternion.Euler(rotation);
-        Vector3 scale = Vector3.one;
-        scale.x = direction > 0 ? 1 : -1;
-        transform.localScale=scale;
+        _rigidbody.velocity = direction * 10;
     }
 }

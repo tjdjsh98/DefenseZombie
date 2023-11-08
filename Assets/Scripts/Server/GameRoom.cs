@@ -5,6 +5,7 @@ using static Define;
 using CharacterInfo = S_EnterSyncInfos.CharacterInfo;
 using BuildingInfo = S_EnterSyncInfos.BuildingInfo;
 using ItemInfo = S_EnterSyncInfos.ItemInfo;
+using static S_EnterSyncInfos;
 
 public class GameRoom : IJobQueue
 {
@@ -19,9 +20,11 @@ public class GameRoom : IJobQueue
     Dictionary<int, BuildingInfo> _buildingDictionary = new Dictionary<int, BuildingInfo>();
     Dictionary<int, Dictionary<int, BuildingInfo>> _buildingCoordiate = new Dictionary<int, Dictionary<int, BuildingInfo>>();
     Dictionary<int, ItemInfo> _itemDictionary = new Dictionary<int, ItemInfo>();
+    Dictionary<int, ProjectileInfo> _projectileDictionary = new Dictionary<int, ProjectileInfo>();
     static int _characterId = 1000;
     static int _buildingId = 0;
     static int _itemId = 0;
+    static int _projectileId = 0;
 
     public void Push(Action job)
     {
@@ -360,6 +363,7 @@ public class GameRoom : IJobQueue
                 info = new BuildingInfo()
                 {
                     buildingId = ++_buildingId,
+                    hp = buildingOrigin.Hp,
                     buildingName = packet.buildingName,
                     cellPosX = packet.posX,
                     cellPosY = packet.posY,
@@ -454,6 +458,50 @@ public class GameRoom : IJobQueue
 
         BroadcastInGame(sendPacket.Write());
     }
+    public void GenreateProjectile(C_RequestGenerateProjectile packet)
+    {
+        ProjectileInfo projectileInfo = new ProjectileInfo();
+
+        projectileInfo.projectileName = packet.projectileName;
+        projectileInfo.projectileId = ++_projectileId;
+        projectileInfo.posX = packet.posX;
+        projectileInfo.posY = packet.posY;
+        
+        projectileInfo.data = string.Empty;
+
+        _projectileDictionary.Add(projectileInfo.projectileId, projectileInfo);
+
+        S_BroadcastGenerateProjectile sendPacket = new S_BroadcastGenerateProjectile();
+
+        sendPacket.requestNumber = packet.requestNumber;
+        sendPacket.isSuccess = true;
+        sendPacket.projectileId = projectileInfo.projectileId;
+        sendPacket.projectileName = projectileInfo.projectileName;
+        sendPacket.posX = projectileInfo.posX;
+        sendPacket.posY = projectileInfo.posY;
+        sendPacket.fireDirectionX= packet.fireDirectionX;
+        sendPacket.fireDirectionY = packet.fireDirectionY;
+        sendPacket.characterTag1 = packet.characterTag1;
+        sendPacket.characterTag2 = packet.characterTag2;
+
+        BroadcastInGame(sendPacket.Write());
+    }
+    public void RemoveProjectile(C_RequestRemoveProjectile packet)
+    {
+        ProjectileInfo Info = null;
+
+        if (_projectileDictionary.TryGetValue(packet.projectileId, out Info))
+        {
+            _projectileDictionary.Remove(packet.projectileId);
+
+            S_BroadcastRemoveProjectile sendPacket = new S_BroadcastRemoveProjectile();
+            sendPacket.requestNumber = packet.requestNumber;
+            sendPacket.projectileId = packet.projectileId;
+           
+            BroadcastInGame(sendPacket.Write());
+        }
+    }
+
     public void RemoveItem(C_RequestRemoveItem packet)
     {
         ItemInfo itemInfo = null;
@@ -463,8 +511,11 @@ public class GameRoom : IJobQueue
             _itemDictionary.Remove(packet.itemId);
 
             S_BroadcastRemoveItem sendPacket = new S_BroadcastRemoveItem();
+            sendPacket.itemId = packet.itemId;
             sendPacket.requestNumber= packet.requestNumber;
             sendPacket.isSuccess = true;
+
+            BroadcastInGame(sendPacket.Write());
         }
     }
 

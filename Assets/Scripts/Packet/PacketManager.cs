@@ -30,6 +30,10 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_LeaveGame, PacketHandler.C_LeaveGameHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastLeaveGame, MakePacket<S_BroadcastLeaveGame>);
         _handler.Add((ushort)PacketID.S_BroadcastLeaveGame, PacketHandler.S_BroadcastLeaveGameHandler);
+      _makeFunc.Add((ushort)PacketID.C_PingPacket, MakePacket<C_PingPacket>);
+        _handler.Add((ushort)PacketID.C_PingPacket, PacketHandler.C_PingPacketHandler);
+      _makeFunc.Add((ushort)PacketID.S_PingPacket, MakePacket<S_PingPacket>);
+        _handler.Add((ushort)PacketID.S_PingPacket, PacketHandler.S_PingPacketHandler);
       _makeFunc.Add((ushort)PacketID.S_EnterSyncInfos, MakePacket<S_EnterSyncInfos>);
         _handler.Add((ushort)PacketID.S_EnterSyncInfos, PacketHandler.S_EnterSyncInfosHandler);
       _makeFunc.Add((ushort)PacketID.C_CharacterControlInfo, MakePacket<C_CharacterControlInfo>);
@@ -80,6 +84,14 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_RequestGenerateEffect, PacketHandler.C_RequestGenerateEffectHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateEffect, MakePacket<S_BroadcastGenerateEffect>);
         _handler.Add((ushort)PacketID.S_BroadcastGenerateEffect, PacketHandler.S_BroadcastGenerateEffectHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestGenerateProjectile, MakePacket<C_RequestGenerateProjectile>);
+        _handler.Add((ushort)PacketID.C_RequestGenerateProjectile, PacketHandler.C_RequestGenerateProjectileHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastGenerateProjectile, MakePacket<S_BroadcastGenerateProjectile>);
+        _handler.Add((ushort)PacketID.S_BroadcastGenerateProjectile, PacketHandler.S_BroadcastGenerateProjectileHandler);
+      _makeFunc.Add((ushort)PacketID.C_RequestRemoveProjectile, MakePacket<C_RequestRemoveProjectile>);
+        _handler.Add((ushort)PacketID.C_RequestRemoveProjectile, PacketHandler.C_RequestRemoveProjectileHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastRemoveProjectile, MakePacket<S_BroadcastRemoveProjectile>);
+        _handler.Add((ushort)PacketID.S_BroadcastRemoveProjectile, PacketHandler.S_BroadcastRemoveProjectileHandler);
 
     }
 

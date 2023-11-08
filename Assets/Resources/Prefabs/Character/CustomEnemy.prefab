@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 81305175345455859}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.264, y: -0.057, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -425,7 +425,7 @@ MonoBehaviour:
   _behindHandPos: {fileID: 6853389751011361528}
   _behindHand: {fileID: 1604390588027744911}
   _liftPos: {fileID: 7946594430840207039}
-  _preHoldingWeaponData: {fileID: 0}
+  _setupData: {fileID: 0}
   attackType: 0
 --- !u!114 &7634549512888743910
 MonoBehaviour:

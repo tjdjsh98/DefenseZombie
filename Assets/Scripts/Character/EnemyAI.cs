@@ -150,7 +150,10 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
         while (true)
         {
             if (Client.Instance.IsMain)
+            {
+                Client.Instance.SendCharacterInfo(_character);
                 Client.Instance.SendCharacterControlInfo(_character);
+            }
             yield return new WaitForSeconds(Client.SendPacketInterval);
         }
     }
@@ -162,4 +165,6 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
     public void DataDeserialize()
     {
     }
+
+
 }

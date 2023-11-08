@@ -59,8 +59,12 @@ public class Cannon : MonoBehaviour, IBuildingOption
         if(_coolTime <= _time && _target != null)
         {
             Projectile projectile = Instantiate(_projectile);
+            float rotation = _cannonPos.transform.eulerAngles.z;
+            Vector3 direction = new Vector3(Mathf.Cos(rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
+
             projectile.transform.position = _firePoint.transform.position;
-            projectile.Fire(transform.lossyScale.x, _cannonPos.transform.eulerAngles,Define.CharacterTag.Enemy);
+
+            projectile.Fire(direction, Define.CharacterTag.Enemy,Define.CharacterTag.Enemy);
             _time = 0;
         }
     }

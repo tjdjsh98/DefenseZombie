@@ -106,7 +106,7 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
         }
         else
         {
-            if(Client.Instance.IsMain)
+            if(!Client.Instance.IsSingle && Client.Instance.IsMain)
                 Client.Instance.SendBuildingInfo(this);
         }
     }
@@ -272,7 +272,6 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
         transform.position = new Vector3(packet.posX,packet.posY);
         Hp = packet.hp;
 
-        Debug.Log("Sync");
         DeserializeData(packet.data);
     }
 }

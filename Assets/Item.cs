@@ -36,7 +36,6 @@ public class Item : MonoBehaviour, IDataSerializable
             StartCoroutine(CorSendPacket());
         }
     }
-
     public void GrapItem(CustomCharacter character)
     {
         FreezeRigidBody();

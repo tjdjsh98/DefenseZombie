@@ -5,7 +5,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static Define;
-using static UnityEditor.Progress;
 
 public class UI_Equipment : UIBase
 {

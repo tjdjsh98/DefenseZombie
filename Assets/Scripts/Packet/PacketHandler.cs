@@ -6,6 +6,33 @@ using Debug = UnityEngine.Debug;
 
 class PacketHandler
 {
+    public static void C_PingPacketHandler(PacketSession session, IPacket packet)
+    {
+        C_PingPacket pkt = packet as C_PingPacket;
+        ClientSession clientSession = session as ClientSession;
+
+        S_PingPacket sendPacket = new S_PingPacket();
+        sendPacket.time = pkt.time;
+
+        if (clientSession.Room == null)
+            return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => { clientSession.Send(sendPacket.Write()); });
+      
+    }
+
+    public static void S_PingPacketHandler(PacketSession session, IPacket packet)
+    {
+        S_PingPacket pkt = packet as S_PingPacket;
+        if (pkt != null)
+        {
+            UI_Debug ui = Manager.UI.GetUI(UIName.Debug) as UI_Debug;
+
+            ui.ReceivcePing(pkt.time);
+        }
+    }
+
     public static void C_LeaveGameHandler(PacketSession session, IPacket packet)
     {
         ClientSession clientSession = session as ClientSession;
@@ -102,9 +129,9 @@ class PacketHandler
         S_EnterSyncInfos pkt = packet as S_EnterSyncInfos;
         UI_Debug ui = Manager.UI.GetUI(UIName.Debug) as UI_Debug;
         ui.AddText($"#{pkt.ToString()}");
-        Manager.Character.GeneratePacketCharacter(pkt);
         Manager.Item.GenerateItemByPacket(pkt);
         Manager.Building.GenerateBuildingByPacket(pkt);
+        Manager.Character.GeneratePacketCharacter(pkt);
     }
 
     public static void C_SuccessToEnterServerHandler(PacketSession session, IPacket packet)
@@ -156,7 +183,7 @@ class PacketHandler
     {
         S_BroadcastRemoveCharacter pkt = packet as S_BroadcastRemoveCharacter;
 
-        Manager.Character.RemoveCharacter(pkt.characterId);
+        Manager.Character.RemoveCharacterByPacket(pkt);
     }
 
     public static void C_DamageHandler(PacketSession session, IPacket packet)
@@ -350,4 +377,47 @@ class PacketHandler
 
         Manager.Effect.GenerateEffectByPacket(pkt);
     }
+
+    public static void C_RequestGenerateProjectileHandler(PacketSession session, IPacket packet)
+    {
+        C_RequestGenerateProjectile pkt = packet as C_RequestGenerateProjectile;
+        if (pkt == null) return;
+
+        ClientSession clientSession = session as ClientSession;
+        if (clientSession.Room == null) return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.GenreateProjectile(pkt));
+    }
+
+    public static void S_BroadcastGenerateProjectileHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastGenerateProjectile pkt = packet as S_BroadcastGenerateProjectile;
+
+        if (pkt == null) return;
+
+        Manager.Projectile.GenerateProjectileByPacket(pkt);
+    }
+
+    public static void C_RequestRemoveProjectileHandler(PacketSession session, IPacket packet)
+    {
+        C_RequestRemoveProjectile pkt = packet as C_RequestRemoveProjectile;
+
+        ClientSession clientSession = session as ClientSession;
+        if (clientSession.Room == null) return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.RemoveProjectile(pkt));
+    }
+
+    public static void S_BroadcastRemoveProjectileHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastRemoveProjectile pkt = (packet as S_BroadcastRemoveProjectile);
+
+        if(pkt == null) return;
+
+        Manager.Projectile.RemoveProjectileByPakcet(pkt);
+    }
+
+   
 }

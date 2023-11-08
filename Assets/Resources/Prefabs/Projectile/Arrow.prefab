@@ -272,6 +272,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 086312f634caae34097c116472893beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ProjectileId: 0
+  _projectileName: 1
   _projectileType: 1
   _autoDestroy: 1
   _destroyTime: 5

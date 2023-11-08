@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc220a6ee54a4fd4da852c2bdf932562, type: 3}
-  m_Name: Bow
+  m_Name: ArcherHat
   m_EditorClassIdentifier: 
-  <ItemName>k__BackingField: 13
-  <ItemSprite>k__BackingField: {fileID: 877284915, guid: 5ff1ec67eb5d29446b81e7c4538739df, type: 3}
+  <ItemName>k__BackingField: 12
+  <ItemSprite>k__BackingField: {fileID: 21300000, guid: 02136e85380e1c44090e2fbe1e91e162, type: 3}
   <ItemType>k__BackingField: 1
-  <EquipmentData>k__BackingField: {fileID: 0}
+  <EquipmentData>k__BackingField: {fileID: 11400000, guid: 0bec2313d2c4e83478c9f0df0aee40fd, type: 2}
   <Origin>k__BackingField: {fileID: 0}

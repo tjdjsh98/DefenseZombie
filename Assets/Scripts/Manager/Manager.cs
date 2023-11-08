@@ -23,6 +23,9 @@ public class Manager : MonoBehaviour
     static BuildingManager _building;
     public static BuildingManager Building { get { Init(); return _building; } }
 
+    static ProjectileManager _projectile;
+    public static ProjectileManager Projectile { get { Init(); return _projectile; } }
+
     static ItemManager _item;
     public static ItemManager Item { get { Init(); return _item; } }
 
@@ -48,6 +51,7 @@ public class Manager : MonoBehaviour
         _effect = GameObject.Find(_managerName).GetOrAddComponent<EffectManager>();
         _character = GameObject.Find(_managerName).GetOrAddComponent<CharacterManager>();
         _building = GameObject.Find(_managerName).GetOrAddComponent<BuildingManager>();
+        _projectile= GameObject.Find(_managerName).GetOrAddComponent<ProjectileManager>();
         _item = GameObject.Find(_managerName).GetOrAddComponent<ItemManager>();
         _ui = GameObject.Find(_managerName).GetOrAddComponent<UIManager>();
         _game = GameObject.Find(_managerName).GetOrAddComponent<GameManager>();
@@ -57,6 +61,7 @@ public class Manager : MonoBehaviour
         _effect.Init();
         _character.Init();
         _building.Init();
+        _projectile.Init();
         _item.Init();
         _ui.Init();
         _game.Init();

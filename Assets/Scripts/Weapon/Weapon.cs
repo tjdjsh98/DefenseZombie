@@ -89,7 +89,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
         WeaponData weaponData = null;
         if (_customCharacter != null)
-            weaponData = _customCharacter.PreHoldingWeaponData == null ? WeaponData : _customCharacter.PreHoldingWeaponData;
+            weaponData = WeaponData;
 
         AttackData attackData = weaponData == null ? _defaultAttack : weaponData.AttackList[0];
 
@@ -261,7 +261,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
                         penetration++;
                         if (penetration > WeaponAttackData.penetrationPower) break;
                     }
-                    else if(building != null)
+                    else if(_character.tag != CharacterTag.Player.ToString() && building != null)
                     {
                         if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
                         {
@@ -283,60 +283,40 @@ public class Weapon : MonoBehaviour,ICharacterOption
         {
             if (_customCharacter != null)
             {
+                float rotation = 0;
+                Vector3 firePoint = Vector3.zero;
                 if ((_customCharacter.WeaponData != null && _customCharacter.WeaponData.IsFrontWeapon) || _customCharacter.WeaponData == null)
                 {
                     _frontfirePoint.transform.localPosition = WeaponAttackData.firePos;
-                    Projectile projectile = Instantiate(WeaponAttackData.projectile);
-                    projectile.transform.position = transform.position;
-                    if (projectile.ProjectileType == Define.ProjectileType.Linear)
-                    {
-                        projectile.Fire(transform.localScale.x, _frontfirePoint.transform.eulerAngles,
-                            gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
-                    }
-                    else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
-                    {
-                        Arrow arrow = projectile as Arrow;
-                        float  rotation = _customCharacter.GetFrontHandRotation();
-
-                        Vector3 direction = new Vector3(Mathf.Cos( rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
-                        if (gameObject.tag == CharacterTag.Player.ToString())
-                        {
-                            arrow.Fire(direction, CharacterTag.Enemy, CharacterTag.Enemy);
-                        }
-                        else if (gameObject.tag == CharacterTag.Enemy.ToString())
-                        {
-                            arrow.Fire(direction, CharacterTag.Player, CharacterTag.Building);
-                        }
-                    }
-
+                    firePoint = _frontfirePoint.transform.position;
+                    rotation = _customCharacter.GetFrontHandRotation();
                 }
                 else if (_customCharacter.WeaponData != null && !_customCharacter.WeaponData.IsFrontWeapon)
                 {
                     _behindfirePoint.transform.localPosition = WeaponAttackData.firePos;
-                    Projectile projectile = Instantiate(WeaponAttackData.projectile);
-                    projectile.transform.position = _behindfirePoint.transform.position;
-                    if (projectile.ProjectileType == Define.ProjectileType.Linear)
-                    { 
-                        projectile.Fire(transform.localScale.x, _behindfirePoint.transform.eulerAngles,
-                        gameObject.tag == Define.CharacterTag.Player.ToString() ? Define.CharacterTag.Enemy : Define.CharacterTag.Player);
-                    }
-                    else if (projectile.ProjectileType == Define.ProjectileType.Arrow)
-                    {
-                        Arrow arrow = projectile as Arrow;
-                        float rotation = _customCharacter.GetBehindHandRotation();
-
-                        Vector3 direction = new Vector3(Mathf.Cos(rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
-
-                        if(gameObject.tag == CharacterTag.Player.ToString())
-                        {
-                            arrow.Fire(direction, CharacterTag.Enemy,CharacterTag.Enemy);
-                        }
-                        else if (gameObject.tag == CharacterTag.Enemy.ToString())
-                        {
-                            arrow.Fire(direction, CharacterTag.Player, CharacterTag.Building);
-                        }
-                    }
+                    firePoint = _behindfirePoint.transform.position;
+                    rotation = _customCharacter.GetBehindHandRotation();
                 }
+                Vector3 direction = new Vector3(Mathf.Cos(rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
+                Projectile projectile = null;
+
+                CharacterTag tag1 = CharacterTag.Enemy;
+                CharacterTag tag2 = CharacterTag.Enemy;
+
+                if (gameObject.tag == CharacterTag.Player.ToString())
+                {
+                    tag1 = CharacterTag.Enemy;
+                    tag2 = CharacterTag.Enemy;
+                }
+                else if (gameObject.tag == CharacterTag.Enemy.ToString())
+                {
+                    tag1 = CharacterTag.Player;
+                    tag2 = CharacterTag.Building;
+                }
+                Manager.Projectile.SetPacketDetail(direction, tag1, tag2);
+                Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
+                
+                projectile?.Fire(direction, tag1, tag2);
             }
         }
     }

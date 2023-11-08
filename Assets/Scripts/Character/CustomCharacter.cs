@@ -32,9 +32,8 @@ public class CustomCharacter : Character
     public Building HoldingBuilding => _holdingBuildingId == 0 ? null : Manager.Building.GetBuilding(_holdingBuildingId);
 
 
-    // 가지고 나올 무기 정보
-    [SerializeField] WeaponData _preHoldingWeaponData;
-    public WeaponData PreHoldingWeaponData => _preHoldingWeaponData;
+    // 가지고 나올 장구류
+    public SetupData _setupData;
 
     public WeaponData WeaponData
     {
@@ -67,22 +66,63 @@ public class CustomCharacter : Character
 
         SetAnimatorBool("IsFrontWeapon", true);
 
-        if (_preHoldingWeaponData != null)
+        if(_setupData!= null)
         {
-            string weaponName = _preHoldingWeaponData.WeaponName.ToString();
-
-            ItemName itemName = Define.ItemName.None;
-            Enum.TryParse(weaponName, true, out itemName);
-
-            if (itemName != ItemName.None)
-            {
-                Item item = null;
-                Manager.Item.GenerateItem(itemName, transform.position, ref item);
-                GrapItem(item);
-            }
+            SetSetup(_setupData);
         }
+
     }
 
+    public void SetSetup(SetupData data)
+    {
+        ItemData itemData = Manager.Data.GetItemData(data.HatItem);
+        if (itemData.ItemType == ItemType.Equipment)
+        {
+            if(itemData.EquipmentData != null && itemData.EquipmentData.CharacterParts == CharacterParts.Hat)
+            {
+                Item item = null;
+                int requsetNumber = Manager.Item.GenerateItem(itemData.ItemName, transform.position, ref item);
+
+                if (item != null)
+                {
+                    _characterEquipment.EquipItem(item);
+                }
+                else
+                {
+                    Manager.Item.AddGenerateRequset(requsetNumber, (item)
+                        =>
+                    {
+                        _characterEquipment.EquipItem(item);
+                    }
+                    );
+                }
+            }
+        }
+        itemData = Manager.Data.GetItemData(data.WeaponItem);
+        if(itemData.ItemType == ItemType.Equipment)
+        {
+            if (itemData.EquipmentData == null)
+            {
+                Item item = null;
+                int requsetNumber = Manager.Item.GenerateItem(itemData.ItemName, transform.position, ref item);
+
+                if (item != null)
+                {
+                    _characterEquipment.EquipItem(item);
+                }
+                else
+                {
+                    Manager.Item.AddGenerateRequset(requsetNumber, (item)
+                        =>
+                    {
+                        _characterEquipment.EquipItem(item);
+                    }
+                    );
+                }
+            }
+        }
+
+    }
 
     protected override void MoveCharacter()
     {
@@ -376,6 +416,7 @@ public class CustomCharacter : Character
         {
             if (HoldingItem && !IsEquipWeapon)
             {
+                
                 Item item = HoldingItem;
                 ReleaseItem();
                 Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -388,13 +429,12 @@ public class CustomCharacter : Character
         }
         else
         {
-
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePos.z = 0;
             _isThrow = true;
-            _holdingItemId = 0;
             _throwDirection = mousePos - transform.position;
-
+            Client.Instance.SendCharacterControlInfo(this);
+            _isThrow = false;
         }
 
         return false;
@@ -403,12 +443,15 @@ public class CustomCharacter : Character
     public void ThrowItem(Vector3 direction)
     {
         Item item = HoldingItem;
+        if (item == null) return;
         ReleaseItem();
+
         item.GetComponent<Projectile>()?.Throw(direction, 5);
 
         _isThrow = false;
         _throwDirection = Vector3.zero;
 
+        Client.Instance.SendItemInfo(item);
         Client.Instance.SendCharacterInfo(this);
     }
 
@@ -594,9 +637,6 @@ public class CustomCharacter : Character
         Util.StartWriteSerializedData();
 
 
-        Util.WriteSerializedData(_isThrow);
-        Util.WriteSerializedData(_throwDirection.x);
-        Util.WriteSerializedData(_throwDirection.y);
 
 
         Util.WriteSerializedData(_holdingItemId);
@@ -618,9 +658,7 @@ public class CustomCharacter : Character
         if (string.IsNullOrEmpty(stringData)) return;
         Util.StartReadSerializedData(stringData);
 
-        bool isThrow = Util.ReadSerializedDataToBoolean();
-        float throwDirectionX = Util.ReadSerializedDataToFloat();
-        float throwDirectionY = Util.ReadSerializedDataToFloat();
+        
 
         _holdingItemId = Util.ReadSerializedDataToInt();
         _holdingBuildingId = Util.ReadSerializedDataToInt();
@@ -652,6 +690,9 @@ public class CustomCharacter : Character
         Util.WriteSerializedData(_behindHandPos.transform.localRotation.z);
         Util.WriteSerializedData(_behindHandPos.transform.localRotation.w);
 
+        Util.WriteSerializedData(_isThrow);
+        Util.WriteSerializedData(_throwDirection.x);
+        Util.WriteSerializedData(_throwDirection.y);
 
         return Util.EndWriteSerializeData();
     }
@@ -677,6 +718,11 @@ public class CustomCharacter : Character
             ShowCharacter();
 
         IsItemInteract = Util.ReadSerializedDataToBoolean();
+        if(IsItemInteract)
+        {
+            ItemInteract();
+            IsItemInteract = false;
+        }
 
         float frontHandRotationZ = Util.ReadSerializedDataToFloat();
         float frontHandRotationW = Util.ReadSerializedDataToFloat();
@@ -685,6 +731,16 @@ public class CustomCharacter : Character
 
         _frontHandPos.transform.localRotation = new Quaternion(0, 0, frontHandRotationZ, frontHandRotationW);
         _behindHandPos.transform.localRotation = new Quaternion(0, 0, behindHandRotationZ, behindHandRotationW);
+
+        bool isThrow = Util.ReadSerializedDataToBoolean();
+        float throwDirectionX = Util.ReadSerializedDataToFloat();
+        float throwDirectionY = Util.ReadSerializedDataToFloat();
+
+
+        if (isThrow)
+        {
+            ThrowItem(new Vector3(throwDirectionX, throwDirectionY, 0));
+        }
 
     }
 

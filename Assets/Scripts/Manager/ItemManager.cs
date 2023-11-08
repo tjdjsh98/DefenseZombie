@@ -1,8 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
 using static Define;
 
 public class ItemManager : MonoBehaviour
@@ -11,6 +10,8 @@ public class ItemManager : MonoBehaviour
 
     Dictionary<int, Item> _itemDictionary= new Dictionary<int, Item>();
 
+    Dictionary<int, Action<Item>> _requestGenerateAction = new Dictionary<int, Action<Item>>();
+    Dictionary<int, Action> _requsetRemoveAction = new Dictionary<int, Action>();
 
     public void Init()
     {
@@ -158,6 +159,13 @@ public class ItemManager : MonoBehaviour
 
         _itemDictionary.Add(item.ItemId, item);
 
+
+        if(_requestGenerateAction.ContainsKey(packet.requestNumber))
+        {
+            _requestGenerateAction[packet.requestNumber]?.Invoke(item);
+            _requestGenerateAction.Remove(packet.requestNumber);
+        }
+
         return item;
     }
     public void GenerateItemByPacket(S_EnterSyncInfos packet)
@@ -202,7 +210,20 @@ public class ItemManager : MonoBehaviour
 
         int itemId = packet.itemId;
 
-        SingleRemoveItem(itemId);
+        Item item = null;
+
+        if (_itemDictionary.TryGetValue(itemId, out item))
+        {
+            GameObject.Destroy(item.gameObject);
+
+            _itemDictionary.Remove(itemId);
+        }
+
+        if (_requsetRemoveAction.ContainsKey(packet.requestNumber))
+        {
+            _requsetRemoveAction[packet.requestNumber]?.Invoke();
+            _requsetRemoveAction.Remove(packet.requestNumber);
+        }
     }
 
     public Item GetItem(int itemNumber)
@@ -235,5 +256,14 @@ public class ItemManager : MonoBehaviour
             //}
             yield return new WaitForSeconds(0.25f);
         }
+    }
+
+    public void AddGenerateRequset(int requestNumber, Action<Item> action)
+    {
+        _requestGenerateAction.Add(requestNumber, action);
+    }
+    public void AddRemoveRequset(int requestNumber, Action action)
+    {
+        _requsetRemoveAction.Add(requestNumber, action);
     }
 }

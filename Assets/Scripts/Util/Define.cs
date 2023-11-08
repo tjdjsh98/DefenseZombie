@@ -81,6 +81,7 @@ public static class Define
         Handgun,
         ZeusSpear,
         WorkerHat,
+        ArcherHat,
         Bow
     }
     public enum ItemType
@@ -109,6 +110,7 @@ public static class Define
         Worker,
         Solider,
         Bear,
+        Archer
     }
 
     public enum CharacterTag
@@ -127,7 +129,8 @@ public static class Define
         Smithy,
         Debug,
         GameOver,
-        Equipment
+        Equipment,
+        Core
     }
     public enum EffectName
     {
@@ -141,6 +144,13 @@ public static class Define
     {
         Linear,
         Arrow
+    }
+
+    public enum ProjectileName
+    {
+        Normal,
+        Arrow,
+        Polar
     }
 }
 

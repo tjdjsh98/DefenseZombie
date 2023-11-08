@@ -35,7 +35,8 @@ public class CharacterManager : MonoBehaviour
 
     Dictionary<int, Character> _characterDictionary = new Dictionary<int, Character>();
 
-    public Action<int,Character> ReciveGenPacket;
+    Dictionary<int , Action<Character>> _requestGenerateAction = new Dictionary<int, Action<Character>>();
+    Dictionary<int , Action> _requsetRemoveAction = new Dictionary<int , Action>();
 
     public void Init()
     {
@@ -58,7 +59,7 @@ public class CharacterManager : MonoBehaviour
     // 싱글, 멀티 혼용으로 사용하는 캐릭터 생성 함수
     public int GenerateCharacter(CharacterName name, Vector3 position,ref Character character, bool isPlayerCharacter = false)
     {
-        int requestNumber = -1;
+        int requestNumber = 0;
         if(Client.Instance.ClientId == -1)
         {
             character = GenerateCharacter(name, position);
@@ -162,7 +163,12 @@ public class CharacterManager : MonoBehaviour
 
         _characterDictionary.Add(packet.characterId, character);
 
-        ReciveGenPacket?.Invoke(packet.requestNumber, character);
+        if (_requestGenerateAction.ContainsKey(packet.requestNumber))
+        {
+            _requestGenerateAction[packet.requestNumber]?.Invoke(character);
+            _requestGenerateAction.Remove(packet.requestNumber);
+        }
+
 
         return true;
     }
@@ -192,5 +198,31 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
-   
+    public void AddGenerateRequset(int requestNumber, Action<Character> action)
+    {
+        _requestGenerateAction.Add(requestNumber, action);
+    }
+    public void AddRemoveRequset(int requestNumber, Action action)
+    {
+        _requsetRemoveAction.Add(requestNumber, action);
+    }
+
+    public void RemoveCharacterByPacket(S_BroadcastRemoveCharacter pkt)
+    {
+        Character character = null;
+
+        _characterDictionary.TryGetValue(pkt.characterId, out character);
+
+        if (character != null)
+        {
+            Destroy(character.gameObject);
+        }
+        _characterDictionary.Remove(pkt.characterId);
+
+        if (_requsetRemoveAction.ContainsKey(pkt.requestNumber))
+        {
+            _requsetRemoveAction[pkt.requestNumber]?.Invoke();
+            _requsetRemoveAction.Remove(pkt.requestNumber);
+        }
+    }
 }

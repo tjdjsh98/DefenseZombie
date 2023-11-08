@@ -113,24 +113,18 @@ public class PlayerController : MonoBehaviour, ICharacterOption
             Item item = null;
             Manager.Item.GenerateItem(Define.ItemName.ZeusSpear, transform.position + Vector3.right,ref item);
         }
-        
-        if (_character != null)
-        {
-            if (_character.IsItemInteract)
-            {
-                _character.IsItemInteract = false;
-                Client.Instance.SendCharacterControlInfo(_character);
-            }
-        }
+
+        if (_character.IsItemInteract == true)
+            _character.IsItemInteract = false;  
+
         if (Input.GetKeyDown(KeyCode.E))
         {
-            
             if (_character == null) return;
 
             _character.IsItemInteract = true;
             Client.Instance.SendCharacterControlInfo(_character);
         }
-        if(Input.GetKeyDown(KeyCode.I))
+        if (Input.GetKeyDown(KeyCode.I))
         {
             if (_character == null) return;
 

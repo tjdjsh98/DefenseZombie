@@ -29,12 +29,13 @@ public class Arrow : Projectile
                 collision.ClosestPoint(transform.position);
                 GameObject effect = null;
                 Manager.Effect.GenerateEffect(EffectName.Normal, collision.ClosestPoint(transform.position), ref effect);
-                Destroy(gameObject);
+                Manager.Projectile.RemoveProjectile(ProjectileId);
+
             }
         }
         if(_isDestroyOnGround&&collision.gameObject.tag == "Ground")
         {
-            Destroy(gameObject);
+            Manager.Projectile.RemoveProjectile(ProjectileId);
         }
     }
 
@@ -71,7 +72,7 @@ public class Arrow : Projectile
         return false;
     }
 
-    public void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2)
+    public override void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2)
     {
         _tag = attackTag1.ToString();
         _tag2 = attackTag2.ToString();

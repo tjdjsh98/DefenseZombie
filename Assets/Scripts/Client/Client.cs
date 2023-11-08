@@ -149,7 +149,8 @@ public class Client : MonoBehaviour
     }
     public void SendCharacterControlInfo(Character character)
     {
-        if (ClientId == -1) return;
+        if (IsSingle) return;
+
         C_CharacterControlInfo packet = new C_CharacterControlInfo();
         packet.characterId = character.CharacterId;
         packet.posX = character.transform.position.x;
@@ -219,6 +220,36 @@ public class Client : MonoBehaviour
 
         Send(packet.Write());
     }
+
+    public void SendRequestGenreateProjectile(ProjectileName name, Vector3 position, int requestNumber, Vector3 direction, CharacterTag tag1, CharacterTag tag2)
+    {
+        if (IsSingle) return;
+        C_RequestGenerateProjectile packet = new C_RequestGenerateProjectile();
+
+        packet.requestNumber = requestNumber;
+        packet.projectileName = (int)name;
+        packet.posX = position.x;
+        packet.posY = position.y;
+        packet.fireDirectionX = direction.x;
+        packet.fireDirectionY = direction.y;
+        packet.characterTag1 = (int)tag1;
+        packet.characterTag2 = (int)tag2;
+
+        Send(packet.Write());
+    }
+    public void SendRequestRemoveProjectile(int id, int requsetNumber)
+    {
+        if (ClientId == -1) return;
+
+        C_RequestRemoveProjectile packet = new C_RequestRemoveProjectile();
+
+        packet.projectileId = id;
+        packet.requestNumber = requsetNumber;
+
+
+        Send(packet.Write());
+    }
+
     public void SendRequestRemoveCharacter(int id)
     {
         if (ClientId == -1) return;
