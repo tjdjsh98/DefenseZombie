@@ -19,6 +19,9 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 
     bool _initDone;
 
+    int _requsetBlueprintIndex = -1;
+    int _mainBlueprintIndex = -1;
+
     ItemBlueprintData _mainBlueprint;
     public ItemBlueprintData MainBlueprint => _mainBlueprint;
 
@@ -69,13 +72,26 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
         return true;
     }
 
-    public void SetMainBlueprint(ItemBlueprintData data)
+    public void SetMainBlueprint(int index)
     {
-        _mainBlueprint = new ItemBlueprintData();
-        _mainBlueprint.BlueprintItemList = data.BlueprintItemList.ConvertAll(o =>  new BlueprintItem(o));
-        _mainBlueprint.ResultItemName = data.ResultItemName;
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            _mainBlueprintIndex = index;
+            ItemBlueprintData data = ItemBlueprintDataList[index];
+            _mainBlueprint = new ItemBlueprintData();
+            _mainBlueprint.BlueprintItemList = data.BlueprintItemList.ConvertAll(o => new BlueprintItem(o));
+            _mainBlueprint.ResultItemName = data.ResultItemName;
+             MainBlueprintSetHandler?.Invoke();
 
-        MainBlueprintSetHandler?.Invoke();
+            Client.Instance.SendBuildingInfo(_building);
+        }
+        else
+        {
+            _requsetBlueprintIndex = index;
+            Client.Instance.SendBuildingControlInfo(_building);
+            _requsetBlueprintIndex = -1;
+        }
+
     }
 
     public bool InsertItem(Item item)
@@ -136,16 +152,104 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
             Item item = null;
             Manager.Item.GenerateItem(MainBlueprint.ResultItemName, transform.position,ref item);
             _mainBlueprint = null;
+            _mainBlueprintIndex = -1;
         }
 
         return isSuccess;
     }
 
-    public void DataSerialize()
+    public void SerializeData()
     {
+        Util.WriteSerializedData(_mainBlueprintIndex);
+        if (_mainBlueprint != null)
+        {
+            Util.WriteSerializedData(_mainBlueprint.BlueprintItemList.Count);
+            for (int i = 0; i < _mainBlueprint.BlueprintItemList.Count; i++)
+            {
+                int name = (int)_mainBlueprint.BlueprintItemList[i].name;
+                Util.WriteSerializedData(name);
+                int requireCount = _mainBlueprint.BlueprintItemList[i].requireCount;
+                Util.WriteSerializedData(requireCount);
+                int currentCount = _mainBlueprint.BlueprintItemList[i].currentCount;
+                Util.WriteSerializedData(currentCount);
+
+                Util.WriteSerializedData(_mainBlueprint.BlueprintItemList[i].itemIdList.Count);
+                for (int j = 0; j < _mainBlueprint.BlueprintItemList[i].itemIdList.Count; j++)
+                {
+                    int id = _mainBlueprint.BlueprintItemList[i].itemIdList[j];
+                    Util.WriteSerializedData(id);
+                }
+            }
+        }
+        else
+            Util.WriteSerializedData(0);
     }
 
-    public void DataDeserialize()
+    public void DeserializeData()
     {
+        int mainBlueprintIndex = Util.ReadSerializedDataToInt();
+
+        if (_mainBlueprintIndex == -1 && mainBlueprintIndex != -1)
+        {
+            _mainBlueprintIndex = mainBlueprintIndex;
+            ItemBlueprintData data = ItemBlueprintDataList[mainBlueprintIndex];
+            _mainBlueprint = ScriptableObject.CreateInstance<ItemBlueprintData>();
+            _mainBlueprint.BlueprintItemList = data.BlueprintItemList.ConvertAll(o => new BlueprintItem(o));
+            _mainBlueprint.ResultItemName = data.ResultItemName;
+            MainBlueprintSetHandler?.Invoke();
+        }
+        else if(_mainBlueprintIndex != -1 && mainBlueprintIndex == -1) 
+        {
+            _mainBlueprint = null;
+            _mainBlueprintIndex = -1;
+            ItemChangedHandler?.Invoke(true);
+        }
+
+        int blueprintItemCount = Util.ReadSerializedDataToInt();
+        for (int i = 0; i < blueprintItemCount; i++)
+        {
+            int name = Util.ReadSerializedDataToInt();
+            int requireCount = Util.ReadSerializedDataToInt();
+            int currentCount = Util.ReadSerializedDataToInt();
+
+            if (_mainBlueprint.BlueprintItemList.Count <= i)
+            {
+                _mainBlueprint.BlueprintItemList.Add(new BlueprintItem((ItemName)name, requireCount, currentCount));
+            }
+            else
+            {
+                _mainBlueprint.BlueprintItemList[i].name = (ItemName)name;
+                _mainBlueprint.BlueprintItemList[i].requireCount = requireCount;
+                _mainBlueprint.BlueprintItemList[i].currentCount = currentCount;
+            }
+            int itemIdCount = Util.ReadSerializedDataToInt();
+
+            _mainBlueprint.BlueprintItemList[i].itemIdList.Clear();
+
+            for (int j = 0; j < itemIdCount; j++)
+            {
+                int id = Util.ReadSerializedDataToInt();
+                if (_mainBlueprint.BlueprintItemList[i].itemIdList.Count >= j)
+                    _mainBlueprint.BlueprintItemList[i].itemIdList.Add(id);
+                else
+                    _mainBlueprint.BlueprintItemList[i].itemIdList[j] = id;
+            }
+        }
+        ItemChangedHandler?.Invoke(CheckIsFinish());
+    }
+
+    public void SerializeControlData()
+    {
+        Util.WriteSerializedData(_requsetBlueprintIndex);
+    }
+
+    public void DeserializeControlData()
+    {
+        int requestIndex = Util.ReadSerializedDataToInt();
+        if (requestIndex != -1 && Client.Instance.IsMain)
+        {
+            SetMainBlueprint(requestIndex);
+        }
+
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
@@ -53,6 +54,15 @@ public class ItemBlueprintDisplayer : MonoBehaviour
 
     void OnItemChanaged(bool isFinish)
     {
+        if (!Client.Instance.IsSingle && !Client.Instance.IsMain)
+        {
+            if (_smithy.MainBlueprint == null)
+            {
+                Hide();
+                return;
+            }
+        }
+
         if (isFinish)
         {
             Hide();
@@ -60,18 +70,21 @@ public class ItemBlueprintDisplayer : MonoBehaviour
         }
 
         ItemBlueprintData blueprint = _smithy.MainBlueprint;
-        for (int i = 0; i < blueprint.BlueprintItemList.Count; i++)
+        if (blueprint != null)
         {
-            ItemData itemData = Manager.Data.GetItemData(blueprint.BlueprintItemList[i].name);
-            _slotImageList[i].sprite = itemData.ItemSprite;
-            _slotCountList[i].text = $"{blueprint.BlueprintItemList[i].currentCount}/{blueprint.BlueprintItemList[i].requireCount}";
+            for (int i = 0; i < blueprint.BlueprintItemList.Count; i++)
+            {
+                ItemData itemData = Manager.Data.GetItemData(blueprint.BlueprintItemList[i].name);
+                _slotImageList[i].sprite = itemData.ItemSprite;
+                _slotCountList[i].text = $"{blueprint.BlueprintItemList[i].currentCount}/{blueprint.BlueprintItemList[i].requireCount}";
 
+            }
         }
-    }
 
-    void Hide()
-    {
-        gameObject.SetActive(false);
-        _resultSpriteRenderer.gameObject.SetActive(false);
+        void Hide()
+        {
+            gameObject.SetActive(false);
+            _resultSpriteRenderer.gameObject.SetActive(false);
+        }
     }
 }

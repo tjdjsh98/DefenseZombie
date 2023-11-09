@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using static Define;
 using Debug = UnityEngine.Debug;
@@ -19,7 +20,7 @@ class PacketHandler
 
         GameRoom room = clientSession.Room;
         room.Push(() => { clientSession.Send(sendPacket.Write()); });
-      
+
     }
 
     public static void S_PingPacketHandler(PacketSession session, IPacket packet)
@@ -94,7 +95,7 @@ class PacketHandler
         ui.AddText($"#{pkt.ToString()}");
         Client.Instance.EnterNewOtherClinet(pkt.clientId);
     }
-    
+
     public static void C_RequestEnterGameHandler(PacketSession session, IPacket packet)
     {
         ClientSession clientSession = session as ClientSession;
@@ -109,7 +110,7 @@ class PacketHandler
     {
         S_AnswerEnterGame pkt = packet as S_AnswerEnterGame;
 
-        Client.Instance.ClientId =  pkt.playerId;
+        Client.Instance.ClientId = pkt.playerId;
 
         if (pkt == null) Debug.Log($"MissingPacket {typeof(S_AnswerEnterGame)}");
 
@@ -123,7 +124,7 @@ class PacketHandler
         Manager.Character.RemoveCharacter(pkt.playerId);
     }
 
-   
+
     public static void S_EnterSyncInfosHandler(PacketSession session, IPacket packet)
     {
         S_EnterSyncInfos pkt = packet as S_EnterSyncInfos;
@@ -154,7 +155,7 @@ class PacketHandler
 
         C_RequestGenerateCharacter pkt = packet as C_RequestGenerateCharacter;
 
-        clientSession.Room.Push(() => { clientSession.Room.GenerateCharacter(clientSession,pkt); });
+        clientSession.Room.Push(() => { clientSession.Room.GenerateCharacter(clientSession, pkt); });
     }
 
     public static void S_BroadcastGenerateCharacterHandler(PacketSession session, IPacket packet)
@@ -174,7 +175,7 @@ class PacketHandler
         if (clientSession == null || clientSession.Room == null) return;
 
         C_RequestRemoveCharacter pkt = packet as C_RequestRemoveCharacter;
-        
+
         GameRoom room = clientSession.Room as GameRoom;
         room.Push(() => { room.RemoveCharacter(pkt); });
     }
@@ -205,11 +206,11 @@ class PacketHandler
 
         Character character = Manager.Character.GetCharacter(pkt.characterId);
 
-        if(character == null) return;
+        if (character == null) return;
 
         if (Client.Instance.IsMain && character.CharacterId == Client.Instance.ClientId) return;
 
-        character.Damage(0,new Vector2(pkt.directionX,pkt.directionY),pkt.power,pkt.stagger);
+        character.Damage(0, new Vector2(pkt.directionX, pkt.directionY), pkt.power, pkt.stagger);
     }
 
     public static void C_RequestGenerateBuildingHandler(PacketSession session, IPacket packet)
@@ -256,7 +257,7 @@ class PacketHandler
     public static void C_RequestRemoveItemHandler(PacketSession session, IPacket packet)
     {
         C_RequestRemoveItem pkt = packet as C_RequestRemoveItem;
-        ClientSession clientSession = session as ClientSession;    
+        ClientSession clientSession = session as ClientSession;
 
         if (pkt == null) return;
         if (clientSession == null) return;
@@ -331,7 +332,7 @@ class PacketHandler
         if (pkt == null) return;
 
         Item item = Manager.Item.GetItem(pkt.itemId);
-        if(item != null)
+        if (item != null)
         {
             item.SyncItemInfo(pkt);
         }
@@ -414,10 +415,79 @@ class PacketHandler
     {
         S_BroadcastRemoveProjectile pkt = (packet as S_BroadcastRemoveProjectile);
 
-        if(pkt == null) return;
+        if (pkt == null) return;
 
         Manager.Projectile.RemoveProjectileByPakcet(pkt);
     }
 
-   
+    public static void C_BuildingControlInfoHandler(PacketSession session, IPacket packet)
+    {
+        C_BuildingControlInfo pkt = packet as C_BuildingControlInfo;
+
+        if (pkt == null) return;
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession.Room == null) return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.SyncBuildingControlInfo(pkt));
+    }
+
+    public static void S_BroadcastBuildingControlInfoHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastBuildingControlInfo pkt = packet as S_BroadcastBuildingControlInfo;
+
+        if (pkt == null) return;
+
+        Building building = Manager.Building.GetBuilding(pkt.buildingId);
+        building?.SyncBuildingControlInfo(pkt);
+    }
+
+    public static void C_ManagerInfoHandler(PacketSession session, IPacket packet)
+    {
+        C_ManagerInfo pkt = packet as C_ManagerInfo;
+
+        if (pkt == null) return;
+        ClientSession clientSession = session as ClientSession;
+
+        if (clientSession.Room == null) return;
+
+        GameRoom room = clientSession.Room;
+        room.Push(() => room.SyncManagerInfo(pkt));
+    }
+
+    public static void S_BroadcastManagerInfoHandler(PacketSession session, IPacket packet)
+    {
+        S_BroadcastManagerInfo pkt = packet as S_BroadcastManagerInfo;
+
+        if (pkt == null) return;
+        if (!Client.Instance.IsMain)
+        {
+
+            switch ((ManagerName)pkt.managerName)
+            {
+                case ManagerName.Building:
+                    Manager.Building.DeserializeData(pkt.data);
+                    break;
+                case ManagerName.Character:
+                    break;
+                case ManagerName.Data:
+                    break;
+                case ManagerName.Effect:
+                    break;
+                case ManagerName.Game:
+                    Manager.Game.DeserializeData(pkt.data);
+                    break;
+                case ManagerName.Input:
+                    break;
+                case ManagerName.Item:
+                    break;
+                case ManagerName.Projectile:
+                    break;
+                case ManagerName.UI:
+                    break;
+            }
+
+        }
+    }
 }

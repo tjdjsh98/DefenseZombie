@@ -8,7 +8,6 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    float startTime = 30;
     float time;
     public float Time => time;
     [SerializeField] Material _mat;
@@ -24,8 +23,6 @@ public class GameManager : MonoBehaviour
 
     public UI_Commander Commander;
 
-    List<int> _generateRequestList = new List<int>();
-
     public Action InventoryChanagedHandler;
 
     int _rockCount;
@@ -37,26 +34,36 @@ public class GameManager : MonoBehaviour
 
     public void Init()
     {
+
         if (Client.Instance.IsSingle || (!Client.Instance.IsSingle && Client.Instance.IsMain))
         {
             Building building = null;
-            for (int x = -20; x <= 20; x++)
+            for (int x = -30; x <= 30; x++)
             {
                 Manager.Building.GenerateBuilding(BuildingName.GrassTile, new Vector2Int(x, -2), ref building);
-                for (int y = -3; y >= -5; y--)
+                for (int y = -3; y >= -10; y--)
                 {
                     Manager.Building.GenerateBuilding(BuildingName.GroundTile, new Vector2Int(x, y), ref building);
                 }
-           }
+            }
             Manager.Building.GenerateBuilding(BuildingName.Core, new Vector2Int(0, -1), ref building);
-            MainCore = building;
-
         }
-
-
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);
-        StartCoroutine(CorStartLevel());
+
+        if(Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            StartCoroutine(CorStartLevel());
+        }
     }
+
+    private void Update()
+    {
+        if (MainCore == null)
+        {
+            MainCore = Manager.Building.GetBuildingByName(BuildingName.Core);
+        }
+    }
+
     IEnumerator CorStartLevel()
     {
         int index = 0;
@@ -68,7 +75,15 @@ public class GameManager : MonoBehaviour
                 // 웨이브 별 몬스터 생성
                 if (!IsStartLevel)
                 {
-                    time -= UnityEngine.Time.fixedDeltaTime;
+                    if ((int)time != (int)(time - UnityEngine.Time.fixedDeltaTime))
+                    {
+                        time -= UnityEngine.Time.fixedDeltaTime;
+                        Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
+                    }
+                    else
+                    {
+                        time -= UnityEngine.Time.fixedDeltaTime;
+                    }
                     if (time <= 0)
                     {
                         if (_levels.Count <= _level) _level = 0;
@@ -76,6 +91,7 @@ public class GameManager : MonoBehaviour
                         IsStartLevel = true;
                         index = 0;
                         time = _levels[_level].nextInterval;
+                        Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
                     }
                 }
                 else
@@ -96,30 +112,22 @@ public class GameManager : MonoBehaviour
                                 genPos = new Vector3(-20, -2f, 0);
 
                             Character character = null;
-                            int requsetNumber = Manager.Character.GenerateCharacter(enemyName, genPos, ref character);
-
-                            if (requsetNumber != 0)
+                            int requsetNumber = Manager.Character.GenerateCharacter(enemyName, genPos, ref character,false, (c) =>
                             {
-                                Manager.Character.AddGenerateRequset(requsetNumber, (c)
-                                    =>
+                                SummonCount++;
+                                c.DeadHandler += () =>
                                 {
-                                    SummonCount++;
-                                    c.DeadHandler += () =>
-                                    {
-                                        SummonCount--;
-                                    };
-                                    CustomCharacter customCharacter = c as CustomCharacter;
+                                    SummonCount--;
+                                    Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
+                                };
+                                CustomCharacter customCharacter = c as CustomCharacter;
 
-                                    if (levelCharacter.setupData != null)
-                                    {
-                                        customCharacter.SetSetup(levelCharacter.setupData);
-                                    }
-                                });
-                                _generateRequestList.Add(requsetNumber);
+                                if (levelCharacter.setupData != null)
+                                {
+                                    customCharacter.SetSetup(levelCharacter.setupData);
+                                }
+                            });
 
-
-
-                            }
                             if (character != null)
                             {
                                 SummonCount++;
@@ -135,6 +143,7 @@ public class GameManager : MonoBehaviour
                                 }
                             }
                         }
+                        Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
 
                         yield return new WaitForSeconds(_levels[_level].levelCharacterList[index].nextGenDelay);
 
@@ -146,6 +155,7 @@ public class GameManager : MonoBehaviour
                         {
                             IsStartLevel = false;
                             _level++;
+                            Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
                         }
                     }
                 }    
@@ -224,6 +234,28 @@ public class GameManager : MonoBehaviour
         pos.y = 10;
         Item item = null;
         Manager.Item.GenerateItem(ItemName.Supplies, pos, ref item);
+    }
+
+    public string SerializeData()
+    {
+        Util.StartWriteSerializedData();
+
+        Util.WriteSerializedData(IsStartLevel);
+        Util.WriteSerializedData(time);
+        Util.WriteSerializedData(SummonCount);
+
+
+        return Util.EndWriteSerializeData();
+    }
+
+    public void DeserializeData(string stringData)
+    {
+        if (stringData == null) return;
+        Util.StartReadSerializedData(stringData);
+
+        IsStartLevel = Util.ReadSerializedDataToBoolean();
+        time = Util.ReadSerializedDataToFloat();
+        SummonCount = Util.ReadSerializedDataToInt();
     }
 }
 

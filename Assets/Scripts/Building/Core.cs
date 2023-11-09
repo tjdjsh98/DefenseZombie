@@ -14,11 +14,11 @@ public class Core : MonoBehaviour, IBuildingOption
         _building.DestroyedHandler += OnDestroyed;
     }
 
-    public void DataDeserialize()
+    public void DeserializeData()
     {
 
     }
-    public void DataSerialize()
+    public void SerializeData()
     {
         
     }
@@ -27,5 +27,13 @@ public class Core : MonoBehaviour, IBuildingOption
     {
         UI_GameOver gameOver = Manager.UI.GetUI(Define.UIName.GameOver) as UI_GameOver;
         gameOver.GameOver();
+    }
+
+    public void SerializeControlData()
+    {
+    }
+
+    public void DeserializeControlData()
+    {
     }
 }

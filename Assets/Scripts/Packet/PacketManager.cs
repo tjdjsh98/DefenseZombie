@@ -44,6 +44,10 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_CharacterInfo, PacketHandler.C_CharacterInfoHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastCharacterInfo, MakePacket<S_BroadcastCharacterInfo>);
         _handler.Add((ushort)PacketID.S_BroadcastCharacterInfo, PacketHandler.S_BroadcastCharacterInfoHandler);
+      _makeFunc.Add((ushort)PacketID.C_ManagerInfo, MakePacket<C_ManagerInfo>);
+        _handler.Add((ushort)PacketID.C_ManagerInfo, PacketHandler.C_ManagerInfoHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastManagerInfo, MakePacket<S_BroadcastManagerInfo>);
+        _handler.Add((ushort)PacketID.S_BroadcastManagerInfo, PacketHandler.S_BroadcastManagerInfoHandler);
       _makeFunc.Add((ushort)PacketID.C_ItemInfo, MakePacket<C_ItemInfo>);
         _handler.Add((ushort)PacketID.C_ItemInfo, PacketHandler.C_ItemInfoHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastItemInfo, MakePacket<S_BroadcastItemInfo>);
@@ -52,6 +56,10 @@ public class PacketManager
         _handler.Add((ushort)PacketID.C_BuildingInfo, PacketHandler.C_BuildingInfoHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastBuildingInfo, MakePacket<S_BroadcastBuildingInfo>);
         _handler.Add((ushort)PacketID.S_BroadcastBuildingInfo, PacketHandler.S_BroadcastBuildingInfoHandler);
+      _makeFunc.Add((ushort)PacketID.C_BuildingControlInfo, MakePacket<C_BuildingControlInfo>);
+        _handler.Add((ushort)PacketID.C_BuildingControlInfo, PacketHandler.C_BuildingControlInfoHandler);
+      _makeFunc.Add((ushort)PacketID.S_BroadcastBuildingControlInfo, MakePacket<S_BroadcastBuildingControlInfo>);
+        _handler.Add((ushort)PacketID.S_BroadcastBuildingControlInfo, PacketHandler.S_BroadcastBuildingControlInfoHandler);
       _makeFunc.Add((ushort)PacketID.C_Damage, MakePacket<C_Damage>);
         _handler.Add((ushort)PacketID.C_Damage, PacketHandler.C_DamageHandler);
       _makeFunc.Add((ushort)PacketID.S_BroadcastDamage, MakePacket<S_BroadcastDamage>);

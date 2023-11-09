@@ -38,6 +38,8 @@ public class UI_Core : UIBase
                 _hpImage.rectTransform.sizeDelta = size;
                 _text.text = $"{_coreHp.Hp}/{_coreHp.MaxHp}";
                 _preHp = _coreHp.Hp;
+
+                
             }
         }
     }

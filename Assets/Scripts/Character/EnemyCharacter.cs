@@ -59,19 +59,8 @@ public class EnemyCharacter : Character
                 SetAnimatorBool("Walk", false);
             }
         }
-        if(!IsDamaged && !IsStagger) 
-        {
-            IsStagger = true;
-            SetAnimatorTrigger("Hit");
-            SetAnimatorBool("Stagger", IsStagger);
+        SetAnimatorBool("Damaged", IsDamaged);
 
-        }
-        if (!IsDamaged && IsStagger)
-        {
-            IsStagger = false;
-            SetAnimatorBool("Stagger", IsStagger);
-
-        }
         SetAnimatorBool("Attack", IsAttacking);
     }
 

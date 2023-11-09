@@ -56,10 +56,23 @@ public class Login : MonoBehaviour
             string ip = _inputField.text.TrimEnd();
             ip = ip.Remove(ip.Length - 1, 1);
 
+            client.Init(ip);
+        }
+    }
+
+    public void LoginLocal()
+    {
+        string clientName = "Client";
+        if (GameObject.Find(clientName) == null)
+        {
+            GameObject temp = new GameObject(clientName);
+            DontDestroyOnLoad(temp);
+            Client client = temp.AddComponent<Client>();
+
             IPHostEntry ipEntry = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress[] addr = ipEntry.AddressList;
+            string ip = addr[1].ToString();
 
-            ip = addr[1].ToString();
             client.Init(ip);
         }
     }

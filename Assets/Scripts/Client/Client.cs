@@ -57,13 +57,21 @@ public class Client : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "InGame") return;
 
         _clinet = this;
-        IPAddress ipAddr = IPAddress.Parse(ipAddress);
-        IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
-        Connector connecter = new Connector();
+        try
+        {
 
-        ip = ipAddress;
+            IPAddress ipAddr = IPAddress.Parse(ipAddress);
+            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
+            Connector connecter = new Connector();
 
-        connecter.Connect(endPoint, () => { return _session; }, EnterGame);
+            ip = ipAddress;
+
+            connecter.Connect(endPoint, () => { return _session; }, EnterGame, this);
+        }
+        catch
+        {
+            Destroy(this.gameObject);
+        }
 
     }
 
@@ -190,6 +198,18 @@ public class Client : MonoBehaviour
         Send(packet.Write());
     }
 
+    public void SendBuildingControlInfo(Building building)
+    {
+        if (Client.Instance.IsSingle) return;
+
+        C_BuildingControlInfo packet = new C_BuildingControlInfo();
+
+        packet.buildingId = building.BuildingId;
+        packet.data = building.SerializeControlData();
+
+        Send(packet.Write());
+    }
+
 
     public void SendRequestGenreateCharacter(CharacterName name, Vector3 position, int requestNumber, bool isPlayerCharacter)
     {
@@ -310,6 +330,17 @@ public class Client : MonoBehaviour
 
         packet.itemId = itemId;
         packet.requestNumber = requestNumber;
+
+        Send(packet.Write());
+    }
+
+    public void SendManagerInfo(ManagerName name, string data)
+    {
+        if (IsSingle) return;
+
+        C_ManagerInfo packet = new C_ManagerInfo();
+        packet.managerName = (int)name;
+        packet.data = data;
 
         Send(packet.Write());
     }

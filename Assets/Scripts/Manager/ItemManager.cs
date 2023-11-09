@@ -29,7 +29,7 @@ public class ItemManager : MonoBehaviour
 
     // 싱글, 멀티 혼용으로 아이템 생성
 
-    public int GenerateItem(ItemName itemName, Vector3 position, ref Item item)
+    public int GenerateItem(ItemName itemName, Vector3 position, ref Item item, Action<Item> addAction = null)
     {
         int requestNumber = -1;
 
@@ -39,7 +39,7 @@ public class ItemManager : MonoBehaviour
         }
         else
         {
-            requestNumber = RequestGenerateItem(itemName, position);
+            requestNumber = RequestGenerateItem(itemName, position,addAction);
         }
 
         return requestNumber;
@@ -74,9 +74,15 @@ public class ItemManager : MonoBehaviour
     }
 
     // 멀티 일 때 아이템 생성 서버에 요청
-    private int RequestGenerateItem(ItemName itemName, Vector3 position)
+    private int RequestGenerateItem(ItemName itemName, Vector3 position, Action<Item> addAction = null)
     {
         int requestNumber = UnityEngine.Random.Range(300, 700);
+
+        if (addAction != null)
+        {
+            _requestGenerateAction.Add(requestNumber, addAction);
+        }
+            
 
         Client.Instance.SendRequestGeneratingItem(itemName,position, requestNumber);
 
@@ -101,9 +107,15 @@ public class ItemManager : MonoBehaviour
     }
 
     // 멀티 일 때 아이템 삭제 서버에 요청
-    private int RequestRemoveItem(int itemId)
+    private int RequestRemoveItem(int itemId,Action removeAction = null)
     {
         int requestNumber = UnityEngine.Random.Range(500, 1000);
+
+        if (removeAction != null)
+        {
+            _requsetRemoveAction.Add(requestNumber, removeAction);
+        }
+
         Client.Instance.SendRequestRemoveItem(itemId, requestNumber);
 
         return requestNumber;
@@ -250,20 +262,11 @@ public class ItemManager : MonoBehaviour
     {
         while (true)
         {
-            //foreach(var item in _itemDictionary.Values)
-            //{
-            //    Client.Instance.SendItemInfo(item);
-            //}
+            foreach (var item in _itemDictionary.Values)
+            {
+                Client.Instance.SendItemInfo(item);
+            }
             yield return new WaitForSeconds(0.25f);
         }
-    }
-
-    public void AddGenerateRequset(int requestNumber, Action<Item> action)
-    {
-        _requestGenerateAction.Add(requestNumber, action);
-    }
-    public void AddRemoveRequset(int requestNumber, Action action)
-    {
-        _requsetRemoveAction.Add(requestNumber, action);
     }
 }

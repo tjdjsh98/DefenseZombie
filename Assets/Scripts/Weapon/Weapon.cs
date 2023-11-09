@@ -149,7 +149,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
     protected virtual void OnAttackKeyDown()
     {
         if (Manager.Building.IsDrawing) return;
-        if (_customCharacter != null && (_customCharacter.HoldingItem != null&&!_customCharacter.IsEquipWeapon)|| _customCharacter.HoldingBuilding != null) return;
+        if (_customCharacter != null && (_customCharacter.HoldingItem != null&&!_customCharacter.IsEquipWeapon)) return;
         if (_character.IsAttacking) return;
         if (WeaponData.AttackDelay > _attackTime) return;
 

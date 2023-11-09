@@ -26,10 +26,8 @@ public class CustomCharacter : Character
     // 캐릭터 상태
     public bool IsItemInteract { set; get; }
 
-    int _holdingBuildingId;
     int _holdingItemId;
     public Item HoldingItem => _holdingItemId == 0 ? null : Manager.Item.GetItem(_holdingItemId);
-    public Building HoldingBuilding => _holdingBuildingId == 0 ? null : Manager.Building.GetBuilding(_holdingBuildingId);
 
 
     // 가지고 나올 장구류
@@ -51,10 +49,6 @@ public class CustomCharacter : Character
     Vector3 _preLiftBuildingCharacterScale;
     Vector3 _preLiftBuildingBuildingScale;
 
-
-    bool _isThrow;
-    Vector2 _throwDirection;
-
     public override void Init()
     {
         base.Init();
@@ -66,7 +60,7 @@ public class CustomCharacter : Character
 
         SetAnimatorBool("IsFrontWeapon", true);
 
-        if(_setupData!= null)
+        if(_setupData!= null && (Client.Instance.IsSingle || Client.Instance.IsMain))
         {
             SetSetup(_setupData);
         }
@@ -78,23 +72,17 @@ public class CustomCharacter : Character
         ItemData itemData = Manager.Data.GetItemData(data.HatItem);
         if (itemData.ItemType == ItemType.Equipment)
         {
-            if(itemData.EquipmentData != null && itemData.EquipmentData.CharacterParts == CharacterParts.Hat)
+            if (itemData.EquipmentData != null && itemData.EquipmentData.CharacterParts == CharacterParts.Hat)
             {
                 Item item = null;
-                int requsetNumber = Manager.Item.GenerateItem(itemData.ItemName, transform.position, ref item);
-
+                int requsetNumber = Manager.Item.GenerateItem(itemData.ItemName, transform.position, ref item,
+                    (item) =>
+                    {
+                        _characterEquipment.EquipItem(item);
+                    });
                 if (item != null)
                 {
                     _characterEquipment.EquipItem(item);
-                }
-                else
-                {
-                    Manager.Item.AddGenerateRequset(requsetNumber, (item)
-                        =>
-                    {
-                        _characterEquipment.EquipItem(item);
-                    }
-                    );
                 }
             }
         }
@@ -104,20 +92,15 @@ public class CustomCharacter : Character
             if (itemData.EquipmentData == null)
             {
                 Item item = null;
-                int requsetNumber = Manager.Item.GenerateItem(itemData.ItemName, transform.position, ref item);
+                int requsetNumber = Manager.Item.GenerateItem(itemData.ItemName, transform.position, ref item,
+                        (item) =>
+                    {
+                        _characterEquipment.EquipItem(item);
+                    });
 
                 if (item != null)
                 {
                     _characterEquipment.EquipItem(item);
-                }
-                else
-                {
-                    Manager.Item.AddGenerateRequset(requsetNumber, (item)
-                        =>
-                    {
-                        _characterEquipment.EquipItem(item);
-                    }
-                    );
                 }
             }
         }
@@ -333,6 +316,7 @@ public class CustomCharacter : Character
         }
 
 
+        SetAnimatorBool("Damaged", IsDamaged);
 
         if (IsEnableAttack)
         {
@@ -359,7 +343,8 @@ public class CustomCharacter : Character
 
         if (IsItemInteract)
         {
-            ItemInteract();
+            if(!IsAttacking && !IsDamaged)
+                ItemInteract();
             IsItemInteract = false;
         }
 
@@ -393,7 +378,7 @@ public class CustomCharacter : Character
         }
         else
         {
-            if (!HoldingItem && !HoldingBuilding)
+            if (!HoldingItem)
             {
                 GrapSomething();
             }
@@ -410,62 +395,24 @@ public class CustomCharacter : Character
         _holdingItemId  = id;
     }
 
-    public bool ThrowItem()
-    {
-        if (Client.Instance.IsSingle || Client.Instance.IsMain)
-        {
-            if (HoldingItem && !IsEquipWeapon)
-            {
-                
-                Item item = HoldingItem;
-                ReleaseItem();
-                Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                mousePos.z = 0;
-                item.GetComponent<Projectile>()?.Throw(mousePos - transform.position, 5);
-
-                Client.Instance.SendItemInfo(item);
-                return true;
-            }
-        }
-        else
-        {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.z = 0;
-            _isThrow = true;
-            _throwDirection = mousePos - transform.position;
-            Client.Instance.SendCharacterControlInfo(this);
-            _isThrow = false;
-        }
-
-        return false;
-    }
-
-    public void ThrowItem(Vector3 direction)
-    {
-        Item item = HoldingItem;
-        if (item == null) return;
-        ReleaseItem();
-
-        item.GetComponent<Projectile>()?.Throw(direction, 5);
-
-        _isThrow = false;
-        _throwDirection = Vector3.zero;
-
-        Client.Instance.SendItemInfo(item);
-        Client.Instance.SendCharacterInfo(this);
-    }
-
     public GameObject GrapSomething()
     {
-        if (HoldingItem != null || HoldingBuilding) return null;
+        if (HoldingItem != null ) return null;
 
-        Item item = GetOverrapGameObject<Item>();
+        List<Item> items = GetOverrapGameObjects<Item>();
+        Item item = null;
+        float distance = 1000;
+        foreach(var i in items)
+        {
+            if ((i.transform.position - transform.position).magnitude < distance)
+            {
+                distance = (i.transform.position - transform.position).magnitude;
+                item = i;
+            }
+
+        }
         if (GrapItem(item))
             return item.gameObject;
-
-        Building building = GetOverrapGameObject<Building>();
-        if (GrapBuilding(building))
-            return building.gameObject;
 
         return null;
     }
@@ -473,7 +420,8 @@ public class CustomCharacter : Character
     public bool GrapItem(Item item)
     {
         if (item == null) return false;
-        if (HoldingItem || HoldingBuilding || IsEquipWeapon) return false;
+        if (HoldingItem || IsEquipWeapon) return false;
+
 
         bool isSuccess = true;
         if (!item.IsGraped && item.ItemData.ItemType == ItemType.Etc)
@@ -483,39 +431,15 @@ public class CustomCharacter : Character
         }
         else if (_characterEquipment.EquipItem(item))
         {
-            isSuccess = true;
+        }
+        else
+        {
+            isSuccess = false;
         }
 
         Client.Instance.SendCharacterInfo(this);
        
         return isSuccess;
-    }
-
-    public bool GrapBuilding(Building building)
-    {
-        bool success = false;
-        if (building == null) return success;
-        if (HoldingItem || HoldingBuilding || IsEquipWeapon) return success;
-
-        if (!building._isTile)
-        {
-            if (building.BuildingSize.width == 1)
-            {
-                Manager.Building.RemoveBuildingCoordinate(building);
-
-                _holdingItemId = building.BuildingId;
-                building.transform.parent = _liftPos.transform;
-                building.transform.localPosition = Vector3.zero;
-
-                _preLiftBuildingBuildingScale = building.transform.localScale;
-                _preLiftBuildingCharacterScale = transform.transform.localScale;
-
-                success = true;
-            }
-        }
-
-
-        return success;
     }
 
     // 아이템의 강체 고정을 해제
@@ -537,14 +461,12 @@ public class CustomCharacter : Character
             Item holdingItem = HoldingItem;
             if (holdingItem.ItemData.ItemType == ItemType.Etc)
             {
-                _isThrow = false;
                 holdingItem.ReleaseItem(this, true);
             }
             else if (holdingItem.ItemData.ItemType == ItemType.Equipment)
             {
                 if (_characterEquipment.TakeOffWeapon())
                 {
-                    _isThrow = false;
                 }
             }
             _holdingItemId = 0;
@@ -552,13 +474,6 @@ public class CustomCharacter : Character
         else if(_holdingItemId != 0) 
         {
             _holdingItemId = 0;
-        }
-        if (HoldingBuilding)
-        {
-            if (Manager.Building.SetBuilding(gameObject, transform.position + (transform.localScale.x > 0 ? Vector3.right : Vector3.left), HoldingBuilding))
-            {
-                _holdingBuildingId = 0;
-            }
         }
 
     }
@@ -573,26 +488,6 @@ public class CustomCharacter : Character
         scale.x = direction > 0 ? 1 : -1;
         transform.localScale = scale;
 
-        if (HoldingBuilding)
-        {
-            GameObject building = HoldingBuilding.gameObject;
-            if (_preLiftBuildingCharacterScale.x == transform.localScale.x)
-            {
-                if (building.transform.localScale.x != _preLiftBuildingBuildingScale.x)
-                {
-                    building.transform.localScale = _preLiftBuildingBuildingScale;
-                }
-            }
-            else
-            {
-                if (building.transform.localScale.x == _preLiftBuildingBuildingScale.x)
-                {
-                    Vector3 temp = _preLiftBuildingBuildingScale;
-                    temp.x = -_preLiftBuildingBuildingScale.x;
-                    building.transform.localScale = temp;
-                }
-            }
-        }
     }
 
     public void RotationHand(Vector3 targetPos)
@@ -636,11 +531,10 @@ public class CustomCharacter : Character
     {
         Util.StartWriteSerializedData();
 
-
-
-
+        Util.WriteSerializedData(IsDamaged);
         Util.WriteSerializedData(_holdingItemId);
-        Util.WriteSerializedData(_holdingBuildingId);
+        Util.WriteSerializedData(IsHide);
+
 
         foreach (var option in _optionList)
         {
@@ -658,10 +552,21 @@ public class CustomCharacter : Character
         if (string.IsNullOrEmpty(stringData)) return;
         Util.StartReadSerializedData(stringData);
 
-        
-
+        bool _isDamaged = Util.ReadSerializedDataToBoolean();
+        if (_isDamaged && _isDamaged != IsDamaged)
+        {
+            
+            if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
+            _shakingCoroutine = StartCoroutine(CorShaking());
+        }
+        SetAnimatorBool("Damaged", _isDamaged);
+        IsDamaged = _isDamaged;
         _holdingItemId = Util.ReadSerializedDataToInt();
-        _holdingBuildingId = Util.ReadSerializedDataToInt();
+        bool isHide = Util.ReadSerializedDataToBoolean();
+        if (!IsHide && isHide)
+            HideCharacter();
+        if (IsHide && !isHide)
+            ShowCharacter();
 
 
         foreach (var option in _optionList)
@@ -679,20 +584,16 @@ public class CustomCharacter : Character
         Util.WriteSerializedData(_characterMoveDirection.x);
         Util.WriteSerializedData(AttackType);
         Util.WriteSerializedData(IsAttacking);
+        Util.WriteSerializedData(IsEnableMoveWhileAttack);
         Util.WriteSerializedData(IsJumping);
         Util.WriteSerializedData(IsContactGround);
         Util.WriteSerializedData(IsConncetCombo);
-        Util.WriteSerializedData(IsHide);
         Util.WriteSerializedData(IsItemInteract);
 
         Util.WriteSerializedData(_frontHandPos.transform.localRotation.z);
         Util.WriteSerializedData(_frontHandPos.transform.localRotation.w);
         Util.WriteSerializedData(_behindHandPos.transform.localRotation.z);
         Util.WriteSerializedData(_behindHandPos.transform.localRotation.w);
-
-        Util.WriteSerializedData(_isThrow);
-        Util.WriteSerializedData(_throwDirection.x);
-        Util.WriteSerializedData(_throwDirection.y);
 
         return Util.EndWriteSerializeData();
     }
@@ -708,14 +609,12 @@ public class CustomCharacter : Character
         SetCharacterDirection(new Vector3(Util.ReadSerializedDataToFloat(), 0, 0));
         AttackType = Util.ReadSerializedDataToInt();
         IsAttacking = Util.ReadSerializedDataToBoolean();
+        IsEnableMoveWhileAttack = Util.ReadSerializedDataToBoolean();
         IsJumping = Util.ReadSerializedDataToBoolean();
         IsContactGround = Util.ReadSerializedDataToBoolean();
         IsConncetCombo = Util.ReadSerializedDataToBoolean();
-        bool isHide = Util.ReadSerializedDataToBoolean();
-        if (!IsHide && isHide)
-            HideCharacter();
-        if (IsHide && !isHide)
-            ShowCharacter();
+       
+      
 
         IsItemInteract = Util.ReadSerializedDataToBoolean();
         if(IsItemInteract)
@@ -731,17 +630,6 @@ public class CustomCharacter : Character
 
         _frontHandPos.transform.localRotation = new Quaternion(0, 0, frontHandRotationZ, frontHandRotationW);
         _behindHandPos.transform.localRotation = new Quaternion(0, 0, behindHandRotationZ, behindHandRotationW);
-
-        bool isThrow = Util.ReadSerializedDataToBoolean();
-        float throwDirectionX = Util.ReadSerializedDataToFloat();
-        float throwDirectionY = Util.ReadSerializedDataToFloat();
-
-
-        if (isThrow)
-        {
-            ThrowItem(new Vector3(throwDirectionX, throwDirectionY, 0));
-        }
-
     }
 
     public float GetFrontHandRotation()

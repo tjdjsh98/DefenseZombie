@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Debug = UnityEngine.Debug;
@@ -13,9 +9,12 @@ public class Connector
     Func<Session> _sessionFactory;
     Action _successConnectHandler;
 
-    public void Connect(IPEndPoint endPoint, Func<Session> sessionFactory,Action successConnectHandler)
+    public void Connect(IPEndPoint endPoint, Func<Session> sessionFactory,Action successConnectHandler,Client client)
     {
         Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+        if (socket == null)
+            UnityEngine.Object.Destroy(client.gameObject);
 
         _sessionFactory = sessionFactory;
         _successConnectHandler += successConnectHandler;

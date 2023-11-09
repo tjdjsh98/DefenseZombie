@@ -27,7 +27,10 @@ public class BuildingManager : MonoBehaviour
 
     GameObject _tileFolder;
 
-    public Action<int> ReciveRemoveBuildingPacketHandler;
+    Dictionary<int, Action<Building>> _requestGenerateAction = new Dictionary<int, Action<Building>>();
+    Dictionary<int, Action> _requsetRemoveAction = new Dictionary<int, Action>();
+
+
     public void Init()
     {
         _blankBox = Resources.Load<GameObject>("BlankBox");
@@ -172,25 +175,30 @@ public class BuildingManager : MonoBehaviour
     }
 
     // 혼용으로 건물 생성
-    public int GenerateBuilding(BuildingName name, Vector2Int cellPos, ref Building building)
+    public int GenerateBuilding(BuildingName name, Vector2Int cellPos, ref Building building, Action<Building> addAction = null)
     {
-        int requestNumber = -1;
+        int requestNumber = 0;
         if(Client.Instance.IsSingle)
         {
             building = GenerateBuilding(name, cellPos);
         }
         else
         {
-            requestNumber = RequestGeneratingBuilding(name, cellPos);
+            requestNumber = RequestGeneratingBuilding(name, cellPos,addAction);
         }
 
         return requestNumber;
     }
 
     // 멀티 일 때 서버에 건물 생성을 요청
-    private int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos)
+    private int RequestGeneratingBuilding(BuildingName name, Vector2Int cellPos, Action<Building> addAction = null)
     {
         int requestNumber = UnityEngine.Random.Range(100, 1000);
+
+        if (addAction != null)
+        {
+            _requestGenerateAction.Add(requestNumber, addAction);
+        }
 
         Client.Instance.SendRequestGeneratingBuilding(name, cellPos, requestNumber);
 
@@ -264,7 +272,7 @@ public class BuildingManager : MonoBehaviour
 
 
     // 혼용으로 건물 삭제
-    public int RemoveBuilding(int buildingId)
+    public int RemoveBuilding(int buildingId, Action removeAction = null)
     {
         int requsetNumber = -1;
         if(Client.Instance.IsSingle)
@@ -273,16 +281,21 @@ public class BuildingManager : MonoBehaviour
         }
         else
         {
-            requsetNumber = RequestRemoveBuilding(buildingId);
+            requsetNumber = RequestRemoveBuilding(buildingId, removeAction);
         }
 
         return requsetNumber;
     }
 
     // 멀티일 때 서버에 건물 삭제 요청
-    private int RequestRemoveBuilding(int buildingId)
+    private int RequestRemoveBuilding(int buildingId, Action removeAction = null)
     {
         int requestNumber = Random.Range(10, 1000);
+
+        if (removeAction != null)
+        {
+            _requsetRemoveAction.Add(requestNumber, removeAction);
+        }
 
         Client.Instance.SendRequestRemoveBuilding(buildingId, requestNumber);
 
@@ -375,7 +388,12 @@ public class BuildingManager : MonoBehaviour
             _buildingDictionary.Add(building.BuildingId, building);
         }
 
-        ReciveGenPacket?.Invoke(packet.requestNumber, building);
+        if (_requestGenerateAction.ContainsKey(packet.requestNumber))
+        {
+            _requestGenerateAction[packet.requestNumber]?.Invoke(building);
+            _requestGenerateAction.Remove(packet.requestNumber);
+        }
+
         return isSucess;
     }
 
@@ -428,7 +446,7 @@ public class BuildingManager : MonoBehaviour
                 building.AddCoordinate(pos);
             }
 
-            building.DeserializeData(info.data);
+            building.DeserializeData(info.data1);
 
             _buildingDictionary.Add(building.BuildingId,building);
         }
@@ -442,9 +460,17 @@ public class BuildingManager : MonoBehaviour
         Building building = null;
         if(_buildingDictionary.TryGetValue(id,out building))
         {
-            SingleRemoveBuilding(id);
+            RemoveBuildingCoordinate(building);
 
-            ReciveRemoveBuildingPacketHandler?.Invoke(packet.requestNumber);
+            _buildingDictionary.Remove(id);
+            Destroy(building.gameObject);
+
+            if (_requsetRemoveAction.ContainsKey(packet.requestNumber))
+            {
+                _requsetRemoveAction[packet.requestNumber]?.Invoke();
+                _requsetRemoveAction.Remove(packet.requestNumber);
+            }
+
         }
     }
 
@@ -566,5 +592,33 @@ public class BuildingManager : MonoBehaviour
         }
 
         return Vector2Int.one * -999;
+    }
+
+    public Building GetBuildingByName(BuildingName name)
+    {
+        foreach(var building in _buildingDictionary.Values)
+        {
+            if(building.BuildingName == name) return building;
+        }
+
+        return null;
+    }
+
+    public string SerializeData()
+    {
+        Util.StartWriteSerializedData();
+
+   
+
+        return Util.EndWriteSerializeData();
+    }
+
+    public void DeserializeData(string stringData)
+    {
+        if (stringData == null) return;
+
+        Util.StartReadSerializedData(stringData);
+
+
     }
 }

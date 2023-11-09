@@ -20,6 +20,16 @@ public class HpBar : MonoBehaviour
         _frontLine = transform.Find("Front").GetComponent<LineRenderer>();
         _text = transform.Find("Text").GetComponent<TextMeshPro>();
 
+
+        if (transform.parent.gameObject.tag == "Building" || transform.parent.gameObject.tag == "Player")
+        {
+            _frontLine.startColor = Color.blue;
+            _frontLine.endColor = Color.blue;
+            _backLine.startColor = new Color(0,8/255f,96/255f);
+            _backLine.endColor= new Color(0,8/255f,96/255f);
+        }
+
+
     }
 
     void Update()

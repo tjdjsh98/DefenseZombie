@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5130b598b0cce6049a818ef31fdc159d, type: 3}
   m_Name: ArchorSetting
   m_EditorClassIdentifier: 
-  <HatItem>k__BackingField: 12
+  <HatItem>k__BackingField: 11
   <WeaponItem>k__BackingField: 13

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Define;
 
@@ -53,18 +54,25 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
         _boxCollider = GetComponent<BoxCollider2D>();
         
         _buildingOptionList = GetComponents<IBuildingOption>().ToList();
-        foreach(var option in _buildingOptionList)
+        foreach (var option in _buildingOptionList)
+        {
             option.Init();
+        }
         Hp = MaxHp;
+
+        _originLayer = gameObject.layer;
 
         if (Blueprint.BlueprintItemList.Count > 0)
         {
-            _originLayer = gameObject.layer;
             gameObject.layer = UnconstructedBuildingLayer;
             _time = 0;
             Color color = new Color(1, 1, 1, 0.2f);
             foreach (var s in _spriteRenderers)
                 s.color = color;
+        }
+        else
+        {
+            _isConstuctDone = true;
         }
 
         InitDone= true;
@@ -163,6 +171,7 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
 
     public bool CheckIsFinish()
     {
+        if(_isConstuctDone) return true;
         bool isSuccess = true;
 
         for (int i = 0; i < Blueprint.BlueprintItemList.Count; i++)
@@ -195,6 +204,7 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
                 _circleSlider.Hide();
             _isConstuctDone = true;
             gameObject.layer = _originLayer;
+            Debug.Log("A");
         }
 
         return isSuccess;
@@ -221,6 +231,11 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
                 Util.WriteSerializedData(id);
             }
             
+        }
+
+        foreach (var option in _buildingOptionList)
+        {
+            option.SerializeData();
         }
 
         return Util.EndWriteSerializeData();
@@ -263,10 +278,44 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
             }
         }
         ItemChangedHandler?.Invoke(CheckIsFinish());
+
+        foreach (var option in _buildingOptionList)
+        {
+            option.DeserializeData();
+        }
+
+    }
+
+    public string SerializeControlData()
+    {
+        Util.StartWriteSerializedData();
+
+        foreach (var option in _buildingOptionList)
+        {
+            option.SerializeControlData();
+        }
+
+        return Util.EndWriteSerializeData();
+    }
+
+    public void DeserializeControlData(string stringData)
+    {
+        if (stringData == null) return;
+
+        Util.StartReadSerializedData(stringData);
+
+        foreach (var option in _buildingOptionList)
+        {
+            option.DeserializeControlData();
+        }
+
+        return;
     }
 
     public void SyncBuildingInfo(S_BroadcastBuildingInfo packet)
     {
+        if (Client.Instance.IsMain) return;
+
         if (packet == null) return;
 
         transform.position = new Vector3(packet.posX,packet.posY);
@@ -274,4 +323,11 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
 
         DeserializeData(packet.data);
     }
+    public void SyncBuildingControlInfo(S_BroadcastBuildingControlInfo packet)
+    {
+        if (packet == null) return;
+
+        DeserializeControlData(packet.data);
+    }
+
 }

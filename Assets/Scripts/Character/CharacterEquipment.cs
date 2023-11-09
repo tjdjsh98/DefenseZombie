@@ -43,12 +43,11 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
     public bool EquipItem(Item item)
     {
+        if (item == null) return false;
         if(item.ItemData.ItemType != ItemType.Equipment) return false;
 
         if (item.ItemData.EquipmentData == null)
         {
-           
-
             if (EquipWeapon(item))
             {
                 _customCharacter.SetHoldingItemId(item.ItemId);
@@ -111,6 +110,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         item.IsGraped = true;
         item.Hide();
+
         _weaponId = item.ItemId;
 
         EquipmentChanged?.Invoke();
@@ -267,7 +267,6 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         if(_hatItemId != hatItemId)
         {
-            Debug.Log(hatItemId);
             if (hatItemId != 0)
                 EquipOther(Manager.Item.GetItem(hatItemId));
             else
@@ -297,7 +296,9 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         if (_weaponId != weaponId)
         {
             if (weaponId != 0)
-                EquipWeapon(Manager.Item.GetItem(weaponId));
+            {
+                EquipItem(Manager.Item.GetItem(weaponId));
+            }
             else
                 TakeOffWeapon();
         }

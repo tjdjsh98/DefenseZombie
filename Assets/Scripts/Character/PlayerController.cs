@@ -111,7 +111,7 @@ public class PlayerController : MonoBehaviour, ICharacterOption
         if (Input.GetKeyDown(KeyCode.Z))
         {
             Item item = null;
-            Manager.Item.GenerateItem(Define.ItemName.ZeusSpear, transform.position + Vector3.right,ref item);
+            Manager.Item.GenerateItem(Define.ItemName.MagicStick, transform.position + Vector3.right,ref item);
         }
 
         if (_character.IsItemInteract == true)
@@ -193,11 +193,7 @@ public class PlayerController : MonoBehaviour, ICharacterOption
 
     void OnAttackKeyDown()
     {
-        if(_character.ThrowItem())
-        {
-            
-        }
-        else if(Manager.Building.IsDrawing)
+        if(Manager.Building.IsDrawing)
         {
             Manager.Building.PlayerRequestBuilding();
         }

@@ -57,7 +57,7 @@ public class CharacterManager : MonoBehaviour
     }
 
     // 싱글, 멀티 혼용으로 사용하는 캐릭터 생성 함수
-    public int GenerateCharacter(CharacterName name, Vector3 position,ref Character character, bool isPlayerCharacter = false)
+    public int GenerateCharacter(CharacterName name, Vector3 position,ref Character character, bool isPlayerCharacter = false,Action<Character> addAction = null)
     {
         int requestNumber = 0;
         if(Client.Instance.ClientId == -1)
@@ -66,7 +66,7 @@ public class CharacterManager : MonoBehaviour
         }
         else
         {
-            requestNumber = RequestGenerateCharacter(name, position,isPlayerCharacter);
+            requestNumber = RequestGenerateCharacter(name, position,isPlayerCharacter,addAction);
         }
 
         return requestNumber;
@@ -91,9 +91,15 @@ public class CharacterManager : MonoBehaviour
         return character;
     }
     // 멀티 일 떄 캐릭터 만드는 것을 서버에게 요청합니다.
-    private int RequestGenerateCharacter(CharacterName name, Vector3 position, bool isPlayerCharacter = false)
+    private int RequestGenerateCharacter(CharacterName name, Vector3 position, bool isPlayerCharacter = false, Action<Character> addAction = null)
     {
         int requestNumber = UnityEngine.Random.Range(3000, 99999);
+
+        if (addAction != null)
+        {
+            _requestGenerateAction.Add(requestNumber, addAction);
+        }
+
 
         Client.Instance.SendRequestGenreateCharacter(name, position, requestNumber, isPlayerCharacter);
 
@@ -101,22 +107,34 @@ public class CharacterManager : MonoBehaviour
     }
 
     // 싱글, 멀티 혼용으로 사용하는 캐릭터 삭제 함수
-    public void RemoveCharacter(int id)
+    public int RemoveCharacter(int id,Action removeAction = null)
     {
-        if(Client.Instance.ClientId == -1)
+        int requesetNumber = 0;
+        if (Client.Instance.ClientId == -1)
         {
             SingleRemoveCharacter(id);
         }
         else
         {
-            RequestRemoveCharacter(id);
+            requesetNumber = RequestRemoveCharacter(id,removeAction);
         }
+
+        return requesetNumber;
     }
 
     // 멀티 일 떄 캐릭터 삭제를 서버에게 요청합니다.
-    private void RequestRemoveCharacter(int id)
+    private int RequestRemoveCharacter(int id, Action removeAction = null)
     {
+        int requesetNumber = UnityEngine.Random.Range(3000, 99999);
+
+        if (removeAction != null)
+        {
+            _requsetRemoveAction.Add(requesetNumber, removeAction);
+        }
+
         Client.Instance.SendRequestRemoveCharacter(id);
+
+        return requesetNumber;
     }
 
     // 싱글 일 떄 캐릭터 삭제
@@ -198,14 +216,6 @@ public class CharacterManager : MonoBehaviour
         }
     }
 
-    public void AddGenerateRequset(int requestNumber, Action<Character> action)
-    {
-        _requestGenerateAction.Add(requestNumber, action);
-    }
-    public void AddRemoveRequset(int requestNumber, Action action)
-    {
-        _requsetRemoveAction.Add(requestNumber, action);
-    }
 
     public void RemoveCharacterByPacket(S_BroadcastRemoveCharacter pkt)
     {

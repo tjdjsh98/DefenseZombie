@@ -9,11 +9,11 @@ public class DropItemBuildingOption : MonoBehaviour, IBuildingOption
 
     [SerializeField] List<ItemName> data;
 
-    public void DataDeserialize()
+    public void DeserializeData()
     {
     }
 
-    public void DataSerialize()
+    public void SerializeData()
     {
     }
 
@@ -32,5 +32,13 @@ public class DropItemBuildingOption : MonoBehaviour, IBuildingOption
             Manager.Item.GenerateItem(data.GetRandom(), transform.position, ref item);
             _building.DestroyedHandler -= OnDestroyed;
         }
+    }
+
+    public void SerializeControlData()
+    {
+    }
+
+    public void DeserializeControlData()
+    {
     }
 }

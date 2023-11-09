@@ -76,7 +76,7 @@ public class UI_Smithy : UIBase
 
     public void PushCreateButton()
     {
-        _smithy.SetMainBlueprint(_smithy.ItemBlueprintDataList[_selectIndex]);
+        _smithy.SetMainBlueprint(_selectIndex);
 
         Close();
     }

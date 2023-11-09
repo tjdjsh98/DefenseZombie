@@ -8,11 +8,11 @@ using UnityEngine.TextCore.Text;
 using static Define;
 using Random = UnityEngine.Random;
 
-public class Character : MonoBehaviour,IHp, IDataSerializable
+public class Character : MonoBehaviour, IHp, IDataSerializable
 {
-    [field:SerializeField]public int CharacterId { set; get; } = -1;
+    [field: SerializeField] public int CharacterId { set; get; } = -1;
     protected Rigidbody2D _rigidBody;
-    [field: SerializeField]public CharacterName CharacterName {private set; get; }
+    [field: SerializeField] public CharacterName CharacterName { private set; get; }
     public Rigidbody2D RigidBody => _rigidBody;
     protected SpriteRenderer[] _spriteRenderers;
     protected CapsuleCollider2D _capsuleCollider;
@@ -23,7 +23,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     [SerializeField] protected Range _characterSize;
     public Range CharacterSize => _characterSize;
 
-    [SerializeField]protected bool _isEnableFly;
+    [SerializeField] protected bool _isEnableFly;
 
     protected Vector2 _characterMoveDirection;
     public Vector2 CharacterMoveDirection => _characterMoveDirection;
@@ -36,15 +36,15 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public int Hp { get { return _hp; } set { _hp = value; } }
     public bool _isSuperArmerWhenAttack;
 
-    [Range(0,100)][SerializeField] protected int _standing;
+    [Range(0, 100)][SerializeField] protected int _standing;
 
     public int AttackType { get; set; } = 0;
     // 속도
-    [SerializeField]protected float _accelSpeed = 2.0f;
+    [SerializeField] protected float _accelSpeed = 2.0f;
     [SerializeField] protected float _groundBreakSpeed;
     [SerializeField] protected float _airBreakSpeed;
-    protected float BreakSpeed => IsContactGround? _groundBreakSpeed : _airBreakSpeed;
-    [SerializeField]protected float _maxSpeed = 5.0f;
+    protected float BreakSpeed => IsContactGround ? _groundBreakSpeed : _airBreakSpeed;
+    [SerializeField] protected float _maxSpeed = 5.0f;
     public float Speed { set { _maxSpeed = value; } get { return _maxSpeed; } }
 
     // 점프
@@ -55,8 +55,8 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public Action<float> TurnedHandler;
 
     protected float _ySpeed;
-    public float YSpeed=>_ySpeed;
-    
+    public float YSpeed => _ySpeed;
+
 
     // 행동 제약
     public bool IsEnableMove { get; set; } = true;
@@ -69,7 +69,6 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public bool IsContactGround { set; get; }
     public bool IsConncetCombo { set; get; }
     public bool IsDodge { set; get; }
-    public bool IsStagger { set; get; }
 
     public bool IsDamaged { set; get; }
     public bool IsHide { set; get; }
@@ -80,9 +79,9 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     public Vector2 GetVelocity => _rigidBody.velocity;
 
-    Coroutine _damageCoroutine;
-    Coroutine _shakingCoroutine;
- 
+    protected Coroutine _damageCoroutine;
+    protected Coroutine _shakingCoroutine;
+
     //캐릭터가 더미라면 필요한 변수
     protected Vector3 _currentPos;
 
@@ -159,19 +158,8 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
             SetAnimatorBool("Walk", false);
         }
 
-        if (IsDamaged && !IsStagger)
-        {
-            IsStagger = true;
-            SetAnimatorTrigger("Hit");
-            SetAnimatorBool("Stagger", IsStagger);
+        SetAnimatorBool("Damaged", IsDamaged);
 
-        }
-        if (!IsDamaged && IsStagger)
-        {
-            IsStagger = false;
-            SetAnimatorBool("Stagger", IsStagger);
-
-        }
         SetAnimatorBool("Attack", IsAttacking);
     }
 
@@ -183,15 +171,15 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
             if (_rigidBody.velocity.x < 0)
             {
                 SetXVelocity(_rigidBody.velocity.x + BreakSpeed * Time.deltaTime);
-                    
+
                 if (_rigidBody.velocity.x > 0)
-                   SetXVelocity(0 * Time.deltaTime);
+                    SetXVelocity(0 * Time.deltaTime);
             }
             if (_rigidBody.velocity.x > 0)
             {
                 SetXVelocity(_rigidBody.velocity.x - BreakSpeed * Time.deltaTime);
                 if (_rigidBody.velocity.x < 0)
-                   SetXVelocity(0);
+                    SetXVelocity(0);
             }
 
             if (_isEnableFly)
@@ -256,7 +244,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
             else
             {
                 Turn(_rigidBody.velocity.x);
-                SetXVelocity(_rigidBody.velocity.x - _accelSpeed* Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime);
+                SetXVelocity(_rigidBody.velocity.x - _accelSpeed * Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime);
             }
 
             if (_rigidBody.velocity.x < -_maxSpeed)
@@ -310,31 +298,31 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
                     SetYVelocity(-_maxSpeed);
             }
         }
-        
 
-        if (!_isEnableFly&&_jumpCount == 0 && IsJumping)
+
+        if (!_isEnableFly && _jumpCount == 0 && IsJumping)
         {
             _rigidBody.AddForce(Vector2.up * _jumpPower, ForceMode2D.Impulse);
             IsJumping = false;
             _jumpCount++;
         }
-     
+
     }
 
     protected void SetXVelocity(float x)
     {
-        _rigidBody.velocity = new Vector3(x,_rigidBody.velocity.y);
+        _rigidBody.velocity = new Vector3(x, _rigidBody.velocity.y);
     }
     protected void SetYVelocity(float y)
     {
-        _rigidBody.velocity = new Vector3(_rigidBody.velocity.x,y);
+        _rigidBody.velocity = new Vector3(_rigidBody.velocity.x, y);
     }
 
     protected void CheckGround()
     {
         _ySpeed = _rigidBody.velocity.y;
 
-        if(Util.GetGameObjectByPhysics(transform.position, _groundCheckRange, LayerMask.GetMask("Ground")))
+        if (Util.GetGameObjectByPhysics(transform.position, _groundCheckRange, LayerMask.GetMask("Ground")))
         {
             IsJumping = false;
 
@@ -358,22 +346,22 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     public void AddForce(Vector2 direction, float power, int constraints = -1)
     {
-        if(constraints != -1)
+        if (constraints != -1)
             _rigidBody.constraints = (RigidbodyConstraints2D)constraints;
-        
-        if(power != 0)
-            _rigidBody.AddForce(direction.normalized * (power * (1-_standing/100f)), ForceMode2D.Impulse);
+
+        if (power != 0)
+            _rigidBody.AddForce(direction.normalized * (power * (1 - _standing / 100f)), ForceMode2D.Impulse);
     }
     public void Jump()
     {
-        if(_jumpCount == 0)
+        if (_jumpCount == 0)
         {
             IsJumping = true;
         }
     }
     public void StopMove()
     {
-        _rigidBody.velocity = new Vector2(0, _isEnableFly?0:_rigidBody.velocity.y);
+        _rigidBody.velocity = new Vector2(0, _isEnableFly ? 0 : _rigidBody.velocity.y);
     }
     public virtual void Turn(float direction)
     {
@@ -393,7 +381,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         _rigidBody.velocity = Vector2.zero;
         AddForce(attackDirection, power);
 
-        
+
         if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
         _shakingCoroutine = StartCoroutine(CorShaking());
 
@@ -402,8 +390,6 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         {
             if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
             _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
-
-
         }
 
         Hp -= dmg;
@@ -412,7 +398,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
         // 메인 클라가 아니고 다른 클라라면 데미지 패킷을 보냅니다.
         if (Client.Instance.IsMain)
-        { 
+        {
             Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
         }
         if (Hp <= 0)
@@ -425,28 +411,26 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         Manager.Character.RemoveCharacter(CharacterId);
     }
 
-    IEnumerator CorTurnToIdle(float time)
+    protected IEnumerator CorTurnToIdle(float time)
     {
-        if ( !_isSuperArmerWhenAttack)
+        if (!_isSuperArmerWhenAttack)
         {
             IsDamaged = true;
-            SetAnimatorBool("Stagger", true);
             yield return new WaitForSeconds(time);
 
             IsDamaged = false;
-            SetAnimatorBool("Stagger", false);
             Client.Instance.SendCharacterInfo(this);
 
             _damageCoroutine = null;
         }
     }
 
-    IEnumerator CorShaking()
+    protected IEnumerator CorShaking()
     {
         int count = 10;
         while (count-- > 0)
         {
-            _model.transform.localPosition = new Vector3((count%2==0?1:-1) * Random.Range(0.01f,0.03f), 0, 0);
+            _model.transform.localPosition = new Vector3((count % 2 == 0 ? 1 : -1) * Random.Range(0.01f, 0.03f), 0, 0);
 
             yield return new WaitForSeconds(0.05f);
         }
@@ -470,7 +454,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         return gameObjectList;
     }
 
-    public T GetOverrapGameObject<T>(int layerMask = -1) 
+    public T GetOverrapGameObject<T>(int layerMask = -1)
     {
         T gameObject = default(T);
 
@@ -486,7 +470,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         _rigidBody.isKinematic = true;
         _capsuleCollider.enabled = false;
 
-        foreach(var sr in _spriteRenderers)
+        foreach (var sr in _spriteRenderers)
         {
             sr.enabled = false;
         }
@@ -507,7 +491,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     {
         _rigidBody.velocity = velocity;
     }
-    
+
     public void Dodge()
     {
         if (!IsContactGround) return;
@@ -518,7 +502,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
     public void SetAnimatorBool(string name, bool value) => _animator.SetBool(name, value);
     public void SetAnimatorInteger(string name, int value) => _animator.SetInteger(name, value);
     public void SetAnimatorTrigger(string name) => _animator.SetTrigger(name);
-    public void ResetAnimatorTrigger(string name) => _animator.ResetTrigger(name); 
+    public void ResetAnimatorTrigger(string name) => _animator.ResetTrigger(name);
 
     public void SetAnimatorFloat(string name, float value) => _animator.SetFloat(name, value);
 
@@ -569,9 +553,9 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         _interval = _time;
         Util.StartWriteSerializedData();
 
-       
         Util.WriteSerializedData(IsHide);
-        
+        Util.WriteSerializedData(IsDamaged);
+
         foreach (var option in _optionList)
         {
             option.DataSerialize();
@@ -587,13 +571,19 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         if (string.IsNullOrEmpty(stringData)) return;
 
         Util.StartReadSerializedData(stringData);
-
-        
         bool isHide = Util.ReadSerializedDataToBoolean();
         if (!IsHide && isHide)
             HideCharacter();
         if (IsHide && !isHide)
             ShowCharacter();
+        bool _isDamaged = Util.ReadSerializedDataToBoolean();
+        SetAnimatorBool("Damaged", _isDamaged);
+        if (_isDamaged && _isDamaged != IsDamaged)
+        {
+            if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
+            _shakingCoroutine = StartCoroutine(CorShaking());
+        }
+        IsDamaged = _isDamaged;
 
 
         foreach (var option in _optionList)
@@ -604,7 +594,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
 
     public virtual string SeralizeControlData()
     {
-         Util.StartWriteSerializedData();
+        Util.StartWriteSerializedData();
         Util.WriteSerializedData(transform.localScale.x);
         Util.WriteSerializedData(_rigidBody.velocity.x);
         Util.WriteSerializedData(_rigidBody.velocity.y);
@@ -614,6 +604,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         Util.WriteSerializedData(IsJumping);
         Util.WriteSerializedData(IsContactGround);
         Util.WriteSerializedData(IsConncetCombo);
+
 
         return Util.EndWriteSerializeData();
     }
@@ -631,6 +622,7 @@ public class Character : MonoBehaviour,IHp, IDataSerializable
         IsJumping = Util.ReadSerializedDataToBoolean();
         IsContactGround = Util.ReadSerializedDataToBoolean();
         IsConncetCombo = Util.ReadSerializedDataToBoolean();
+      
     }
 }
 

@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingLayerID: 872912963
   m_SortingLayer: 1
   m_SortingOrder: -1
-  m_Sprite: {fileID: 21300000, guid: 7dd44b7048cce0340b9d50fb53e7e10e, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f7f750bb95c371b419ecd06ed4babd3c, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -153,7 +153,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 1}
+  m_Offset: {x: 0, y: 2}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -164,7 +164,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 2}
+  m_Size: {x: 3, y: 4}
   m_EdgeRadius: 0
 --- !u!50 &3626349123389245126
 Rigidbody2D:
@@ -211,11 +211,11 @@ MonoBehaviour:
   <Hp>k__BackingField: 10
   _size:
     isShow: 1
-    width: 1
-    height: 2
+    width: 4
+    height: 4
     pivotX: -1
     pivotY: 1
-    isPlace: 0101
+    isPlace: 01010101010101010101010101010101
   _buildingTime: 0
   _blueprint:
     _blueprintItmeList: []
@@ -298,6 +298,18 @@ PrefabInstance:
     - target: {fileID: 8961153112807148571, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
       propertyPath: m_Layer
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 9194280887300919191, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.b
+      value: 0.3773585
+      objectReference: {fileID: 0}
+    - target: {fileID: 9194280887300919191, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.g
+      value: 0.032349173
+      objectReference: {fileID: 0}
+    - target: {fileID: 9194280887300919191, guid: 141981a1a4179cc47a3dd2fead254d59, type: 3}
+      propertyPath: m_Parameters.colorGradient.key0.r
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

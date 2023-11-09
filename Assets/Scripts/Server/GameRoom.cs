@@ -21,6 +21,7 @@ public class GameRoom : IJobQueue
     Dictionary<int, Dictionary<int, BuildingInfo>> _buildingCoordiate = new Dictionary<int, Dictionary<int, BuildingInfo>>();
     Dictionary<int, ItemInfo> _itemDictionary = new Dictionary<int, ItemInfo>();
     Dictionary<int, ProjectileInfo> _projectileDictionary = new Dictionary<int, ProjectileInfo>();
+    Dictionary<int, ManagerInfo> _managerDictionary = new Dictionary<int, ManagerInfo>();
     static int _characterId = 1000;
     static int _buildingId = 0;
     static int _itemId = 0;
@@ -121,11 +122,17 @@ public class GameRoom : IJobQueue
                 hp= b.hp,
                 posX = b.posX,
                 posY = b.posY,
-                data= b.data,
+                data1 = b.data1,
+                data2 = b.data2,
+
             });
-            if (string.IsNullOrEmpty(packet.buildingInfos[packet.buildingInfos.Count - 1].data))
+            if (string.IsNullOrEmpty(packet.buildingInfos[packet.buildingInfos.Count - 1].data1))
             {
-                packet.buildingInfos[packet.buildingInfos.Count - 1].data = string.Empty;
+                packet.buildingInfos[packet.buildingInfos.Count - 1].data1 = string.Empty;
+            }
+            if (string.IsNullOrEmpty(packet.buildingInfos[packet.buildingInfos.Count - 1].data2))
+            {
+                packet.buildingInfos[packet.buildingInfos.Count - 1].data2 = string.Empty;
             }
         }
 
@@ -263,7 +270,7 @@ public class GameRoom : IJobQueue
             info.posY = packet.posY;
             info.cellPosX= packet.cellPosX;
             info.cellPosY = packet.cellPosY;
-            info.data = packet.data;
+            info.data1 = packet.data;
 
             // 모두에게 알린다
             S_BroadcastBuildingInfo pkt = new S_BroadcastBuildingInfo();
@@ -367,7 +374,8 @@ public class GameRoom : IJobQueue
                     buildingName = packet.buildingName,
                     cellPosX = packet.posX,
                     cellPosY = packet.posY,
-                    data = string.Empty,
+                    data1 = string.Empty,
+                    data2 = string.Empty,
                 };
 
                 _buildingDictionary.Add(info.buildingId, info);
@@ -540,5 +548,34 @@ public class GameRoom : IJobQueue
         }
     }
 
+    public void SyncBuildingControlInfo(C_BuildingControlInfo pkt)
+    {
+        BuildingInfo info = null;
 
+        if (_buildingDictionary.TryGetValue(pkt.buildingId, out info))
+        {
+            info.data2 = pkt.data;
+
+            S_BroadcastBuildingControlInfo sendPacket = new S_BroadcastBuildingControlInfo();
+            sendPacket.buildingId = pkt.buildingId;
+            sendPacket.data = pkt.data;
+
+
+            Broadcast(sendPacket.Write());
+        }
+    }
+    public void SyncManagerInfo(C_ManagerInfo pkt)
+    {
+        if (!_managerDictionary.ContainsKey(pkt.managerName))
+            _managerDictionary.Add(pkt.managerName, new ManagerInfo());
+
+        _managerDictionary[pkt.managerName].data = pkt.data;
+
+        S_BroadcastManagerInfo sendPacket = new S_BroadcastManagerInfo();
+
+        sendPacket.managerName = pkt.managerName;
+        sendPacket.data = pkt.data;
+
+        Broadcast(sendPacket.Write());
+    }
 }

@@ -29,12 +29,7 @@ public class Item : MonoBehaviour, IDataSerializable
         _rigidbody = GetComponent<Rigidbody2D>();   
 
         _spriteRenderer.sprite = _itemData.ItemSprite;
-
-
-        if(!Client.Instance.IsSingle  && Client.Instance.IsMain)
-        {
-            StartCoroutine(CorSendPacket());
-        }
+      
     }
     public void GrapItem(CustomCharacter character)
     {
@@ -167,15 +162,5 @@ public class Item : MonoBehaviour, IDataSerializable
         }
     }
 
-    IEnumerator CorSendPacket()
-    {
-        while (true)
-        {
-            if(Mathf.Abs(_rigidbody.velocity.x) > 0.01f || Mathf.Abs(_rigidbody.velocity.y) > 0.01f)
-            {
-                Client.Instance.SendItemInfo(this);
-            }
-            yield return new WaitForSeconds(0.25f);
-        }
-    }
+  
 }

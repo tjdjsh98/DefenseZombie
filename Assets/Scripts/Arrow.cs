@@ -7,35 +7,46 @@ using static Define;
 public class Arrow : Projectile
 {
     [SerializeField] float power = 10;
+    [SerializeField] EffectName _effect;
     private string _tag2;
+
+    bool _isHit = false;
 
     protected override void Awake()
     {
         base.Awake();
     }
 
-    protected virtual void OnTriggerEnter2D(Collider2D collision)
+    protected override void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == _tag || collision.gameObject.tag == _tag2)
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
         {
-            Character enemy = collision.gameObject.GetComponent<Character>();
-            Building building = collision.gameObject.GetComponent<Building>();
+            if (_isHit) return;
 
-            enemy?.Damage(1, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
-            building?.Damage(1);
-
-            if (enemy != null || building != null)
+            if (collision.gameObject.tag == _tag || collision.gameObject.tag == _tag2)
             {
-                collision.ClosestPoint(transform.position);
-                GameObject effect = null;
-                Manager.Effect.GenerateEffect(EffectName.Normal, collision.ClosestPoint(transform.position), ref effect);
-                Manager.Projectile.RemoveProjectile(ProjectileId);
+                Character enemy = collision.gameObject.GetComponent<Character>();
+                Building building = collision.gameObject.GetComponent<Building>();
 
+                enemy?.Damage(1, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
+                building?.Damage(1);
+                _isHit = true;
+
+                if (enemy != null || building != null)
+                {
+                    collision.ClosestPoint(transform.position);
+                    GameObject effect = null;
+                    Manager.Effect.GenerateEffect(_effect, collision.ClosestPoint(transform.position), ref effect);
+                    Manager.Projectile.RemoveProjectile(ProjectileId);
+                }
             }
-        }
-        if(_isDestroyOnGround&&collision.gameObject.tag == "Ground")
-        {
-            Manager.Projectile.RemoveProjectile(ProjectileId);
+            if (_isDestroyOnGround && (1 << collision.gameObject.layer) == Define.GroundLayerMask)
+            {
+                GameObject effect = null;
+                Manager.Effect.GenerateEffect(_effect, collision.ClosestPoint(transform.position), ref effect);
+                Manager.Projectile.RemoveProjectile(ProjectileId);
+                _isHit = true;
+            }
         }
     }
 

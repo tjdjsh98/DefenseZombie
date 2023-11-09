@@ -64,7 +64,8 @@ public static class Define
         Spear,
         Handgun,
         ZeusSpear,
-        Bow
+        Bow,
+        MagicStick
     }
 
     public enum ItemName
@@ -82,7 +83,8 @@ public static class Define
         ZeusSpear,
         WorkerHat,
         ArcherHat,
-        Bow
+        Bow,
+        MagicStick
     }
     public enum ItemType
     {
@@ -138,7 +140,8 @@ public static class Define
         Normal,
         Dash,
         Dust,
-        Thunder
+        Thunder,
+        Explosion
     }
     public enum ProjectileType
     {
@@ -150,7 +153,20 @@ public static class Define
     {
         Normal,
         Arrow,
-        Polar
+        Polar,
+        MagicBullet
+    }
+    public enum ManagerName
+    {
+        Building,
+        Character,
+        Data,
+        Effect,
+        Game,
+        Input,
+        Item,
+        Projectile,
+        UI
     }
 }
 

@@ -59,8 +59,12 @@ public interface ICharacterOption
 public interface IBuildingOption
 {
     public void Init();
-    public void DataSerialize();
+    public void SerializeData();
 
-    public void DataDeserialize();
+    public void DeserializeData();
+
+    public void SerializeControlData();
+    public void DeserializeControlData();
+
 }
 
