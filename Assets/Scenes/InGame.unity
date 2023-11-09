@@ -1577,7 +1577,7 @@ MonoBehaviour:
   - levelName: 1
     levelCharacterList:
     - characterName: 12
-      setupData: {fileID: 11400000, guid: ecb64d7f8ea10bf4f9cbf077b6e13137, type: 2}
+      setupData: {fileID: 0}
       spawnCount: 1
       isRandomSpawn: 0
       isRightSpawn: 0
@@ -3383,7 +3383,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1698891013}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.0075000003
+  m_Size: 0.0075
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
