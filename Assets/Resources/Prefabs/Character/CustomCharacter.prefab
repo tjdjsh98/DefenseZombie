@@ -1528,7 +1528,7 @@ MonoBehaviour:
     _behindHandSpriteLibraryAsset: {fileID: 7108339969198208228, guid: 34b7436451736b74ba9bc32f87da2688, type: 3}
     _frontWeaponSpriteLibraryAsset: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
     _behindWeaponSpriteLibraryAsset: {fileID: 7108339969198208228, guid: ee6361db189314c498de1b624dddc024, type: 3}
-    _hatSpriteLibraryAsset: {fileID: 0}
+    _hatSpriteLibraryAsset: {fileID: 7108339969198208228, guid: 1746d4ef8e7115c4fb1a5b8bde9a21dd, type: 3}
 --- !u!114 &3605417712847400353
 MonoBehaviour:
   m_ObjectHideFlags: 0

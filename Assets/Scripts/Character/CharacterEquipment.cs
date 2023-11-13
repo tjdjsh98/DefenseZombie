@@ -50,7 +50,6 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         {
             if (EquipWeapon(item))
             {
-                _customCharacter.SetHoldingItemId(item.ItemId);
                 return true;
             }
         }

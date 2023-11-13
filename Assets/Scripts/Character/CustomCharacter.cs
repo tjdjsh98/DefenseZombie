@@ -353,8 +353,9 @@ public class CustomCharacter : Character
     public void ItemInteract()
     {
         if (!Client.Instance.IsSingle && !Client.Instance.IsMain) return;
+
         // 무기를 제외한 아이템을 들고 있고 건물이 근처에 있다면 건축에 아이템을 넣음
-        if (HoldingItem != null && !IsEquipWeapon)
+        if (HoldingItem != null)
         {
             List<IEnableInsertItem> insertableList = GetOverrapGameObjects<IEnableInsertItem>();
 
@@ -420,7 +421,7 @@ public class CustomCharacter : Character
     public bool GrapItem(Item item)
     {
         if (item == null) return false;
-        if (HoldingItem || IsEquipWeapon) return false;
+        if (HoldingItem ) return false;
 
 
         bool isSuccess = true;
@@ -431,6 +432,7 @@ public class CustomCharacter : Character
         }
         else if (_characterEquipment.EquipItem(item))
         {
+
         }
         else
         {

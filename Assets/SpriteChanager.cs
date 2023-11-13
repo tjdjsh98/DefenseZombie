@@ -56,6 +56,9 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
         {
             switch (part)
             {
+                case CharacterParts.Hat:
+                    _spriteLibararyDictionary[CharacterParts.Hat].spriteLibraryAsset = _defaultSetUpParts._hatSpriteLibraryAsset;
+                    break;
                 case CharacterParts.Head:
                     _spriteLibararyDictionary[CharacterParts.Head].spriteLibraryAsset = _defaultSetUpParts._headSpriteLibraryAsset;
                     break;

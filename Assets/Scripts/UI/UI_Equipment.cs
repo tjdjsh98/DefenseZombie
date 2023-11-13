@@ -24,32 +24,32 @@ public class UI_Equipment : UIBase
     {
         gameObject.SetActive(false);
 
-        for(int i = 0; i < transform.childCount; i++)
+        for(int i = 0; i < transform.GetChild(0).childCount; i++)
         {
             bool success = false;
             CharacterParts part = CharacterParts.Head;
 
-            if(transform.GetChild(i).name.Equals("LegSlot"))
+            if(transform.GetChild(0).GetChild(i).name.Equals("LegSlot"))
             {
                 part = CharacterParts.Legs;
                 success = true;
             }
-            if (transform.GetChild(i).name.Equals("HandSlot"))
+            if (transform.GetChild(0).GetChild(i).name.Equals("HandSlot"))
             {
                 part = CharacterParts.FrontHand;
                 success = true;
             }
-            if (transform.GetChild(i).name.Equals("BodySlot"))
+            if (transform.GetChild(0).GetChild(i).name.Equals("BodySlot"))
             {
                 part = CharacterParts.Body;
                 success = true;
             }
-            if (transform.GetChild(i).name.Equals("WeaponSlot"))
+            if (transform.GetChild(0).GetChild(i).name.Equals("WeaponSlot"))
             {
                 part = CharacterParts.FrontWeapon;
                 success = true;
             }
-            if (transform.GetChild(i).name.Equals("HatSlot"))
+            if (transform.GetChild(0).GetChild(i).name.Equals("HatSlot"))
             {
                 part = CharacterParts.Hat;
                 success = true;
@@ -61,14 +61,14 @@ public class UI_Equipment : UIBase
                 Image backgroundImage = null;
                 TextMeshProUGUI text = null;
 
-                for (int j = 0; j < transform.GetChild(i).childCount; j++)
+                for (int j = 0; j < transform.GetChild(0).GetChild(i).childCount; j++)
                 {
-                    if (transform.GetChild(i).GetChild(j).name.Equals("Back"))
-                        backgroundImage = transform.GetChild(i).GetChild(j).GetComponent<Image>();
-                    if (transform.GetChild(i).GetChild(j).name.Equals("Image"))
-                        itemImage = transform.GetChild(i).GetChild(j).GetComponent<Image>();
-                    if (transform.GetChild(i).GetChild(j).name.Equals("Text"))
-                        text = transform.GetChild(i).GetChild(j).GetComponent<TextMeshProUGUI>();
+                    if (transform.GetChild(0).GetChild(i).GetChild(j).name.Equals("Back"))
+                        backgroundImage = transform.GetChild(0).GetChild(i).GetChild(j).GetComponent<Image>();
+                    if (transform.GetChild(0).GetChild(i).GetChild(j).name.Equals("Image"))
+                        itemImage = transform.GetChild(0).GetChild(i).GetChild(j).GetComponent<Image>();
+                    if (transform.GetChild(0).GetChild(i).GetChild(j).name.Equals("Text"))
+                        text = transform.GetChild(0).GetChild(i).GetChild(j).GetComponent<TextMeshProUGUI>();
                 }
 
                 _slots.Add(part,new EquipmentSlot() { itemBackground= backgroundImage , itemImage = itemImage, textMesh = text});
@@ -185,5 +185,18 @@ public class UI_Equipment : UIBase
                     _characterEquipment.TakeOffOther(part);
             }
         }
+    }
+
+    public void TakeOffHead()
+    {
+        _characterEquipment.TakeOffOther(CharacterParts.Head);
+    }
+    public void TakeOffWeapon()
+    {
+        _characterEquipment.TakeOffOther(CharacterParts.FrontWeapon);
+    }
+    public void TakeOffLegs()
+    {
+        _characterEquipment.TakeOffOther(CharacterParts.Legs);
     }
 }
