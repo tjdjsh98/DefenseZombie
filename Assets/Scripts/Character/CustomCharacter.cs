@@ -69,6 +69,8 @@ public class CustomCharacter : Character
 
     public void SetSetup(SetupData data)
     {
+        if (data == null) return;
+
         ItemData itemData = Manager.Data.GetItemData(data.HatItem);
         if (itemData.ItemType == ItemType.Equipment)
         {

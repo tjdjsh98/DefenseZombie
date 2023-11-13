@@ -6,12 +6,6 @@ using static Define;
 
 public class Arrow : Projectile
 {
-    [SerializeField] float power = 10;
-    [SerializeField] EffectName _effect;
-    private string _tag2;
-
-    bool _isHit = false;
-
     protected override void Awake()
     {
         base.Awake();
@@ -23,7 +17,7 @@ public class Arrow : Projectile
         {
             if (_isHit) return;
 
-            if (collision.gameObject.tag == _tag || collision.gameObject.tag == _tag2)
+            if (collision.gameObject.tag == _tag1 || collision.gameObject.tag == _tag2)
             {
                 Character enemy = collision.gameObject.GetComponent<Character>();
                 Building building = collision.gameObject.GetComponent<Building>();
@@ -85,7 +79,7 @@ public class Arrow : Projectile
 
     public override void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2)
     {
-        _tag = attackTag1.ToString();
+        _tag1 = attackTag1.ToString();
         _tag2 = attackTag2.ToString();
 
         _rigidbody.velocity = direction.normalized * power;

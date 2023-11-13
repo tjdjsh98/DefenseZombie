@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
+using static Define;
 
 public class Cannon : MonoBehaviour, IBuildingOption
 {
@@ -11,13 +12,13 @@ public class Cannon : MonoBehaviour, IBuildingOption
 
     [SerializeField] GameObject _cannonPos;
     [SerializeField] GameObject _firePoint;
-    [SerializeField] Projectile _projectile;
 
+    [SerializeField] ProjectileName _fireProjectileName;
 
     [SerializeField] float _coolTime;
     float _time;
 
-   
+    float _rotation;
 
     public void Init()
     {
@@ -31,9 +32,12 @@ public class Cannon : MonoBehaviour, IBuildingOption
     }
     void Update()
     {
-        Detect();
-        ControlCannon();
-        Fire();
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            Detect();
+            ControlCannon();
+            Fire();
+        }
     }
 
     void Detect()
@@ -47,10 +51,14 @@ public class Cannon : MonoBehaviour, IBuildingOption
     {
         if(_target == null) return;
 
-        float rotation = Mathf.Atan2((_target.transform.position.y - _cannonPos.transform.position.y), Mathf.Abs(_target.transform.position.x - _cannonPos.transform.position.x));
-        rotation = rotation / Mathf.PI * 180f;
+        Vector3 targetPos = _target.transform.position;
+        targetPos.x += +_target.CharacterSize.center.x * _target.transform.localScale.x;
+        targetPos.y += +_target.CharacterSize.center.y;
 
-        _cannonPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, rotation));
+        _rotation = Mathf.Atan2((targetPos.y - _cannonPos.transform.position.y), Mathf.Abs(targetPos.x - _cannonPos.transform.position.x));
+        _rotation = _rotation / Mathf.PI * 180f;
+
+        _cannonPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, _rotation));
     }
 
     void Fire()
@@ -58,25 +66,32 @@ public class Cannon : MonoBehaviour, IBuildingOption
         _time += Time.deltaTime;
         if(_coolTime <= _time && _target != null)
         {
-            Projectile projectile = Instantiate(_projectile);
-            float rotation = _cannonPos.transform.eulerAngles.z;
-            Vector3 direction = new Vector3(Mathf.Cos(rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
+            Projectile projectile = null;
+            Manager.Projectile.GenerateProjectile(_fireProjectileName, _firePoint.transform.position, ref projectile);
 
-            projectile.transform.position = _firePoint.transform.position;
+            if (projectile != null)
+            {
+                float rotation = _cannonPos.transform.eulerAngles.z;
+                Vector3 direction = new Vector3(Mathf.Cos(rotation * Mathf.Deg2Rad) * transform.localScale.x, Mathf.Sin(rotation * Mathf.Deg2Rad)).normalized;
 
-            projectile.Fire(direction, Define.CharacterTag.Enemy,Define.CharacterTag.Enemy);
+                projectile.transform.position = _firePoint.transform.position;
+
+                projectile.Fire(direction, Define.CharacterTag.Enemy, Define.CharacterTag.Enemy);
+            }
             _time = 0;
         }
     }
 
     public void SerializeData()
     {
-        
+        Util.WriteSerializedData(_rotation);
     }
 
     public void DeserializeData()
     {
-        
+        _rotation = Util.ReadSerializedDataToFloat();
+        _cannonPos.transform.localRotation = Quaternion.Euler(new Vector3(0, 0, _rotation));
+
     }
 
     public void SerializeControlData()

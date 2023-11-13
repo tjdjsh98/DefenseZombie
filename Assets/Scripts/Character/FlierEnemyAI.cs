@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class FlierEnemyAI : EnemyAI
 {
@@ -32,12 +33,20 @@ public class FlierEnemyAI : EnemyAI
         }
         else
         {
+            
             Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
             Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
-
             if (character != null || building != null)
             {
+                // 원거리 공격하는 캐릭터면 자신의 위치까지 올라가서 공격
+                if (_weapon.WeaponAttackData.projectile != null && !CheckIsEnoughFly())
+                {
+                    Vector3 moveDirection = Vector3.up;
+                    _character.SetCharacterDirection(moveDirection);
+
+                    return;
+                }
                 if (character != null)
                     _character.Turn(character.transform.position.x - transform.position.x);
                 if (building != null)
@@ -47,6 +56,10 @@ public class FlierEnemyAI : EnemyAI
                 _character.SetCharacterDirection(Vector2.zero);
                 _character.IsAttacking = true;
                 _character.IsEnableMoveWhileAttack = false;
+                if(character)
+                    _weapon.TargetPosition = character.transform.position;
+                if (building)
+                    _weapon.TargetPosition = building.transform.position;
                 Client.Instance.SendCharacterControlInfo(_character);
             }
             else

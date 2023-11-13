@@ -36,8 +36,6 @@ public class Server : MonoBehaviour
 
         _initDone = true;
 
-        //_jobFlushThread = new Thread(CorJobFlush);
-        //_jobFlushThread.Start();
     }
 
     private void Update()

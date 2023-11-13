@@ -103,6 +103,21 @@ public class InputManager : MonoBehaviour
         }
     }
 
+    public bool CheckIsOverlapUI()
+    {
+        var ped = new PointerEventData(null);
+
+        _uiRaycastGameObjects.Clear();
+
+        ped.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        GraphicRaycaster.Raycast(ped, results);
+
+        if (results.Count > 0) return true;
+
+        return false;
+    }
+
     public void Raycast()
     {
         RaycastHit2D[] hits = Physics2D.RaycastAll(MousePosition, Vector2.zero, 0);

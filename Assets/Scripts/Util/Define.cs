@@ -53,7 +53,8 @@ public static class Define
         Horriy,
         CustomCharacter,
         Bee,
-        CustomEnemy
+        CustomEnemy,
+        LightingBee
     }
 
     public enum WeaponName
@@ -154,7 +155,8 @@ public static class Define
         Normal,
         Arrow,
         Polar,
-        MagicBullet
+        MagicBullet,
+        LightingBall
     }
     public enum ManagerName
     {

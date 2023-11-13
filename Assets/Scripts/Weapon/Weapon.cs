@@ -46,7 +46,8 @@ public class Weapon : MonoBehaviour,ICharacterOption
 
     float _attackTime;
 
-    public Vector3 FireVector;
+    public Vector3 TargetPosition { set; get; }
+
 
     public virtual void Init()
     {
@@ -317,6 +318,34 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
                 
                 projectile?.Fire(direction, tag1, tag2);
+            }
+            else
+            {
+                int layerMask = gameObject.tag == "Enemy" ? Define.PlayerLayerMask : Define.EnemyLayerMask;
+
+                Vector3 firePoint = transform.position;
+                firePoint.x += transform.localScale.x * _defaultAttack.firePos.x;
+
+                Vector3 direction = TargetPosition- firePoint;
+
+                Projectile projectile = null;
+                Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
+
+                CharacterTag tag1 = CharacterTag.Enemy;
+                CharacterTag tag2 = CharacterTag.Enemy;
+                if (gameObject.tag == CharacterTag.Player.ToString())
+                {
+                    tag1 = CharacterTag.Enemy;
+                    tag2 = CharacterTag.Enemy;
+                }
+                else if (gameObject.tag == CharacterTag.Enemy.ToString())
+                {
+                    tag1 = CharacterTag.Player;
+                    tag2 = CharacterTag.Building;
+                }
+
+                projectile?.Fire(direction, tag1, tag2);
+                
             }
         }
     }

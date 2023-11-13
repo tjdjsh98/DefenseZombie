@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!221 &22100000
+AnimatorOverrideController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: LightingBee
+  m_Controller: {fileID: 9100000, guid: b95931e297baef844924eca4efe687a8, type: 2}
+  m_Clips:
+  - m_OriginalClip: {fileID: 7400000, guid: 7eaa6b53d53119542b611276991a7eb0, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 9aeffc30a9dbafb4e9485fef91f71e4f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: 39335378946f3e147b3fa74740e9d0da, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 9aeffc30a9dbafb4e9485fef91f71e4f, type: 2}
+  - m_OriginalClip: {fileID: 7400000, guid: caf1d002345997144a51ece9cb76b71a, type: 2}
+    m_OverrideClip: {fileID: 7400000, guid: 33385abfe3119f1429e127338d1ce714, type: 2}

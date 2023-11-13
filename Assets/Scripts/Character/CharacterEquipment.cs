@@ -38,6 +38,9 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         _customCharacter = GetComponent<CustomCharacter>();
         _spriteChanger = GetComponent<SpriteChanager>();
         _animator = GetComponent<Animator>();
+
+        _customCharacter.DeadHandler += OnDeaded;
+
         IsDone = true;
     }
 
@@ -303,4 +306,12 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         }
     }
 
+    void OnDeaded()
+    {
+        if (_hatItemId != 0) Manager.Item.DestroyItem(_hatItemId);
+        if (_weaponId != 0) Manager.Item.DestroyItem(_weaponId);
+        if (_bodyItemId != 0) Manager.Item.DestroyItem(_bodyItemId);
+        if (_handItemId != 0) Manager.Item.DestroyItem(_handItemId);
+        if (_legsItemId != 0) Manager.Item.DestroyItem(_legsItemId);
+    }
 }

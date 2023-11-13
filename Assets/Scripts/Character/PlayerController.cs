@@ -74,7 +74,7 @@ public class PlayerController : MonoBehaviour, ICharacterOption
         RotateWeapon();
 
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !Manager.Input.CheckIsOverlapUI())
             AttackKeyDownHandler?.Invoke();
         if (Input.GetMouseButtonUp(0))
             AttackKeyUpHandler?.Invoke();
