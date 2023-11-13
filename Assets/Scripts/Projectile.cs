@@ -55,8 +55,6 @@ public class Projectile : MonoBehaviour
                 building?.Damage(1);
                 _isHit = true;
 
-                Debug.Log("!");
-
                 if (enemy != null || building != null)
                 {
                     collision.ClosestPoint(transform.position);

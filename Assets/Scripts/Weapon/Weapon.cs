@@ -1,17 +1,18 @@
+using System.Net;
 using UnityEngine;
 using static Define;
 
-public class Weapon : MonoBehaviour,ICharacterOption
+public class Weapon : MonoBehaviour, ICharacterOption
 {
-    [SerializeField]protected Character _character;
-    [SerializeField]protected CustomCharacter _customCharacter;
+    [SerializeField] protected Character _character;
+    [SerializeField] protected CustomCharacter _customCharacter;
     protected PlayerController _playerController;
     protected HelperAI _helperAi;
     protected AnimatorHandler _animatorHandler;
 
     [SerializeField] protected int _attackType;
     [SerializeField] protected AttackData _defaultAttack;
-    
+
     [SerializeField] GameObject _frontWeapon;
     [SerializeField] GameObject _frontfirePoint;
 
@@ -19,16 +20,16 @@ public class Weapon : MonoBehaviour,ICharacterOption
     [SerializeField] GameObject _behindfirePoint;
     public AttackData WeaponAttackData
     {
-        get 
+        get
         {
-            if(_customCharacter != null)
+            if (_customCharacter != null)
             {
                 return _customCharacter.WeaponData.AttackList[_attackType];
             }
 
-          
+
             return _defaultAttack;
-          
+
         }
     }
     public WeaponData WeaponData
@@ -39,12 +40,14 @@ public class Weapon : MonoBehaviour,ICharacterOption
         }
     }
     [SerializeField] protected string _enableAttackLayer = "Enemy";
-    
+
     public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
 
     public bool IsDone { get; set; }
 
     float _attackTime;
+
+    public bool IsEnableAttack => _attackTime >= WeaponAttackData.attackDelay;
 
     public Vector3 TargetPosition { set; get; }
 
@@ -58,17 +61,17 @@ public class Weapon : MonoBehaviour,ICharacterOption
         _helperAi = GetComponent<HelperAI>();
         _animatorHandler = GetComponent<AnimatorHandler>();
 
-        if(_playerController != null)
+        if (_playerController != null)
         {
             _playerController.AttackKeyDownHandler += OnAttackKeyDown;
             _playerController.AttackKeyUpHandler += OnAttackKeyUp;
         }
-        else if(_helperAi != null)
+        else if (_helperAi != null)
         {
             _helperAi.AttackHanlder += OnAttackKeyDown;
         }
 
-        if (Client.Instance.ClientId == -1  || Client.Instance.IsMain)
+        if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
         {
             _animatorHandler.AttackHandler += Attack;
         }
@@ -80,7 +83,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
     public void Update()
     {
         if (!IsDone) return;
-        if (!_character.IsAttacking!)
+        if (!_character.IsAttacking)
             _attackTime += Time.deltaTime;
     }
 
@@ -150,9 +153,9 @@ public class Weapon : MonoBehaviour,ICharacterOption
     protected virtual void OnAttackKeyDown()
     {
         if (Manager.Building.IsDrawing) return;
-        if (_customCharacter != null && (_customCharacter.HoldingItem != null&&!_customCharacter.IsEquipWeapon)) return;
+        if (_customCharacter != null && (_customCharacter.HoldingItem != null && !_customCharacter.IsEquipWeapon)) return;
         if (_character.IsAttacking) return;
-        if (WeaponData.AttackDelay > _attackTime) return;
+        if (WeaponAttackData.attackDelay > _attackTime) return;
 
         _attackTime = 0;
         _character.IsAttacking = true;
@@ -180,13 +183,13 @@ public class Weapon : MonoBehaviour,ICharacterOption
     }
 
     public virtual void Attack()
-    {   
-        if(WeaponAttackData.actualAttackEffectName != Define.EffectName.None)
+    {
+        if (WeaponAttackData.actualAttackEffectName != Define.EffectName.None)
         {
             int layerMask = gameObject.tag == "Enemy" ? Define.PlayerLayerMask : Define.EnemyLayerMask;
-            Character character = Util.GetGameObjectByPhysics<Character>(transform.position,WeaponAttackData.attackRange,layerMask);
+            Character character = Util.GetGameObjectByPhysics<Character>(transform.position, WeaponAttackData.attackRange, layerMask);
 
-            if(character != null)
+            if (character != null)
             {
                 GameObject effect = null;
                 Manager.Effect.GenerateEffect(WeaponAttackData.actualAttackEffectName, character.transform.position, ref effect);
@@ -198,7 +201,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
             attackRange.center.x = (_character.gameObject.transform.localScale.x > 0 ? WeaponAttackData.attackRange.center.x : -WeaponAttackData.attackRange.center.x);
 
             int layerMask = LayerMask.GetMask(_enableAttackLayer) | Define.BuildingLayerMask;
-            RaycastHit2D[] hits = null ;
+            RaycastHit2D[] hits = null;
             if (_customCharacter != null)
             {
                 Matrix4x4 rotationMatrix = Matrix4x4.TRS(_frontWeapon.transform.position, _frontWeapon.transform.rotation, _frontWeapon.transform.localScale);
@@ -218,13 +221,13 @@ public class Weapon : MonoBehaviour,ICharacterOption
                         break;
                 }
             }
-            else if(_character != null)
+            else if (_character != null)
             {
                 switch (WeaponAttackData.attacKShape)
                 {
                     case Define.AttacKShape.Rectagle:
 
-                        hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size,0, Vector2.zero, 0, layerMask);
+                        hits = Physics2D.BoxCastAll(transform.position + attackRange.center, attackRange.size, 0, Vector2.zero, 0, layerMask);
                         break;
                     case Define.AttacKShape.Raycast:
                         hits = Physics2D.RaycastAll(transform.position + attackRange.center, transform.parent.localScale.x > 0 ? Vector2.right : Vector2.left, attackRange.size.x, layerMask);
@@ -243,7 +246,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 {
                     Character character = hit.collider.GetComponent<Character>();
                     Building building = hit.collider.GetComponent<Building>();
-                    
+
                     if (character != null && character != _character)
                     {
                         Camera.main.GetComponent<CameraMove>().ShakeCamera(WeaponAttackData.power, 0.4f);
@@ -262,7 +265,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
                         penetration++;
                         if (penetration > WeaponAttackData.penetrationPower) break;
                     }
-                    else if(_character.tag != CharacterTag.Player.ToString() && building != null)
+                    else if (_character.tag != CharacterTag.Player.ToString() && building != null)
                     {
                         if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
                         {
@@ -316,17 +319,27 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 }
                 Manager.Projectile.SetPacketDetail(direction, tag1, tag2);
                 Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
-                
+
                 projectile?.Fire(direction, tag1, tag2);
             }
             else
             {
                 int layerMask = gameObject.tag == "Enemy" ? Define.PlayerLayerMask : Define.EnemyLayerMask;
+                Character character = Util.GetGameObjectByPhysics<Character>(transform.position, WeaponAttackData.attackRange, layerMask);
+                Building building = Util.GetGameObjectByPhysics<Building>(transform.position, WeaponAttackData.attackRange, layerMask);
 
                 Vector3 firePoint = transform.position;
                 firePoint.x += transform.localScale.x * _defaultAttack.firePos.x;
 
-                Vector3 direction = TargetPosition- firePoint;
+                Vector3 direction = Vector3.zero;
+                if (character != null)
+                    direction = character.transform.position - firePoint;
+                else if (building != null)
+                    direction = building.transform.position - firePoint;
+                else
+                    direction = TargetPosition - firePoint;
+
+
 
                 Projectile projectile = null;
                 Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
@@ -345,7 +358,7 @@ public class Weapon : MonoBehaviour,ICharacterOption
                 }
 
                 projectile?.Fire(direction, tag1, tag2);
-                
+
             }
         }
     }

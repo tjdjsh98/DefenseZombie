@@ -101,8 +101,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.010134697, y: 0.3469334}
-  m_Size: {x: 0.46627045, y: 0.7616313}
+  m_Offset: {x: -0.00738585, y: 0.5659331}
+  m_Size: {x: 0.6614995, y: 1.1996307}
   m_Direction: 0
 --- !u!95 &2191531312672671651
 Animator:
@@ -186,7 +186,7 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 129.2, y: 10, z: 0}
   _attackDelay: 0
-  _flyHeight: 4
+  _flyHeight: 3
 --- !u!114 &8508093415058326129
 MonoBehaviour:
   m_ObjectHideFlags: 0

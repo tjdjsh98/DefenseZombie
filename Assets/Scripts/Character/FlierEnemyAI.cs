@@ -14,6 +14,8 @@ public class FlierEnemyAI : EnemyAI
         if (_target != null && !_target.gameObject.activeSelf) _target = null;
         if (_character.IsAttacking) return;
 
+        _attackTime+= Time.deltaTime;
+
         if (_character.IsDamaged)
         {
             _character.SetCharacterDirection(Vector2.zero);
@@ -47,20 +49,25 @@ public class FlierEnemyAI : EnemyAI
 
                     return;
                 }
-                if (character != null)
-                    _character.Turn(character.transform.position.x - transform.position.x);
-                if (building != null)
-                    _character.Turn(building.transform.position.x - transform.position.x);
 
-                _character.StopMove();
-                _character.SetCharacterDirection(Vector2.zero);
-                _character.IsAttacking = true;
-                _character.IsEnableMoveWhileAttack = false;
-                if(character)
-                    _weapon.TargetPosition = character.transform.position;
-                if (building)
-                    _weapon.TargetPosition = building.transform.position;
-                Client.Instance.SendCharacterControlInfo(_character);
+                if (_attackTime >= _attackDelay && _weapon.IsEnableAttack)
+                {
+                    _attackTime = 0;
+                    if (character != null)
+                        _character.Turn(character.transform.position.x - transform.position.x);
+                    if (building != null)
+                        _character.Turn(building.transform.position.x - transform.position.x);
+
+                    _character.StopMove();
+                    _character.SetCharacterDirection(Vector2.zero);
+                    _character.IsAttacking = true;
+                    _character.IsEnableMoveWhileAttack = false;
+                    if (character)
+                        _weapon.TargetPosition = character.transform.position;
+                    if (building)
+                        _weapon.TargetPosition = building.transform.position;
+                    Client.Instance.SendCharacterControlInfo(_character);
+                }
             }
             else
             {
