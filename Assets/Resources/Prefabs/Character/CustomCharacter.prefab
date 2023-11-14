@@ -1501,12 +1501,12 @@ MonoBehaviour:
     penetrationPower: 0
     actualAttackEffectName: 0
     isTargeting: 0
+    attackDelay: 0
   _frontWeapon: {fileID: 1456970922289170419}
   _frontfirePoint: {fileID: 8242404911779622583}
   _behindWeapon: {fileID: 281847820921104779}
   _behindfirePoint: {fileID: 3404647684127944724}
   _enableAttackLayer: Enemy
-  FireVector: {x: 0, y: 0, z: 0}
 --- !u!114 &8767798638352431458
 MonoBehaviour:
   m_ObjectHideFlags: 0

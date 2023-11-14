@@ -67,6 +67,18 @@ public interface IBuildingOption
 
     public void SerializeControlData();
     public void DeserializeControlData();
+}
 
+public interface IItemOption
+{
+    public bool IsDone { set; get; }
+    public void Init();
+
+    public void SerializeData();
+
+    public void DeserializeData();
+
+    public void SerializeControlData();
+    public void DeserializeControlData();
 }
 

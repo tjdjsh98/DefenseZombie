@@ -164,6 +164,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: WorkerHat_Item
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 40
+        width: 15
+        height: 12
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 458f51a4b569d91448c6d4841f1475f9
+      internalID: -803681318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: WorkerHat_Thumbnail
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 40
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb0f10c50c3b4e84e9e19643df1989bf
+      internalID: 1552131239
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -177,6 +219,8 @@ TextureImporter:
     nameFileIdTable:
       SoliderHat: -1256012406
       WorkerHat: -1714936550
+      WorkerHat_Item: -803681318
+      WorkerHat_Thumbnail: 1552131239
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -9,6 +9,7 @@ public class ItemData : ScriptableObject
 {
     [field: SerializeField] public ItemName ItemName { set; get; }
     [field: SerializeField] public Sprite ItemSprite { set; get; }
+    [field: SerializeField] public Sprite ItemThumbnail { set; get; }
     [field: SerializeField] public ItemType ItemType { set; get; }
     [field: SerializeField] public EquipmentData EquipmentData { set; get; }
 

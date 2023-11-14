@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <ItemName>k__BackingField: 13
   <ItemSprite>k__BackingField: {fileID: 877284915, guid: 5ff1ec67eb5d29446b81e7c4538739df, type: 3}
+  <ItemThumbnail>k__BackingField: {fileID: 1443134269, guid: 5ff1ec67eb5d29446b81e7c4538739df, type: 3}
   <ItemType>k__BackingField: 1
   <EquipmentData>k__BackingField: {fileID: 0}
-  <Origin>k__BackingField: {fileID: 0}
+  <Origin>k__BackingField: {fileID: 4421077721425903137, guid: acf6144238ff2554e8e85c1a07285cec, type: 3}

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Stone
   m_EditorClassIdentifier: 
   <ItemName>k__BackingField: 2
-  <ItemSprite>k__BackingField: {fileID: 21300000, guid: ac9fedb0c45c96f418facee6f84d7904, type: 3}
+  <ItemSprite>k__BackingField: {fileID: -1341213982, guid: ac9fedb0c45c96f418facee6f84d7904, type: 3}
+  <ItemThumbnail>k__BackingField: {fileID: 888811170, guid: ac9fedb0c45c96f418facee6f84d7904, type: 3}
   <ItemType>k__BackingField: 0
+  <EquipmentData>k__BackingField: {fileID: 0}
   <Origin>k__BackingField: {fileID: 0}

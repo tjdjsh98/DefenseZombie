@@ -33,6 +33,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     public Action EquipmentChanged { get; set; }
 
     public bool IsDone { set; get; }
+
     public void Init()
     {
         _customCharacter = GetComponent<CustomCharacter>();
@@ -115,6 +116,13 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         _weaponId = item.ItemId;
 
+        if (Manager.Character.MainCharacter == null || _customCharacter == Manager.Character.MainCharacter)
+        {
+            ItemAmmo itemAmmo = null;
+            if ((itemAmmo = item.GetComponent<ItemAmmo>()) != null)
+                (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Open(itemAmmo);
+        }
+
         EquipmentChanged?.Invoke();
 
 
@@ -144,6 +152,13 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         _equipWeaponName = WeaponName.None;
 
         Item item = Manager.Item.GetItem(_weaponId);
+
+        if (Manager.Character.MainCharacter == null|| _customCharacter == Manager.Character.MainCharacter)
+        {
+            ItemAmmo itemAmmo = null;
+            if ((itemAmmo = item.GetComponent<ItemAmmo>()) != null)
+                (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Close();
+        }
 
         item.Show();
         item.ReleaseItem(_customCharacter, putDown);

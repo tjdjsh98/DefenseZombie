@@ -20,6 +20,8 @@ public class Item : MonoBehaviour, IDataSerializable
 
     public bool IsFreeze => _rigidbody.isKinematic;
     
+    List<IItemOption> _optionList=  new List<IItemOption>();
+
     public void Init(ItemData itemData, int itemNumber)
     {
         _itemData = itemData;
@@ -29,7 +31,14 @@ public class Item : MonoBehaviour, IDataSerializable
         _rigidbody = GetComponent<Rigidbody2D>();   
 
         _spriteRenderer.sprite = _itemData.ItemSprite;
-      
+
+        IItemOption[] itemOptions = GetComponents<IItemOption>();
+
+        foreach (var o in itemOptions)
+        {
+            o.Init();
+            _optionList.Add(o);
+        }
     }
     public void GrapItem(CustomCharacter character)
     {

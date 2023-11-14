@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: ArcherHat
   m_EditorClassIdentifier: 
   <ItemName>k__BackingField: 12
-  <ItemSprite>k__BackingField: {fileID: 21300000, guid: 02136e85380e1c44090e2fbe1e91e162, type: 3}
+  <ItemSprite>k__BackingField: {fileID: -936460671, guid: 02136e85380e1c44090e2fbe1e91e162, type: 3}
+  <ItemThumbnail>k__BackingField: {fileID: -1791634093, guid: 02136e85380e1c44090e2fbe1e91e162, type: 3}
   <ItemType>k__BackingField: 1
   <EquipmentData>k__BackingField: {fileID: 11400000, guid: 0bec2313d2c4e83478c9f0df0aee40fd, type: 2}
   <Origin>k__BackingField: {fileID: 0}

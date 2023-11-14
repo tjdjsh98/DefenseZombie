@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Wood
   m_EditorClassIdentifier: 
   <ItemName>k__BackingField: 1
-  <ItemSprite>k__BackingField: {fileID: 21300000, guid: 26effcba0694a184ebd622e676d317d1, type: 3}
+  <ItemSprite>k__BackingField: {fileID: 1749814814, guid: 26effcba0694a184ebd622e676d317d1, type: 3}
+  <ItemThumbnail>k__BackingField: {fileID: 754545445, guid: 26effcba0694a184ebd622e676d317d1, type: 3}
   <ItemType>k__BackingField: 0
+  <EquipmentData>k__BackingField: {fileID: 0}
   <Origin>k__BackingField: {fileID: 0}

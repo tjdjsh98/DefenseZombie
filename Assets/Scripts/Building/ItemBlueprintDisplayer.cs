@@ -28,7 +28,7 @@ public class ItemBlueprintDisplayer : MonoBehaviour
     {
         ItemBlueprintData blueprint = _smithy.MainBlueprint;
 
-        _resultSpriteRenderer.sprite = Manager.Data.GetItemData(blueprint.ResultItemName).ItemSprite;
+        _resultSpriteRenderer.sprite = Manager.Data.GetItemData(blueprint.ResultItemName).ItemThumbnail;
         _resultSpriteRenderer.gameObject.SetActive(true);
 
         for (int i = 0; i < blueprint.BlueprintItemList.Count; i++)
@@ -37,12 +37,12 @@ public class ItemBlueprintDisplayer : MonoBehaviour
             {
                 GameObject slot = Instantiate(_requireItemOrigin, transform);
                 _slotList.Add(slot);
-                _slotImageList.Add(_slotList[i].transform.Find("Image").GetComponent<SpriteRenderer>());
+                _slotImageList.Add(_slotList[i].transform.Find("ItemImage").GetComponent<SpriteRenderer>());
                 _slotCountList.Add(_slotList[i].transform.Find("Count").GetComponent<TextMeshPro>());
             }
 
             ItemData itemData = Manager.Data.GetItemData(blueprint.BlueprintItemList[i].name);
-            _slotImageList[i].sprite = itemData.ItemSprite;
+            _slotImageList[i].sprite = itemData.ItemThumbnail;
             _slotCountList[i].text = $"{blueprint.BlueprintItemList[i].currentCount}/{blueprint.BlueprintItemList[i].requireCount}";
 
             Vector3 slotLocalPos = new Vector3(-(blueprint.BlueprintItemList.Count - 1) / 2f * 1.2f + i * 1.2f, 0, 0);
@@ -75,7 +75,7 @@ public class ItemBlueprintDisplayer : MonoBehaviour
             for (int i = 0; i < blueprint.BlueprintItemList.Count; i++)
             {
                 ItemData itemData = Manager.Data.GetItemData(blueprint.BlueprintItemList[i].name);
-                _slotImageList[i].sprite = itemData.ItemSprite;
+                _slotImageList[i].sprite = itemData.ItemThumbnail;
                 _slotCountList[i].text = $"{blueprint.BlueprintItemList[i].currentCount}/{blueprint.BlueprintItemList[i].requireCount}";
 
             }

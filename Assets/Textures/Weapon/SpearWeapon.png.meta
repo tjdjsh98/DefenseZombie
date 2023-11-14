@@ -206,6 +206,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Spear_Item
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 97
+        width: 10
+        height: 27
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00b8ba19f84e7c64898f6d607dc56b57
+      internalID: 168062408
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Spear_Thumbnail
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 97
+        width: 10
+        height: 27
+      alignment: 9
+      pivot: {x: 0.5, y: 0.44444445}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8f4a80c04071004f96ddeda255d6bc1
+      internalID: -1446891565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -221,6 +263,8 @@ TextureImporter:
       SpearWeapon_1: 1402136834
       SpearWeapon_2: 43753829
       SpearWeapon_3: 660531113
+      Spear_Item: 168062408
+      Spear_Thumbnail: -1446891565
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

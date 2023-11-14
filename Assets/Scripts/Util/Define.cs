@@ -133,7 +133,9 @@ public static class Define
         Debug,
         GameOver,
         Equipment,
-        Core
+        Core,
+        TextDisplayer,
+        Ammo    
     }
     public enum EffectName
     {

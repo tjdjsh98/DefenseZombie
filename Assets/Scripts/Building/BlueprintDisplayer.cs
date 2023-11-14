@@ -25,7 +25,7 @@ public class BlueprintDisplayer : MonoBehaviour
             {
                 GameObject slot = Instantiate(_requireItemOrigin, transform);
                 _slotList.Add(slot);
-                _slotImageList.Add(_slotList[i].transform.Find("Image").GetComponent<SpriteRenderer>());
+                _slotImageList.Add(_slotList[i].transform.Find("ItemImage").GetComponent<SpriteRenderer>());
                 _slotCountList.Add(_slotList[i].transform.Find("Count").GetComponent<TextMeshPro>());
             }
 

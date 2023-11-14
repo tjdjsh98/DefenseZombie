@@ -1,4 +1,3 @@
-using System.Net;
 using UnityEngine;
 using static Define;
 
@@ -6,9 +5,12 @@ public class Weapon : MonoBehaviour, ICharacterOption
 {
     [SerializeField] protected Character _character;
     [SerializeField] protected CustomCharacter _customCharacter;
+    protected CharacterEquipment _characterEquipment;
     protected PlayerController _playerController;
     protected HelperAI _helperAi;
     protected AnimatorHandler _animatorHandler;
+
+    ItemAmmo _itemAmmo;
 
     [SerializeField] protected int _attackType;
     [SerializeField] protected AttackData _defaultAttack;
@@ -18,6 +20,13 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
     [SerializeField] GameObject _behindWeapon;
     [SerializeField] GameObject _behindfirePoint;
+    public WeaponData WeaponData
+    {
+        get
+        {
+            return _customCharacter.WeaponData;
+        }
+    }
     public AttackData WeaponAttackData
     {
         get
@@ -32,16 +41,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
         }
     }
-    public WeaponData WeaponData
-    {
-        get
-        {
-            return _customCharacter.WeaponData;
-        }
-    }
     [SerializeField] protected string _enableAttackLayer = "Enemy";
-
-    public bool Controllable => _playerController != null && _character.CharacterId == Client.Instance.ClientId;
 
     public bool IsDone { get; set; }
 
@@ -51,16 +51,55 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
     public Vector3 TargetPosition { set; get; }
 
+    public Weapon ExternalWeapon { set; get; }
+
 
     public virtual void Init()
     {
         _character = GetComponent<Character>();
         _customCharacter = GetComponent<CustomCharacter>();
+        if (_customCharacter != null)
+        {
+            _characterEquipment = _customCharacter.GetComponent<CharacterEquipment>();
+            _characterEquipment.EquipmentChanged += () =>
+            {
+                ItemAmmo itemAmmo = null;
+                Item item = Manager.Item.GetItem(_characterEquipment.WeaponId);
+                if (item != null)
+                {
+                    itemAmmo = item.GetComponent<ItemAmmo>();
+                }
+                _itemAmmo = itemAmmo;
+            };
+        }
 
         _playerController = GetComponent<PlayerController>();
         _helperAi = GetComponent<HelperAI>();
         _animatorHandler = GetComponent<AnimatorHandler>();
 
+
+        RegisterControl();
+
+        IsDone = true;
+    }
+
+    public void RegisterExternalWeapon(Weapon weapon)
+    {
+        UnregisterControl();
+        weapon.Init();
+        weapon.RegisterControl();
+        ExternalWeapon = weapon;
+    }
+
+    public void UnregisterExternalWeapon()
+    {
+        ExternalWeapon.UnregisterControl();
+        RegisterControl();
+        ExternalWeapon = null;
+    }
+
+    void RegisterControl()
+    {
         if (_playerController != null)
         {
             _playerController.AttackKeyDownHandler += OnAttackKeyDown;
@@ -76,8 +115,24 @@ public class Weapon : MonoBehaviour, ICharacterOption
             _animatorHandler.AttackHandler += Attack;
         }
         _animatorHandler.AttackEndHandler += OnAttackEnd;
+    }
 
-        IsDone = true;
+    void UnregisterControl()
+    {
+        _animatorHandler.AttackEndHandler -= OnAttackEnd;
+        if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
+        {
+            _animatorHandler.AttackHandler -= Attack;
+        }
+        if (_playerController != null)
+        {
+            _playerController.AttackKeyDownHandler -= OnAttackKeyDown;
+            _playerController.AttackKeyUpHandler -= OnAttackKeyUp;
+        }
+        else if (_helperAi != null)
+        {
+            _helperAi.AttackHanlder -= OnAttackKeyDown;
+        }
     }
 
     public void Update()
@@ -156,6 +211,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
         if (_customCharacter != null && (_customCharacter.HoldingItem != null && !_customCharacter.IsEquipWeapon)) return;
         if (_character.IsAttacking) return;
         if (WeaponAttackData.attackDelay > _attackTime) return;
+        if (_itemAmmo != null && _itemAmmo.currentAmmon <= 0) return;
 
         _attackTime = 0;
         _character.IsAttacking = true;
@@ -184,6 +240,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
     public virtual void Attack()
     {
+        // 특수 공격
         if (WeaponAttackData.actualAttackEffectName != Define.EffectName.None)
         {
             int layerMask = gameObject.tag == "Enemy" ? Define.PlayerLayerMask : Define.EnemyLayerMask;
@@ -195,6 +252,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
                 Manager.Effect.GenerateEffect(WeaponAttackData.actualAttackEffectName, character.transform.position, ref effect);
             }
         }
+        // 근접 공격
         else if (WeaponAttackData.projectile == null)
         {
             Range attackRange = WeaponAttackData.attackRange;
@@ -283,6 +341,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
             }
         }
+        // 원거리 공격
         else
         {
             if (_customCharacter != null)
@@ -321,6 +380,11 @@ public class Weapon : MonoBehaviour, ICharacterOption
                 Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
 
                 projectile?.Fire(direction, tag1, tag2);
+
+                if (_itemAmmo != null)
+                {
+                    _itemAmmo.currentAmmon--;
+                }
             }
             else
             {

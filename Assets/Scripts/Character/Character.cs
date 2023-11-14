@@ -393,6 +393,7 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         }
 
         Hp -= dmg;
+        (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText(dmg.ToString(), transform.position + Vector3.up, Color.red, 5);
 
         if (Hp < 0) Hp = 0;
 

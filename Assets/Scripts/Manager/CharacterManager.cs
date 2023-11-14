@@ -8,16 +8,20 @@ public class CharacterManager : MonoBehaviour
     Character _main;
 
     public static int _characterId = 100;
+
+    bool _isGeneratringMain;
     public Character MainCharacter
     {
         get
         {
-            if (_main == null)
+            if (_main == null && !_isGeneratringMain)
             {
                 // ½Ì±Û ÀÌ¶§
                 if (Client.Instance.ClientId == -1)
                 {
+                    _isGeneratringMain= true;
                     Manager.Character.GenerateCharacter(CharacterName.CustomCharacter, Vector3.zero, ref _main);
+                    _isGeneratringMain = false;
                 }
                 else
                 {

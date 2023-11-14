@@ -38,6 +38,14 @@ public class UI_Smithy : UIBase
 
     }
 
+    private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Close();
+        }
+    }
+
 
     void Refresh()
     {
