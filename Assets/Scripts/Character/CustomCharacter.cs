@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -425,20 +426,33 @@ public class CustomCharacter : Character
         if (item == null) return false;
         if (HoldingItem ) return false;
 
+        bool isSuccess = false;
 
-        bool isSuccess = true;
-        if (!item.IsGraped && item.ItemData.ItemType == ItemType.Etc)
+        Item weaponItem = Manager.Item.GetItem(_characterEquipment.WeaponId);
+        ItemAmmo itemAmmo = null;
+        if (weaponItem!= null &&(itemAmmo = weaponItem.GetComponent<ItemAmmo>()) != null )
         {
-            item.GrapItem(this);
-            _holdingItemId = item.ItemId;
+            if(itemAmmo.RequireItem == item.ItemData)
+            {
+                itemAmmo.currentAmmo++;
+                Manager.Item.RemoveItem(item.ItemId);
+                isSuccess = true;
+            }
         }
-        else if (_characterEquipment.EquipItem(item))
-        {
 
-        }
-        else
+
+        if (!isSuccess)
         {
-            isSuccess = false;
+            if (!item.IsGraped && item.ItemData.ItemType == ItemType.Etc)
+            {
+                item.GrapItem(this);
+                _holdingItemId = item.ItemId;
+                isSuccess = true;
+            }
+            else if (_characterEquipment.EquipItem(item))
+            {
+                isSuccess = true;
+            }
         }
 
         Client.Instance.SendCharacterInfo(this);

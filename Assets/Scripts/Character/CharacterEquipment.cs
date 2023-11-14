@@ -75,6 +75,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     }
     bool EquipWeapon(Item item)
     {
+        if (_weaponId != 0) return false;
         if (item == null) return false;
 
         string ItemName = item.ItemData.ItemName.ToString();
@@ -116,11 +117,14 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         _weaponId = item.ItemId;
 
-        if (Manager.Character.MainCharacter == null || _customCharacter == Manager.Character.MainCharacter)
+        if (Manager.Data.GetWeaponData(_equipWeaponName).AttackList[0].projectile != null)
         {
-            ItemAmmo itemAmmo = null;
-            if ((itemAmmo = item.GetComponent<ItemAmmo>()) != null)
-                (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Open(itemAmmo);
+            if (Manager.Character.MainCharacter == null || _customCharacter == Manager.Character.MainCharacter)
+            {
+                ItemAmmo itemAmmo = null;
+                if ((itemAmmo = item.GetComponent<ItemAmmo>()) != null)
+                    (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Open(itemAmmo);
+            }
         }
 
         EquipmentChanged?.Invoke();
@@ -184,20 +188,27 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
             switch (part)
             {
                 case CharacterParts.Body:
+                    if (_bodyItemId != 0) return false;
                     _equipBodyName = equipmentName;
+                    _bodyItemId = item.ItemId;
                     break;
                 case CharacterParts.Legs:
+                    if (_legsItemId != 0) return false;
                     _equipLegsName = equipmentName;
+                    _legsItemId = item.ItemId;
                     break;
                 case CharacterParts.FrontHand:
+                    if (_handItemId != 0) return false;
                     _equipFrontHandName = equipmentName;
                     _handItemId = item.ItemId;
                     break;
                 case CharacterParts.BehindHand:
+                    if (_handItemId != 0) return false;
                     _equipBehindHandName = equipmentName;
                     _handItemId = item.ItemId;
                     break;
                 case CharacterParts.Hat:
+                    if (_handItemId != 0) return false;
                     _equipHatName = equipmentName;
                     _hatItemId = item.ItemId;
                     break;

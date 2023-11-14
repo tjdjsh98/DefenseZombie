@@ -121,7 +121,8 @@ public class GameManager : MonoBehaviour
                                     Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
                                 };
                                 CustomCharacter customCharacter = c as CustomCharacter;
-
+                                if(levelCharacter.hp != 0)
+                                    customCharacter.SetHp(levelCharacter.hp);
                                 if (levelCharacter.setupData != null)
                                 {
                                     customCharacter.SetSetup(levelCharacter.setupData);
@@ -276,4 +277,5 @@ public class LevelCharacter
     public bool isRandomSpawn;
     public bool isRightSpawn;
     public float nextGenDelay;
+    public int hp;
 }

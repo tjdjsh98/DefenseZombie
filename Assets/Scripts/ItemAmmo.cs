@@ -9,7 +9,7 @@ public class ItemAmmo : MonoBehaviour, IItemOption
 
     [field:SerializeField]public ItemData RequireItem { get; set; }
     [SerializeField] int _currnetAmmo;
-    public int currentAmmon
+    public int currentAmmo
     {
         get { return _currnetAmmo; }
         set { _currnetAmmo = value; AmmoChangedHandler?.Invoke(); }

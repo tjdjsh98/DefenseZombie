@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72baa7c15bd87584ba23783a00ba15a3, type: 3}
-  m_Name: Sword
+  m_Name: Dager
   m_EditorClassIdentifier: 
   <WeaponName>k__BackingField: 2
   <IsFrontWeapon>k__BackingField: 1
-  <ThumbnailSprite>k__BackingField: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
+  <ThumbnailSprite>k__BackingField: {fileID: -1451945383, guid: 4028348e4bbe07e458a91a4a069b8efd, type: 3}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: 5508cb133a6137544937384a230d8e0e, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: f5697f794ad9fec4a9df2d0bd998ee63, type: 2}
   <AttackList>k__BackingField:
@@ -28,7 +28,10 @@ MonoBehaviour:
       size: {x: 1.08, y: 1.49, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
-    damage: 1
+    damage: 2
     power: 2
     stagger: 0.2
     penetrationPower: 0
+    actualAttackEffectName: 0
+    isTargeting: 0
+    attackDelay: 0.5

@@ -12,6 +12,7 @@ public class ProjectileManager : MonoBehaviour
     Vector3 _direction;
     CharacterTag _tag1;
     CharacterTag _tag2;
+    int _damage;
 
     public void Init()
     {
@@ -28,11 +29,12 @@ public class ProjectileManager : MonoBehaviour
     }
 
 
-    public void SetPacketDetail(Vector3 direction, CharacterTag tag1, CharacterTag tag2)
+    public void SetPacketDetail(Vector3 direction, CharacterTag tag1, CharacterTag tag2, int damage)
     {
         _direction = direction;
         _tag1 = tag1;
         _tag2 = tag2;
+        _damage = _damage;
     }
 
 
@@ -74,7 +76,7 @@ public class ProjectileManager : MonoBehaviour
     {
         int requestNumber = Random.Range(100, 1000);
 
-        Client.Instance.SendRequestGenreateProjectile(projectileNmae, pos, requestNumber,_direction,_tag1,_tag2);
+        Client.Instance.SendRequestGenreateProjectile(projectileNmae, pos, requestNumber,_direction,_tag1,_tag2,_damage);
 
         return requestNumber;
     }
@@ -153,7 +155,7 @@ public class ProjectileManager : MonoBehaviour
 
         projectile.transform.position = pos;
         Vector3 fireDirection = new Vector3(packet.fireDirectionX, packet.fireDirectionY);
-        projectile.Fire(fireDirection, (CharacterTag)packet.characterTag1, (CharacterTag)packet.characterTag2);
+        projectile.Fire(fireDirection, (CharacterTag)packet.characterTag1, (CharacterTag)packet.characterTag2,packet.damage);
     }
 
 

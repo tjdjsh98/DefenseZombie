@@ -10,10 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc220a6ee54a4fd4da852c2bdf932562, type: 3}
-  m_Name: Sword
+  m_Name: Dager
   m_EditorClassIdentifier: 
   <ItemName>k__BackingField: 5
-  <ItemSprite>k__BackingField: {fileID: -495512950, guid: 203f61c80c0cf9a4097be49603e69f43, type: 3}
+  <ItemSprite>k__BackingField: {fileID: -832003534, guid: 4028348e4bbe07e458a91a4a069b8efd, type: 3}
+  <ItemThumbnail>k__BackingField: {fileID: -1451945383, guid: 4028348e4bbe07e458a91a4a069b8efd, type: 3}
   <ItemType>k__BackingField: 1
-  <EquipmentPart>k__BackingField: 6
+  <EquipmentData>k__BackingField: {fileID: 0}
   <Origin>k__BackingField: {fileID: 0}

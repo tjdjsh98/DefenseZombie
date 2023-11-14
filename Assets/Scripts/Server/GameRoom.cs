@@ -491,6 +491,7 @@ public class GameRoom : IJobQueue
         sendPacket.fireDirectionY = packet.fireDirectionY;
         sendPacket.characterTag1 = packet.characterTag1;
         sendPacket.characterTag2 = packet.characterTag2;
+        sendPacket.damage= packet.damage;
 
         BroadcastInGame(sendPacket.Write());
     }

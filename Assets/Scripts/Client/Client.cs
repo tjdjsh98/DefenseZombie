@@ -241,7 +241,7 @@ public class Client : MonoBehaviour
         Send(packet.Write());
     }
 
-    public void SendRequestGenreateProjectile(ProjectileName name, Vector3 position, int requestNumber, Vector3 direction, CharacterTag tag1, CharacterTag tag2)
+    public void SendRequestGenreateProjectile(ProjectileName name, Vector3 position, int requestNumber, Vector3 direction, CharacterTag tag1, CharacterTag tag2,int damage)
     {
         if (IsSingle) return;
         C_RequestGenerateProjectile packet = new C_RequestGenerateProjectile();
@@ -254,6 +254,7 @@ public class Client : MonoBehaviour
         packet.fireDirectionY = direction.y;
         packet.characterTag1 = (int)tag1;
         packet.characterTag2 = (int)tag2;
+        packet.damage = damage;
 
         Send(packet.Write());
     }

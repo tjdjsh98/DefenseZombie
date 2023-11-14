@@ -2310,6 +2310,7 @@ public class C_RequestGenerateProjectile : IPacket
 	public float fireDirectionY;
 	public int characterTag1;
 	public int characterTag2;
+	public int damage;
 
     public ushort Protocol { get { return (ushort)PacketID.C_RequestGenerateProjectile; } }
 
@@ -2341,6 +2342,9 @@ public class C_RequestGenerateProjectile : IPacket
 		count += sizeof(int);
 		
 		this.characterTag2 = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
+		this.damage = BitConverter.ToInt32(segment.Array, segment.Offset + count);
 		count += sizeof(int);
 		
     }
@@ -2376,6 +2380,9 @@ public class C_RequestGenerateProjectile : IPacket
 		Array.Copy(BitConverter.GetBytes(characterTag2), 0,segment.Array ,segment.Offset + count, sizeof(int));
 		count += sizeof(int);
 		
+		Array.Copy(BitConverter.GetBytes(damage), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
 
         Array.Copy(BitConverter.GetBytes(count), 0, segment.Array, segment.Offset, sizeof(ushort));
 
@@ -2395,6 +2402,7 @@ public class S_BroadcastGenerateProjectile : IPacket
 	public float fireDirectionY;
 	public int characterTag1;
 	public int characterTag2;
+	public int damage;
 
     public ushort Protocol { get { return (ushort)PacketID.S_BroadcastGenerateProjectile; } }
 
@@ -2434,6 +2442,9 @@ public class S_BroadcastGenerateProjectile : IPacket
 		this.characterTag2 = BitConverter.ToInt32(segment.Array, segment.Offset + count);
 		count += sizeof(int);
 		
+		this.damage = BitConverter.ToInt32(segment.Array, segment.Offset + count);
+		count += sizeof(int);
+		
     }
     public ArraySegment<byte> Write()
     {
@@ -2471,6 +2482,9 @@ public class S_BroadcastGenerateProjectile : IPacket
 		count += sizeof(int);
 		
 		Array.Copy(BitConverter.GetBytes(characterTag2), 0,segment.Array ,segment.Offset + count, sizeof(int));
+		count += sizeof(int);
+		
+		Array.Copy(BitConverter.GetBytes(damage), 0,segment.Array ,segment.Offset + count, sizeof(int));
 		count += sizeof(int);
 		
 

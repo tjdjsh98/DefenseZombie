@@ -409,7 +409,7 @@ MonoBehaviour:
     center: {x: -0.18, y: 0.51, z: 0}
     size: {x: 1.03, y: 1.28, z: 0}
   _isEnableFly: 0
-  _maxHp: 3
+  _maxHp: 5
   _isSuperArmerWhenAttack: 0
   _standing: 0
   _accelSpeed: 40
@@ -479,12 +479,12 @@ MonoBehaviour:
     penetrationPower: 0
     actualAttackEffectName: 0
     isTargeting: 0
+    attackDelay: 0
   _frontWeapon: {fileID: 5271968893856518667}
   _frontfirePoint: {fileID: 7831616519700213943}
   _behindWeapon: {fileID: 6797797859868578522}
   _behindfirePoint: {fileID: 4702175060621855360}
   _enableAttackLayer: Player
-  FireVector: {x: 0, y: 0, z: 0}
 --- !u!114 &6261214198764784204
 MonoBehaviour:
   m_ObjectHideFlags: 0

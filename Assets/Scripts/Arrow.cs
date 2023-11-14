@@ -11,39 +11,6 @@ public class Arrow : Projectile
         base.Awake();
     }
 
-    protected override void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (Client.Instance.IsSingle || Client.Instance.IsMain)
-        {
-            if (_isHit) return;
-
-            if (collision.gameObject.tag == _tag1 || collision.gameObject.tag == _tag2)
-            {
-                Character enemy = collision.gameObject.GetComponent<Character>();
-                Building building = collision.gameObject.GetComponent<Building>();
-
-                enemy?.Damage(1, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
-                building?.Damage(1);
-                _isHit = true;
-
-                if (enemy != null || building != null)
-                {
-                    collision.ClosestPoint(transform.position);
-                    GameObject effect = null;
-                    Manager.Effect.GenerateEffect(_effect, collision.ClosestPoint(transform.position), ref effect);
-                    Manager.Projectile.RemoveProjectile(ProjectileId);
-                }
-            }
-            if (_isDestroyOnGround && (1 << collision.gameObject.layer) == Define.GroundLayerMask)
-            {
-                GameObject effect = null;
-                Manager.Effect.GenerateEffect(_effect, collision.ClosestPoint(transform.position), ref effect);
-                Manager.Projectile.RemoveProjectile(ProjectileId);
-                _isHit = true;
-            }
-        }
-    }
-
     private void Update()
     {
         Vector3 dir = _rigidbody.velocity;
@@ -75,15 +42,6 @@ public class Arrow : Projectile
         }
 
         return false;
-    }
-
-    public override void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2)
-    {
-        _tag1 = attackTag1.ToString();
-        _tag2 = attackTag2.ToString();
-
-        _rigidbody.velocity = direction.normalized * power;
-
     }
 
 }

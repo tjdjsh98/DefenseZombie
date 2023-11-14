@@ -40,6 +40,6 @@ public class UI_Ammo : UIBase
         if (_itemAmmo == null) return;
 
         _image.sprite = _itemAmmo.RequireItem.ItemThumbnail;
-        _text.text = $"{_itemAmmo.currentAmmon}/{_itemAmmo.MaxAmmon}";
+        _text.text = $"{_itemAmmo.currentAmmo}/{_itemAmmo.MaxAmmon}";
     }
 }

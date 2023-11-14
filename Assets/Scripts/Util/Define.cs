@@ -61,7 +61,7 @@ public static class Define
     {
         None,
         Gun,
-        Sword,
+        Dager,
         Spear,
         Handgun,
         ZeusSpear,
@@ -76,7 +76,7 @@ public static class Define
         Stone,
         Iron,
         Gun,
-        Sword,
+        Dager,
         Spear,
         BeeHive,
         Supplies,

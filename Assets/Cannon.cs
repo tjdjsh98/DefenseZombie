@@ -76,7 +76,7 @@ public class Cannon : MonoBehaviour, IBuildingOption
 
                 projectile.transform.position = _firePoint.transform.position;
 
-                projectile.Fire(direction, Define.CharacterTag.Enemy, Define.CharacterTag.Enemy);
+                projectile.Fire(direction, Define.CharacterTag.Enemy, Define.CharacterTag.Enemy,3);
             }
             _time = 0;
         }

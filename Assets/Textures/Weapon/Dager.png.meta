@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 203f61c80c0cf9a4097be49603e69f43
+guid: 4028348e4bbe07e458a91a4a069b8efd
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -46,8 +46,8 @@ TextureImporter:
   spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 7
-  spritePivot: {x: 0.5, y: 0}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -123,64 +123,127 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: DefaultWeapon_0
+      name: Dager_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 32
+        width: 93
         height: 32
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.172043, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 32a977fab0312d64482571bf2f4cd9ae
-      internalID: -495512950
+      spriteID: 8abfae55890bbc3438d7f3d9314f303d
+      internalID: -153018716
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: DefaultWeapon_1
+      name: Dager_1
       rect:
         serializedVersion: 2
-        x: 32
+        x: 93
         y: 0
-        width: 32
+        width: 93
         height: 32
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 9
+      pivot: {x: 0.172043, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 79bf37f6b19f674419a67f9a58fcff3c
-      internalID: 1243579240
+      spriteID: 74c771da87614314996367f995e32fdc
+      internalID: 206801887
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: DefaultWeapon_2
+      name: Dager_2
       rect:
         serializedVersion: 2
-        x: 64
+        x: 186
         y: 0
-        width: 32
+        width: 93
         height: 32
-      alignment: 7
+      alignment: 9
+      pivot: {x: 0.172043, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d5507eb0b16a4604ba758fd5893d020d
+      internalID: -895766075
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dager_3
+      rect:
+        serializedVersion: 2
+        x: 279
+        y: 0
+        width: 93
+        height: 32
+      alignment: 9
+      pivot: {x: 0.172043, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6bdef7dc69d7e134fa9529487ca0669a
+      internalID: -564414020
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dager_Item
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 3
+        width: 4
+        height: 15
+      alignment: 9
       pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1ba1f8e2b736c094799aa9d7fc03afea
-      internalID: 173181258
+      spriteID: d7bee4d00fe851d4ea9c3333d453782b
+      internalID: -832003534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Dager_Thumbnail
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 3
+        width: 4
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b1ba8eff418fcc545aed1225b3a417c1
+      internalID: -1451945383
       vertices: []
       indices: 
       edges: []
@@ -196,9 +259,12 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      DefaultWeapon_0: -495512950
-      DefaultWeapon_1: 1243579240
-      DefaultWeapon_2: 173181258
+      Dager_0: -153018716
+      Dager_1: 206801887
+      Dager_2: -895766075
+      Dager_3: -564414020
+      Dager_Item: -832003534
+      Dager_Thumbnail: -1451945383
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -309,6 +309,12 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
 
     }
 
+    public void SetHp(int hp)
+    {
+        _maxHp = hp;
+        _hp = hp;
+    }
+
     protected void SetXVelocity(float x)
     {
         _rigidBody.velocity = new Vector3(x, _rigidBody.velocity.y);

@@ -12,11 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20f2c12f84e81014d9ff9e0330a3d41b, type: 3}
   m_Name: 1 1
   m_EditorClassIdentifier: 
-  <ResultItemName>k__BackingField: 4
+  <ResultItemName>k__BackingField: 5
   <BlueprintItemList>k__BackingField:
-  - name: 2
-    requireCount: 2
-    currentCount: 0
   - name: 1
+    itemIdList: 
     requireCount: 1
     currentCount: 0

@@ -26,6 +26,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] protected bool _autoDestroy;
     [SerializeField] protected float _destroyTime;
 
+    protected int _damage;
 
     protected bool _isDestroyOnGround = true;
 
@@ -51,8 +52,8 @@ public class Projectile : MonoBehaviour
                 Character enemy = collision.gameObject.GetComponent<Character>();
                 Building building = collision.gameObject.GetComponent<Building>();
 
-                enemy?.Damage(1, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
-                building?.Damage(1);
+                enemy?.Damage(_damage, transform.localScale.x > 0 ? Vector2.right : Vector2.left, 1, .5f);
+                building?.Damage(_damage);
                 _isHit = true;
 
                 if (enemy != null || building != null)
@@ -73,14 +74,11 @@ public class Projectile : MonoBehaviour
         }
     }
 
-    public virtual void Throw(Vector3 direction, float power)
+    public virtual void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2,int damage)
     {
-        _rigidbody.AddForce(direction.normalized * power,ForceMode2D.Impulse);
-    }
-    public virtual void Fire(Vector3 direction, CharacterTag attackTag1, CharacterTag attackTag2)
-    {
+        _damage = damage;
         _tag1 = attackTag1.ToString();
         _tag2 = attackTag2.ToString();
-        _rigidbody.velocity = direction * 10;
+        _rigidbody.velocity = direction.normalized * power;
     }
 }

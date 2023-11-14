@@ -211,7 +211,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
         if (_customCharacter != null && (_customCharacter.HoldingItem != null && !_customCharacter.IsEquipWeapon)) return;
         if (_character.IsAttacking) return;
         if (WeaponAttackData.attackDelay > _attackTime) return;
-        if (_itemAmmo != null && _itemAmmo.currentAmmon <= 0) return;
+        if (WeaponAttackData.projectile != null && _itemAmmo != null && _itemAmmo.currentAmmo <= 0) return;
 
         _attackTime = 0;
         _character.IsAttacking = true;
@@ -376,14 +376,14 @@ public class Weapon : MonoBehaviour, ICharacterOption
                     tag1 = CharacterTag.Player;
                     tag2 = CharacterTag.Building;
                 }
-                Manager.Projectile.SetPacketDetail(direction, tag1, tag2);
+                Manager.Projectile.SetPacketDetail(direction, tag1, tag2, WeaponAttackData.damage);
                 Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
 
-                projectile?.Fire(direction, tag1, tag2);
+                projectile?.Fire(direction, tag1, tag2, WeaponAttackData.damage);
 
                 if (_itemAmmo != null)
                 {
-                    _itemAmmo.currentAmmon--;
+                    _itemAmmo.currentAmmo--;
                 }
             }
             else
@@ -403,11 +403,6 @@ public class Weapon : MonoBehaviour, ICharacterOption
                 else
                     direction = TargetPosition - firePoint;
 
-
-
-                Projectile projectile = null;
-                Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
-
                 CharacterTag tag1 = CharacterTag.Enemy;
                 CharacterTag tag2 = CharacterTag.Enemy;
                 if (gameObject.tag == CharacterTag.Player.ToString())
@@ -421,7 +416,11 @@ public class Weapon : MonoBehaviour, ICharacterOption
                     tag2 = CharacterTag.Building;
                 }
 
-                projectile?.Fire(direction, tag1, tag2);
+                Projectile projectile = null;
+                Manager.Projectile.SetPacketDetail(direction, tag1, tag2,WeaponAttackData.damage);
+                Manager.Projectile.GenerateProjectile(WeaponAttackData.projectile.ProjectileName, firePoint, ref projectile);
+
+                projectile?.Fire(direction, tag1, tag2, WeaponAttackData.damage);
 
             }
         }

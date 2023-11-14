@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <WeaponName>k__BackingField: 3
   <IsFrontWeapon>k__BackingField: 1
-  <ThumbnailSprite>k__BackingField: {fileID: -2034105252, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
+  <ThumbnailSprite>k__BackingField: {fileID: -1446891565, guid: 464b41777cfc8dc49837b8918a943f49, type: 3}
   <WeaponSpriteLibrary>k__BackingField: {fileID: 7108339969198208228, guid: e0164a0d55e840d4babd5ccd5dfea5a0, type: 3}
   <AttackAnimationClip>k__BackingField: {fileID: 7400000, guid: d66d6ce1277566e4f85053bd04f5996a, type: 2}
   <AttackList>k__BackingField:
@@ -28,10 +28,10 @@ MonoBehaviour:
       size: {x: 1.96, y: 1.05, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
-    damage: 1
-    power: 2
+    damage: 3
+    power: 3
     stagger: 0.2
-    penetrationPower: 0
+    penetrationPower: 3
     actualAttackEffectName: 0
     isTargeting: 0
-  <AttackDelay>k__BackingField: 3
+    attackDelay: 2
