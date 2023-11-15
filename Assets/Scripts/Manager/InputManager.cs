@@ -16,12 +16,14 @@ public class InputManager : MonoBehaviour
     public Vector3 MousePosition { get { _mousePosition = _mainCamera.ScreenToWorldPoint(Input.mousePosition); return _mousePosition; } }
 
     public Action<List<GameObject>> UIMouseDownHandler;
+    public Action<List<GameObject>> UIMouse1DownHandler;
     public Action<List<GameObject>> UIMouseDragHandler;
     public Action<List<GameObject>> UIMouseUpHandler;
     public int _uiMouseDownSubcribeCount;
     List<GameObject> _uiRaycastGameObjects = new List<GameObject>();
 
     public Action<List<GameObject>> MouseDown;
+    public Action<List<GameObject>> Mouse1Down;
     public Action<List<GameObject>> MouseDraged;
     public Action<List<GameObject>> MouseUp;
     List<GameObject> _mouseRaycastGameobjects = new List<GameObject>();
@@ -49,7 +51,20 @@ public class InputManager : MonoBehaviour
             }
 
         }
+        if (Input.GetMouseButtonDown(1))
+        {
+            if (Mouse1Down != null)
+            {
+                Raycast();
+                Mouse1Down(_mouseRaycastGameobjects);
+            }
+            if (UIMouse1DownHandler != null)
+            {
+                RaycastUI();
+                UIMouse1DownHandler.Invoke(_uiRaycastGameObjects);
+            }
 
+        }
         if (Input.GetMouseButton(0))
         {
             if (MouseDraged != null)

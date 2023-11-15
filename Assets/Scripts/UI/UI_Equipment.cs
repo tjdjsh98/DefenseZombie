@@ -19,6 +19,8 @@ public class UI_Equipment : UIBase
 
     Dictionary<CharacterParts, EquipmentSlot> _slots = new Dictionary<CharacterParts, EquipmentSlot>();
 
+    UI_Description _uiDescription = null;
+    bool _isDescriptionOpen = false;
 
     public override void Init()
     {
@@ -88,6 +90,7 @@ public class UI_Equipment : UIBase
         if (_characterEquipment == null) return;
 
         Manager.Input.UIMouseDownHandler += OnMouseDown;
+        Manager.Input.UIMouse1DownHandler += OnMouse1Down;
 
         _characterEquipment.EquipmentChanged += Refresh;
         Refresh();
@@ -170,9 +173,16 @@ public class UI_Equipment : UIBase
 
         _characterEquipment.EquipmentChanged -= Refresh;
 
+        Manager.Input.UIMouseDragHandler -= OnMouse1Down;
         Manager.Input.UIMouseDownHandler -= OnMouseDown;
 
         _characterEquipment = null;
+
+        if (_uiDescription!=null && _uiDescription.gameObject.activeSelf && _isDescriptionOpen)
+        {
+            _uiDescription.Close();
+            _isDescriptionOpen= false;
+        }
 
         gameObject.SetActive(false);
 
@@ -191,6 +201,27 @@ public class UI_Equipment : UIBase
             }
         }
     }
+
+    void OnMouse1Down(List<GameObject> list)
+    {
+        foreach (var part in _slots.Keys)
+        {
+            if (list.Contains(_slots[part].itemBackground.gameObject))
+            {
+                if (_uiDescription == null)
+                    _uiDescription = Manager.UI.GetUI(UIName.Description) as UI_Description;
+
+                _uiDescription.OpenItemDescription(Manager.Item.GetItem(_characterEquipment.WeaponId), Vector3.zero);
+                _isDescriptionOpen = true;
+                return;
+            }
+        }
+
+
+        _uiDescription.Close();
+        _isDescriptionOpen = false;
+    }
+
 
     public void TakeOffHead()
     {

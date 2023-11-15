@@ -135,7 +135,8 @@ public static class Define
         Equipment,
         Core,
         TextDisplayer,
-        Ammo    
+        Ammo,
+        Description
     }
     public enum EffectName
     {

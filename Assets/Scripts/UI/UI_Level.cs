@@ -21,7 +21,7 @@ public class UI_Level : UIBase
         }
         else
         {
-            _timeText.text = Manager.Game.SummonCount.ToString();
+            _timeText.text = $"{Manager.Game.Level.ToString()} Round";
         }
     }
 }

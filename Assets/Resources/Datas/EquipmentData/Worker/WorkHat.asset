@@ -14,4 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <CharacterParts>k__BackingField: 8
   <EquipmentName>k__BackingField: 2
+  <AddDefense>k__BackingField: 1
+  <AddHp>k__BackingField: 3
+  <AddSpeed>k__BackingField: 1
   <SpriteLibraryAsset>k__BackingField: {fileID: 7108339969198208228, guid: f610c68f092d97a45a2f8393ea1da4ef, type: 3}

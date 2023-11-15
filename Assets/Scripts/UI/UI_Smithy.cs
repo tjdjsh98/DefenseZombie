@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using static Define;
@@ -11,6 +12,7 @@ public class UI_Smithy : UIBase
 
     [SerializeField]List<Image> _slotImageList = new List<Image>();
     [SerializeField]List<Image> _stuffItemImageList = new List<Image>();
+    List<TextMeshProUGUI> _stuffItemCountList = new List<TextMeshProUGUI>();
 
     int _selectIndex = 0;
 
@@ -19,6 +21,11 @@ public class UI_Smithy : UIBase
     public override void Init()
     {
         _isDone = true;
+        foreach(var image in _stuffItemImageList)
+        {
+            _stuffItemCountList.Add(image.GetComponentInChildren<TextMeshProUGUI>());
+        }
+
         gameObject.SetActive(false);
     }
 
@@ -74,6 +81,7 @@ public class UI_Smithy : UIBase
             ItemName itemName = _smithy.ItemBlueprintDataList[_selectIndex].BlueprintItemList[i].name;
             _stuffItemImageList[i].sprite = Manager.Data.GetItemData(itemName).ItemSprite;
             _stuffItemImageList[i].rectTransform.sizeDelta = Util.CalcFitSize(_imageSize, _stuffItemImageList[i].sprite);
+            _stuffItemCountList[i].text = _smithy.ItemBlueprintDataList[_selectIndex].BlueprintItemList[i].requireCount.ToString();
 
             _stuffItemImageList[i].transform.localPosition = new Vector3
                 (-(_smithy.ItemBlueprintDataList[_selectIndex].BlueprintItemList.Count-1)/2f*120f + i*120f,

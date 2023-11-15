@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] int _length;
 
     int _level = 0;
+    public int Level => _level;
     [SerializeField] List<Level> _levels;
 
     [SerializeField] Dictionary<ItemData, int> _inventory = new Dictionary<ItemData, int>();

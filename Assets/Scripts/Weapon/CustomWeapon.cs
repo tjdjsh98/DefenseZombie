@@ -1,7 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.VFX.Utility;
 using static Define;
 
 public class CustomWeapon : Weapon
@@ -42,6 +40,7 @@ public class CustomWeapon : Weapon
 
         RegisterControl();
 
+        IsDone = true;
     }
 
     protected override void RegisterControl()

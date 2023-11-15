@@ -29,6 +29,7 @@ public class ItemBlueprintDisplayer : MonoBehaviour
         ItemBlueprintData blueprint = _smithy.MainBlueprint;
 
         _resultSpriteRenderer.sprite = Manager.Data.GetItemData(blueprint.ResultItemName).ItemThumbnail;
+        _resultSpriteRenderer.size = Util.CalcFitSize(0.8f, _resultSpriteRenderer.sprite);
         _resultSpriteRenderer.gameObject.SetActive(true);
 
         for (int i = 0; i < blueprint.BlueprintItemList.Count; i++)

@@ -213,6 +213,14 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         EquipmentData data = Manager.Data.GetEquipmentData(equipmentName, part);
         if (data == null) return false;
 
+        ItemEquipment e = null;
+        if ((e = item.GetComponent<ItemEquipment>()) != null)
+        {
+            _customCharacter.AddedHp += e.AddHp;
+            _customCharacter.AddedDefense += e.AddDefense;
+            _customCharacter.AddedSpeed += e.AddSpeed;
+        }
+
         if (_spriteChanger.ChangeSprite(part, data.SpriteLibraryAsset))
         {
             switch (part)
@@ -238,7 +246,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
                     _handItemId = item.ItemId;
                     break;
                 case CharacterParts.Hat:
-                    if (_handItemId != 0) return false;
+                    if (_hatItemId != 0) return false;
                     _equipHatName = equipmentName;
                     _hatItemId = item.ItemId;
                     break;
@@ -302,6 +310,16 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
             item.Show();
             item.ReleaseItem(_customCharacter, putDown);
         }
+
+        ItemEquipment e = null;
+        if ((e = item.GetComponent<ItemEquipment>()) != null)
+        {
+            _customCharacter.AddedHp -= e.AddHp;
+            _customCharacter.AddedDefense -= e.AddDefense;
+            _customCharacter.AddedSpeed -= e.AddSpeed;
+        }
+
+
         EquipmentChanged?.Invoke();
 
         return returnId;

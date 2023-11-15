@@ -201,8 +201,8 @@ public class CustomCharacter : Character
                 SetXVelocity(_rigidBody.velocity.x + _accelSpeed * Mathf.Clamp01(_characterMoveDirection.x) * Time.deltaTime);
             }
 
-            if (_rigidBody.velocity.x > _maxSpeed)
-                SetXVelocity(_maxSpeed);
+            if (_rigidBody.velocity.x > Speed)
+                SetXVelocity(Speed);
         }
         else if (_characterMoveDirection.x < 0)
         {
@@ -217,8 +217,8 @@ public class CustomCharacter : Character
                 SetXVelocity(_rigidBody.velocity.x - _accelSpeed * Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime);
             }
 
-            if (_rigidBody.velocity.x < -_maxSpeed)
-                SetXVelocity(-_maxSpeed);
+            if (_rigidBody.velocity.x < -Speed)
+                SetXVelocity(-Speed);
         }
 
 
@@ -250,8 +250,8 @@ public class CustomCharacter : Character
                     SetYVelocity(_rigidBody.velocity.y + _accelSpeed * Time.deltaTime);
                 }
 
-                if (_rigidBody.velocity.y > _maxSpeed)
-                    SetYVelocity(_maxSpeed);
+                if (_rigidBody.velocity.y > Speed)
+                    SetYVelocity(Speed);
             }
             else if (_characterMoveDirection.y < 0)
             {
@@ -264,8 +264,8 @@ public class CustomCharacter : Character
                     SetYVelocity(_rigidBody.velocity.y - _accelSpeed * Time.deltaTime);
                 }
 
-                if (_rigidBody.velocity.y < -_maxSpeed)
-                    SetYVelocity(-_maxSpeed);
+                if (_rigidBody.velocity.y < -Speed)
+                    SetYVelocity(-Speed);
             }
         }
 

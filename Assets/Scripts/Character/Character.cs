@@ -1,10 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 using static Define;
 using Random = UnityEngine.Random;
 
@@ -31,9 +28,15 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
 
     // 캐릭터 상태
     [SerializeField] protected int _maxHp;
-    public int MaxHp => _maxHp;
+    public int MaxHp => _maxHp + AddedHp;
+    public int AddedHp { set; get; }
     protected int _hp;
     public int Hp { get { return _hp; } set { _hp = value; } }
+
+    int _defense = 0;
+    public int AddedDefense { set; get; }
+    public int Defense=>_defense + AddedDefense;
+
     public bool _isSuperArmerWhenAttack;
 
     [Range(0, 100)][SerializeField] protected int _standing;
@@ -45,8 +48,8 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
     [SerializeField] protected float _airBreakSpeed;
     protected float BreakSpeed => IsContactGround ? _groundBreakSpeed : _airBreakSpeed;
     [SerializeField] protected float _maxSpeed = 5.0f;
-    public float Speed { set { _maxSpeed = value; } get { return _maxSpeed; } }
-
+    public float Speed=>_maxSpeed + AddedSpeed; 
+    public float AddedSpeed { set; get; }
     // 점프
     [SerializeField] protected Range _groundCheckRange;
     [SerializeField] protected float _jumpPower = 10.0f;
@@ -246,8 +249,8 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
                 SetXVelocity(_rigidBody.velocity.x + _accelSpeed * Mathf.Clamp01(_characterMoveDirection.x) * Time.deltaTime);
             }
 
-            if (_rigidBody.velocity.x > _maxSpeed)
-                SetXVelocity(_maxSpeed);
+            if (_rigidBody.velocity.x > Speed)
+                SetXVelocity(Speed);
         }
         else if (_characterMoveDirection.x < 0)
         {
@@ -263,8 +266,8 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
                 SetXVelocity(_rigidBody.velocity.x - _accelSpeed * Mathf.Clamp01(Mathf.Abs(_characterMoveDirection.x)) * Time.deltaTime);
             }
 
-            if (_rigidBody.velocity.x < -_maxSpeed)
-                SetXVelocity(-_maxSpeed);
+            if (_rigidBody.velocity.x < -Speed)
+                SetXVelocity(-Speed);
         }
 
 
@@ -296,8 +299,8 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
                     SetYVelocity(_rigidBody.velocity.y + _accelSpeed * Time.deltaTime);
                 }
 
-                if (_rigidBody.velocity.y > _maxSpeed)
-                    SetYVelocity(_maxSpeed);
+                if (_rigidBody.velocity.y > Speed)
+                    SetYVelocity(Speed);
             }
             else if (_characterMoveDirection.y < 0)
             {
@@ -310,8 +313,8 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
                     SetYVelocity(_rigidBody.velocity.y - _accelSpeed * Time.deltaTime);
                 }
 
-                if (_rigidBody.velocity.y < -_maxSpeed)
-                    SetYVelocity(-_maxSpeed);
+                if (_rigidBody.velocity.y < -Speed)
+                    SetYVelocity(-Speed);
             }
         }
 
@@ -400,32 +403,43 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
     {
         if (IsDodge) return;
 
-        _rigidBody.velocity = Vector2.zero;
-        AddForce(attackDirection, power);
+        dmg = dmg - Defense;
+        if (dmg < 0) dmg = 0;
 
-
-        if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
-        _shakingCoroutine = StartCoroutine(CorShaking());
-
-
-        if (staggerTime > 0)
+        if (dmg != 0)
         {
-            if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
-            _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
+            _rigidBody.velocity = Vector2.zero;
+            AddForce(attackDirection, power);
+
+
+            if (_shakingCoroutine != null) StopCoroutine(_shakingCoroutine);
+            _shakingCoroutine = StartCoroutine(CorShaking());
+
+
+            if (staggerTime > 0)
+            {
+                if (_damageCoroutine != null) StopCoroutine(_damageCoroutine);
+                _damageCoroutine = StartCoroutine(CorTurnToIdle(staggerTime));
+            }
+
+            Hp -= dmg;
+            (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText(dmg.ToString(), transform.position + Vector3.up, Color.red, 5);
+
+            if (Hp < 0) Hp = 0;
+
+            // 메인 클라가 아니고 다른 클라라면 데미지 패킷을 보냅니다.
+            if (Client.Instance.IsMain)
+            {
+                Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
+            }
+            if (Hp <= 0)
+                Dead();
         }
-
-        Hp -= dmg;
-        (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText(dmg.ToString(), transform.position + Vector3.up, Color.red, 5);
-
-        if (Hp < 0) Hp = 0;
-
-        // 메인 클라가 아니고 다른 클라라면 데미지 패킷을 보냅니다.
-        if (Client.Instance.IsMain)
+        else
         {
-            Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
+            (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText("가드", transform.position + Vector3.up, new Color(0.3f,0.3f,.9f,1f), 5);
+
         }
-        if (Hp <= 0)
-            Dead();
     }
 
     protected virtual void Dead()

@@ -12,6 +12,7 @@ public class HpBar : MonoBehaviour
     TextMeshPro _text;
 
     int _preHp;
+    int _preMaxHp;
 
     private void Awake()
     {
@@ -38,7 +39,7 @@ public class HpBar : MonoBehaviour
 
         if(_hp == null) return;
 
-        if (_preHp != _hp.Hp)
+        if (_preHp != _hp.Hp || _preMaxHp != _hp.MaxHp)
         {
             _frontLine.SetPosition(1, new Vector3(((float)_hp.Hp / _hp.MaxHp) - 0.5f, 0, 0));
             _text.text = $"{_hp.Hp}/{_hp.MaxHp}"; 

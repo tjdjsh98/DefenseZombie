@@ -445,7 +445,7 @@ MonoBehaviour:
   _searchRange:
     center: {x: 0, y: 0, z: 0}
     size: {x: 100, y: 10, z: 0}
-  _attackDelay: 5
+  _attackDelay: 0
 --- !u!114 &6261214198764784204
 MonoBehaviour:
   m_ObjectHideFlags: 0
