@@ -19,6 +19,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
     [field: SerializeField] public int Hp { set; get; } 
     [SerializeField] BuildingSize _size;
     [SerializeField] float _buildingTime;
+    [SerializeField][TextArea] string _description;
+    public string Description=>_description;
     [SerializeField] BuildingBlueprint _blueprint;
     public BuildingBlueprint Blueprint => _blueprint;
 

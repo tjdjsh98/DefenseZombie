@@ -211,7 +211,12 @@ public class UI_Equipment : UIBase
                 if (_uiDescription == null)
                     _uiDescription = Manager.UI.GetUI(UIName.Description) as UI_Description;
 
-                _uiDescription.OpenItemDescription(Manager.Item.GetItem(_characterEquipment.WeaponId), Vector3.zero);
+                if(part == CharacterParts.FrontWeapon)
+                    _uiDescription.OpenItemDescription(Manager.Item.GetItem(_characterEquipment.WeaponId), Vector3.zero);
+                if (part == CharacterParts.Hat)
+                    _uiDescription.OpenItemDescription(Manager.Item.GetItem(_characterEquipment.HatItemId), Vector3.zero);
+                if (part == CharacterParts.Body)
+                    _uiDescription.OpenItemDescription(Manager.Item.GetItem(_characterEquipment.BodyItemId), Vector3.zero);
                 _isDescriptionOpen = true;
                 return;
             }

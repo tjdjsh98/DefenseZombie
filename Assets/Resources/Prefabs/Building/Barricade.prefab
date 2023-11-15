@@ -217,9 +217,11 @@ MonoBehaviour:
     pivotY: 0
     isPlace: 0101
   _buildingTime: 1
+  _description: "\uC801\uC744 \uB9C9\uB294 \uBC14\uB9AC\uAC8C\uC774\uD2B8\uC785\uB2C8\uB2E4."
   _blueprint:
     _blueprintItmeList:
     - name: 1
+      itemIdList: 
       requireCount: 3
       currentCount: 0
 --- !u!1001 &4808508675580610301
