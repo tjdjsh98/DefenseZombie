@@ -764,7 +764,7 @@ GameObject:
   m_Component:
   - component: {fileID: 446145728537938533}
   m_Layer: 6
-  m_Name: FirePoint
+  m_Name: BehindFirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1298,7 +1298,6 @@ GameObject:
   - component: {fileID: 8797273952533053488}
   - component: {fileID: -3789622636814383866}
   - component: {fileID: 5271368358810605203}
-  - component: {fileID: 5823153669523172687}
   - component: {fileID: 8767798638352431458}
   - component: {fileID: 3605417712847400353}
   m_Layer: 6
@@ -1469,44 +1468,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03cf1f5cbba7dc448bf4a855300d5efd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &5823153669523172687
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7995936695963995305}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3ccf3440234273459b555400a439ac8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _character: {fileID: 8797273952533053488}
-  _customCharacter: {fileID: 8797273952533053488}
-  _attackType: 0
-  _defaultAttack:
-    attackEffectName: 0
-    attackEffectPoint: {x: 0, y: 0, z: 0}
-    projectile: {fileID: 0}
-    firePos: {x: 0, y: 0, z: 0}
-    hitEffectName: 0
-    attackRange:
-      center: {x: 0, y: 0, z: 0}
-      size: {x: 0, y: 0, z: 0}
-    AttackDirection: {x: 0, y: 0, z: 0}
-    attacKShape: 0
-    damage: 0
-    power: 0
-    stagger: 0
-    penetrationPower: 0
-    actualAttackEffectName: 0
-    isTargeting: 0
-    attackDelay: 0
-  _frontWeapon: {fileID: 1456970922289170419}
-  _frontfirePoint: {fileID: 8242404911779622583}
-  _behindWeapon: {fileID: 281847820921104779}
-  _behindfirePoint: {fileID: 3404647684127944724}
-  _enableAttackLayer: Enemy
 --- !u!114 &8767798638352431458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1671,7 +1632,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2587802444812510765}
   m_Layer: 6
-  m_Name: FirePoint
+  m_Name: FrontFirePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

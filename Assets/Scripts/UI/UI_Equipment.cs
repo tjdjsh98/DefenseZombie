@@ -101,7 +101,8 @@ public class UI_Equipment : UIBase
         if(_characterEquipment.BodyItemId != 0)
         {
             Item item = Manager.Item.GetItem(_characterEquipment.BodyItemId);
-            _slots[CharacterParts.Body].itemImage.sprite = item.ItemData.ItemSprite;
+            _slots[CharacterParts.Body].itemImage.sprite = item.ItemData.ItemThumbnail;
+            _slots[CharacterParts.Body].itemImage.rectTransform.sizeDelta = Util.CalcFitSize(80, item.ItemData.ItemThumbnail);
             _slots[CharacterParts.Body].textMesh.text = string.Empty;
         }
         else
@@ -113,7 +114,8 @@ public class UI_Equipment : UIBase
         if (_characterEquipment.HandItemId != 0)
         {
             Item item = Manager.Item.GetItem(_characterEquipment.HandItemId);
-            _slots[CharacterParts.FrontHand].itemImage.sprite = item.ItemData.ItemSprite;
+            _slots[CharacterParts.FrontHand].itemImage.sprite = item.ItemData.ItemThumbnail;
+            _slots[CharacterParts.FrontHand].itemImage.rectTransform.sizeDelta = Util.CalcFitSize(80, item.ItemData.ItemThumbnail);
             _slots[CharacterParts.FrontHand].textMesh.text = string.Empty;
         }
         else
@@ -125,7 +127,8 @@ public class UI_Equipment : UIBase
         if (_characterEquipment.HatItemId != 0)
         {
             Item item = Manager.Item.GetItem(_characterEquipment.HatItemId);
-            _slots[CharacterParts.Hat].itemImage.sprite = item.ItemData.ItemSprite;
+            _slots[CharacterParts.Hat].itemImage.sprite = item.ItemData.ItemThumbnail;
+            _slots[CharacterParts.Hat].itemImage.rectTransform.sizeDelta = Util.CalcFitSize(80, item.ItemData.ItemThumbnail);
             _slots[CharacterParts.Hat].textMesh.text = string.Empty;
         }
         else
@@ -137,7 +140,8 @@ public class UI_Equipment : UIBase
         if (_characterEquipment.LegsItemId != 0)
         {
             Item item = Manager.Item.GetItem(_characterEquipment.LegsItemId);
-            _slots[CharacterParts.Legs].itemImage.sprite = item.ItemData.ItemSprite;
+            _slots[CharacterParts.Legs].itemImage.sprite = item.ItemData.ItemThumbnail;
+            _slots[CharacterParts.Legs].itemImage.rectTransform.sizeDelta = Util.CalcFitSize(80, item.ItemData.ItemThumbnail);
             _slots[CharacterParts.Legs].textMesh.text = string.Empty;
         }
         else
@@ -150,6 +154,7 @@ public class UI_Equipment : UIBase
         {
             WeaponData item = Manager.Data.GetWeaponData(_characterEquipment.EquipWeaponName);
             _slots[CharacterParts.FrontWeapon].itemImage.sprite = item.ThumbnailSprite;
+            _slots[CharacterParts.FrontWeapon].itemImage.rectTransform.sizeDelta = Util.CalcFitSize(80, item.ThumbnailSprite);
             _slots[CharacterParts.FrontWeapon].textMesh.text = string.Empty;
         }
         else

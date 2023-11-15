@@ -112,6 +112,22 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         }
     }
 
+    public void AddOption(ICharacterOption option)
+    {
+        _optionList.Add(option);
+        option.Init();
+    }
+
+    public void RemoveOption(ICharacterOption option)
+    {
+        if (_optionList.Contains(option))
+        {
+            option.Remove();
+            _optionList.Remove(option);
+        }
+    }
+
+
 
     protected virtual void OnDrawGizmosSelected()
     {

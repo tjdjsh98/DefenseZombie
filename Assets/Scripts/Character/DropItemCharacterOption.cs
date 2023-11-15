@@ -28,6 +28,11 @@ public class DropItemCharacterOption : MonoBehaviour, ICharacterOption
         IsDone = true;
     }
 
+
+    public virtual void Remove()
+    {
+
+    }
     void OnDead()
     {
         Item item = null;

@@ -13,6 +13,9 @@ public class UI_Smithy : UIBase
     [SerializeField]List<Image> _stuffItemImageList = new List<Image>();
 
     int _selectIndex = 0;
+
+    float _imageSize = 80;
+
     public override void Init()
     {
         _isDone = true;
@@ -54,6 +57,7 @@ public class UI_Smithy : UIBase
             ItemName itemName = _smithy.ItemBlueprintDataList[i].ResultItemName;
             ItemData result = Manager.Data.GetItemData(itemName);
             _slotImageList[i].sprite = result.ItemSprite;
+            _slotImageList[i].rectTransform.sizeDelta  = Util.CalcFitSize(_imageSize, result.ItemSprite);
         }
 
         PushSelectButton(0);
@@ -69,6 +73,7 @@ public class UI_Smithy : UIBase
         {
             ItemName itemName = _smithy.ItemBlueprintDataList[_selectIndex].BlueprintItemList[i].name;
             _stuffItemImageList[i].sprite = Manager.Data.GetItemData(itemName).ItemSprite;
+            _stuffItemImageList[i].rectTransform.sizeDelta = Util.CalcFitSize(_imageSize, _stuffItemImageList[i].sprite);
 
             _stuffItemImageList[i].transform.localPosition = new Vector3
                 (-(_smithy.ItemBlueprintDataList[_selectIndex].BlueprintItemList.Count-1)/2f*120f + i*120f,

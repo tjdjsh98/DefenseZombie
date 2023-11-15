@@ -22,6 +22,10 @@ public class AnimatorHandler : MonoBehaviour, ICharacterOption
         _character = GetComponent<Character>();
         IsDone = true;
     }
+    public virtual void Remove()
+    {
+
+    }
     public void AnimatorAttackStarted()
     {
         AttackStartedHandler?.Invoke();

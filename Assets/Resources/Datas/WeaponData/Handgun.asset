@@ -32,4 +32,7 @@ MonoBehaviour:
     power: 2
     stagger: 0.2
     penetrationPower: 0
-  <AttackDelay>k__BackingField: 0.1
+    actualAttackEffectName: 0
+    isTargeting: 0
+    attackDelay: 0
+  <Weapon>k__BackingField: {fileID: 3087540297273847347, guid: 5ce3d226b7d990945b3a5ab0b32b37ab, type: 3}

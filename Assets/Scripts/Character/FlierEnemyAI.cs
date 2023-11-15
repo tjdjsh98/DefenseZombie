@@ -42,7 +42,7 @@ public class FlierEnemyAI : EnemyAI
             if (character != null || building != null)
             {
                 // 원거리 공격하는 캐릭터면 자신의 위치까지 올라가서 공격
-                if (_weapon.WeaponAttackData.projectile != null && !CheckIsEnoughFly())
+                if (_weapon.AttackData.projectile != null && !CheckIsEnoughFly())
                 {
                     Vector3 moveDirection = Vector3.up;
                     _character.SetCharacterDirection(moveDirection);

@@ -43,6 +43,7 @@ public class ItemBlueprintDisplayer : MonoBehaviour
 
             ItemData itemData = Manager.Data.GetItemData(blueprint.BlueprintItemList[i].name);
             _slotImageList[i].sprite = itemData.ItemThumbnail;
+            _slotImageList[i].size = Util.CalcFitSize(0.8f, itemData.ItemThumbnail);
             _slotCountList[i].text = $"{blueprint.BlueprintItemList[i].currentCount}/{blueprint.BlueprintItemList[i].requireCount}";
 
             Vector3 slotLocalPos = new Vector3(-(blueprint.BlueprintItemList.Count - 1) / 2f * 1.2f + i * 1.2f, 0, 0);

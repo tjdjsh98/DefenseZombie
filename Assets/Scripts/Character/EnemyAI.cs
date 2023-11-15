@@ -14,7 +14,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
 
     protected Character _target;
 
-    protected Range AttackRange
+    protected virtual Range AttackRange
     {
         get
         {
@@ -22,7 +22,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
             if (_weapon == null)
                 range = _attackRange;
             else
-                range = _weapon.WeaponAttackData.attackRange;
+                range = _weapon.AttackData.attackRange;
 
             range.center.x = transform.localScale.x > 0 ? range.center.x : -range.center.x;
 
@@ -30,7 +30,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
             
         }
     }
-    protected Range SearchRange
+    protected virtual Range SearchRange
     {
         get
         {
@@ -60,7 +60,10 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
 
         IsDone = true;
     }
+    public virtual void Remove()
+    {
 
+    }
     protected void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;
@@ -97,7 +100,7 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
             Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
             Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
-            if (character != null || building != null)
+            if (character != null || (building != null && !building.tag.Equals(Define.CharacterTag.Enemy.ToString())))
             {
                 _character.StopMove();
                 _character.SetCharacterDirection(Vector2.zero);

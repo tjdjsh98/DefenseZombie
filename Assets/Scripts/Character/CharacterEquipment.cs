@@ -13,6 +13,9 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     WeaponName _equipWeaponName;
     public WeaponName EquipWeaponName =>_equipWeaponName;
 
+    Weapon _weapon;
+    public Weapon Weapon => _weapon;
+
     EquipmentName _equipHatName;
     EquipmentName _equipBodyName;
     EquipmentName _equipLegsName;
@@ -44,7 +47,10 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         IsDone = true;
     }
+    public virtual void Remove()
+    {
 
+    }
     public bool EquipItem(Item item)
     {
         if (item == null) return false;
@@ -91,9 +97,15 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
 
         if (data.IsFrontWeapon)
+        {
             _spriteChanger.ChangeSprite(CharacterParts.FrontWeapon, data.WeaponSpriteLibrary);
+            _spriteChanger.ChangeDefaultSprite(CharacterParts.BehindWeapon);
+        }
         else
+        {
             _spriteChanger.ChangeSprite(CharacterParts.BehindWeapon, data.WeaponSpriteLibrary);
+            _spriteChanger.ChangeDefaultSprite(CharacterParts.FrontWeapon);
+        }
 
         RuntimeAnimatorController myController = _animator.runtimeAnimatorController;
 
@@ -117,7 +129,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         _weaponId = item.ItemId;
 
-        if (Manager.Data.GetWeaponData(_equipWeaponName).AttackList[0].projectile != null)
+        if (data.AttackList[0].projectile != null)
         {
             if (Manager.Character.MainCharacter == null || _customCharacter == Manager.Character.MainCharacter)
             {
@@ -127,6 +139,14 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
             }
         }
 
+        if (_weapon)
+        {
+            _customCharacter.RemoveOption(_weapon);
+            Destroy(_weapon.gameObject);
+        }
+        _weapon = Instantiate(data.Weapon,transform);
+        _customCharacter.AddOption(_weapon);
+
         EquipmentChanged?.Invoke();
 
 
@@ -134,8 +154,6 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     }
     public bool TakeOffWeapon(bool putDown = true)
     {
-        if (_equipWeaponName == WeaponName.None) return false;
-
         WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
 
         _spriteChanger.ChangeDefaultSprite(CharacterParts.FrontWeapon);
@@ -164,9 +182,21 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
                 (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Close();
         }
 
-        item.Show();
-        item.ReleaseItem(_customCharacter, putDown);
+        if (item != null)
+        {
+            item.Show();
+            item.ReleaseItem(_customCharacter, putDown);
+        }
         _weaponId = 0;
+
+
+        if (_weapon)
+        {
+            _customCharacter.RemoveOption(_weapon);
+            Destroy(_weapon.gameObject);
+        }
+        _weapon = Instantiate(data.Weapon, transform);
+        _customCharacter.AddOption(_weapon);
 
         EquipmentChanged?.Invoke();
 

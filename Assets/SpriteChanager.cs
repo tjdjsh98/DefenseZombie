@@ -39,6 +39,10 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
         _spriteLibararyDictionary[CharacterParts.Hat].spriteLibraryAsset = _defaultSetUpParts._hatSpriteLibraryAsset;
     }
 
+    public virtual void Remove()
+    {
+
+    }
     public bool ChangeSprite(CharacterParts part, SpriteLibraryAsset asset)
     {
         if (_spriteLibararyDictionary.ContainsKey(part))

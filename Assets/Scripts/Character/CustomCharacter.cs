@@ -46,13 +46,36 @@ public class CustomCharacter : Character
 
     public int attackType = 0;
 
-    // 건물이 안 돌아가게 하기 위해서 필요
-    Vector3 _preLiftBuildingCharacterScale;
-    Vector3 _preLiftBuildingBuildingScale;
+    public GameObject FrontWeapon { private set; get; }
+    public GameObject FrontfirePoint { private set; get; }
+
+    public GameObject BehindWeapon{ private set; get; }
+    public GameObject BehindfirePoint { private set; get; }
 
     public override void Init()
     {
         base.Init();
+
+        Transform[] trs = GetComponentsInChildren<Transform>();
+        foreach (Transform t in trs)
+        {
+            switch (t.name)
+            {
+                case "FrontWeapon":
+                    FrontWeapon = t.gameObject;
+                    break;
+                case "FrontFirePoint":
+                    FrontfirePoint = t.gameObject;
+                    break;
+                case "BehindWeapon":
+                    BehindWeapon = t.gameObject;
+                    break;
+                case "BehindFirePoint":
+                    BehindfirePoint = t.gameObject;
+                    break;
+            }
+        }
+
         _animatorHandler = GetComponent<AnimatorHandler>();
         _chanager = GetComponent<SpriteChanager>();
         _characterEquipment = GetComponent<CharacterEquipment>();
@@ -65,7 +88,10 @@ public class CustomCharacter : Character
         {
             SetSetup(_setupData);
         }
-
+        else
+        {
+            _characterEquipment.TakeOffWeapon();
+        }
     }
 
     public void SetSetup(SetupData data)

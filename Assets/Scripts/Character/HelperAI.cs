@@ -61,6 +61,10 @@ public class HelperAI : MonoBehaviour, ICharacterOption
 
         IsDone = true;
     }
+    public virtual void Remove()
+    {
+
+    }
     protected void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.green;

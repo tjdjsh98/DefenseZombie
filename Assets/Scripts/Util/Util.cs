@@ -212,6 +212,27 @@ public static class Util
 
         return result;
     }
+
+    public static Vector2 CalcFitSize(float maxSize, Sprite sprite)
+    {
+        Vector2 result = Vector2.zero;
+        float width = sprite.textureRect.width;
+        float height = sprite.textureRect.height;
+
+        if (width > height)
+        {
+            result.x = maxSize;
+            result.y = maxSize * height / width;
+        }
+        else
+        {
+            result.y = maxSize;
+            result.x = maxSize * width/height;
+        }
+
+        return result;
+    }
+
 }
 
 [System.Serializable]

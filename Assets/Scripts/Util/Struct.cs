@@ -53,6 +53,7 @@ public interface ICharacterOption
     public bool IsDone { set; get; }
     public void Init();
 
+    public void Remove();
     public void DataSerialize();
 
     public void DataDeserialize();

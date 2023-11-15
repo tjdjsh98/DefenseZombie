@@ -17,7 +17,7 @@ public class CustomHelperAI : HelperAI
             if (_weapon == null)
                 range = _attackRange;
             else
-                range = _weapon.WeaponAttackData.attackRange;
+                range = _weapon.AttackData.attackRange;
 
             range.center.x = transform.localScale.x > 0 ? range.center.x : -range.center.x;
 

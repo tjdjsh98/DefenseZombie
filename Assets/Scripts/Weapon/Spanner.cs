@@ -44,13 +44,13 @@ public class Spanner : Weapon
 
         if (_attackType == 0)
         {
-            GameObject attackEffect = Manager.Data.GetEffect(WeaponAttackData.attackEffectName).gameObject;
+            GameObject attackEffect = Manager.Data.GetEffect(AttackData.attackEffectName).gameObject;
             if (attackEffect != null)
             {
                 GameObject effect = Instantiate(attackEffect);
                 effect.transform.parent = transform;
 
-                Vector3 point = WeaponAttackData.attackEffectPoint;
+                Vector3 point = AttackData.attackEffectPoint;
 
                 effect.transform.localPosition = point;
                 effect.transform.localScale = Vector3.one;

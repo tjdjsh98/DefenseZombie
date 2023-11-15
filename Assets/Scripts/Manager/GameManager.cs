@@ -50,9 +50,10 @@ public class GameManager : MonoBehaviour
         }
         time = (_levels.Count >= 0 ? _levels[0].nextInterval : 10);
 
-        if(Client.Instance.IsSingle || Client.Instance.IsMain)
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
         {
             StartCoroutine(CorStartLevel());
+            StartCoroutine(CorStartGenerateEnvironment());
         }
     }
 
@@ -112,7 +113,7 @@ public class GameManager : MonoBehaviour
                                 genPos = new Vector3(-20, -2f, 0);
 
                             Character character = null;
-                            int requsetNumber = Manager.Character.GenerateCharacter(enemyName, genPos, ref character,false, (c) =>
+                            int requsetNumber = Manager.Character.GenerateCharacter(enemyName, genPos, ref character, false, (c) =>
                             {
                                 SummonCount++;
                                 c.DeadHandler += () =>
@@ -121,7 +122,7 @@ public class GameManager : MonoBehaviour
                                     Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
                                 };
                                 CustomCharacter customCharacter = c as CustomCharacter;
-                                if(levelCharacter.hp != 0)
+                                if (levelCharacter.hp != 0)
                                     customCharacter.SetHp(levelCharacter.hp);
                                 if (levelCharacter.setupData != null)
                                 {
@@ -152,66 +153,87 @@ public class GameManager : MonoBehaviour
                     }
                     else
                     {
-                        if(SummonCount <= 0)
+                        if (SummonCount <= 0)
                         {
                             IsStartLevel = false;
                             _level++;
                             Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
                         }
                     }
-                }    
-
-                // 일정 갯수의 나무와 바위 지속 생성
-
-                //if(_rockMaxCount > _rockCount)
-                //{
-                //    Building building = Manager.Data.GetBuilding(BuildingName.Rock);
-                //    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
-
-                //    if(cellPos.x != -999)
-                //    {
-                //        Building rock = null;
-                //        int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Rock,cellPos, ref rock);
-
-                //        if(rock != null)
-                //        {
-                //            _rockCount++;
-                //            rock.DestroyedHandler += ()=> { _rockCount--; } ;
-                //        }
-                //    }
-                //}
-
-                //if(_treeMaxCount > _treeCount)
-                //{
-                //    Building building = Manager.Data.GetBuilding(BuildingName.Tree);
-                //    Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
-
-                //    if (cellPos.x != -999)
-                //    {
-                //        Building tree = null;
-                //        int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos, ref tree);
-
-                //        if (tree != null)
-                //        {
-                //            _treeCount++;
-                //            tree.DestroyedHandler += () => { _treeCount--; };
-                //        }
-                //    }
-                //}
+                }
 
 
             }
-            
+
             yield return new WaitForFixedUpdate();
         }
     }
 
+    IEnumerator CorStartGenerateEnvironment()
+    {
+        // 일정 갯수의 나무와 바위 지속 생성
+
+        while (true)
+        {
+            if (_rockMaxCount > _rockCount)
+            {
+                Building building = Manager.Data.GetBuilding(BuildingName.Rock);
+                Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
+
+                if (cellPos.x != -999)
+                {
+                    _rockCount++;
+                    Building rock = null;
+                    int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Rock, cellPos, ref rock,
+                        (b) =>
+                        {
+                            b.DestroyedHandler += () =>
+                            {
+                                _rockCount--;
+                            };
+                        });
+
+                    if (rock != null)
+                    {
+                        rock.DestroyedHandler += () => { _rockCount--; };
+                    }
+                }
+            }
+
+            if (_treeMaxCount > _treeCount)
+            {
+                Building building = Manager.Data.GetBuilding(BuildingName.Tree);
+                Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
+
+                if (cellPos.x != -999)
+                {
+                    Building tree = null;
+                    _treeCount++;
+                    int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos, ref tree,
+                         (b) =>
+                         {
+                             b.DestroyedHandler += () =>
+                             {
+                                 _treeCount--;
+                             };
+                         });
+
+                    if (tree != null)
+                    {
+                        tree.DestroyedHandler += () => { _treeCount--; };
+                    }
+                }
+            }
+
+            yield return new WaitForSeconds(Random.Range(0.5f, 1f));
+        }
+    }
 
     public void AddItem(ItemData data)
     {
         if (data == null) return;
 
-        if(_inventory.ContainsKey(data))
+        if (_inventory.ContainsKey(data))
         {
             _inventory[data]++;
         }
@@ -223,7 +245,7 @@ public class GameManager : MonoBehaviour
         InventoryChanagedHandler?.Invoke();
     }
 
-    public Dictionary<ItemData,int> GetInventory()
+    public Dictionary<ItemData, int> GetInventory()
     {
         return _inventory;
     }

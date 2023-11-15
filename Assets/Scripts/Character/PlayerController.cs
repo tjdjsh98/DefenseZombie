@@ -47,6 +47,10 @@ public class PlayerController : MonoBehaviour, ICharacterOption
 
         IsDone = true;
     }
+    public virtual void Remove()
+    {
+
+    }   
 
     private void Update()
     {
