@@ -213,13 +213,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         EquipmentData data = Manager.Data.GetEquipmentData(equipmentName, part);
         if (data == null) return false;
 
-        ItemEquipment e = null;
-        if ((e = item.GetComponent<ItemEquipment>()) != null)
-        {
-            _customCharacter.AddedHp += e.AddHp;
-            _customCharacter.AddedDefense += e.AddDefense;
-            _customCharacter.AddedSpeed += e.AddSpeed;
-        }
+       
 
         if (_spriteChanger.ChangeSprite(part, data.SpriteLibraryAsset))
         {
@@ -259,6 +253,13 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         else
         {
             return false;
+        }
+        ItemEquipment e = null;
+        if ((e = item.GetComponent<ItemEquipment>()) != null)
+        {
+            _customCharacter.AddedHp += e.AddHp;
+            _customCharacter.AddedDefense += e.AddDefense;
+            _customCharacter.AddedSpeed += e.AddSpeed;
         }
         EquipmentChanged?.Invoke();
 

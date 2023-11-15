@@ -47,10 +47,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
     public bool InitDone { get; private set; } = false; 
     public void Init()
     {
-        _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
-        SpriteRenderer sr = transform.Find("Model").GetComponent<SpriteRenderer>();
-        if(sr != null)
-            _spriteRenderers.Add(sr);
+        if(_spriteRenderers == null)
+            _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
         _boxCollider = GetComponent<BoxCollider2D>();
         
         _buildingOptionList = GetComponents<IBuildingOption>().ToList();
@@ -328,6 +326,15 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
         if (packet == null) return;
 
         DeserializeControlData(packet.data);
+    }
+
+    public List<SpriteRenderer> GetSpriteRendererList()
+    {
+        if (InitDone == false)
+        {
+            _spriteRenderers = transform.Find("Model").GetComponentsInChildren<SpriteRenderer>().ToList();
+        }
+        return _spriteRenderers;
     }
 
 }
