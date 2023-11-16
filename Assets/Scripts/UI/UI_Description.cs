@@ -63,9 +63,9 @@ public class UI_Description : UIBase
             // 방어구 일 경우
             else if ((itemEquipment = item.GetComponent<ItemEquipment>()) != null)
             {
-                _stringBuilder.AppendLine($"체력\t{itemEquipment.AddHp}");
-                _stringBuilder.AppendLine($"방어력\t{itemEquipment.AddDefense}");
-                _stringBuilder.AppendLine($"속도\t{itemEquipment.AddDefense}");
+                _stringBuilder.AppendLine($"체력\t{itemEquipment.Hp}");
+                _stringBuilder.AppendLine($"방어력\t{itemEquipment.Defense}");
+                _stringBuilder.AppendLine($"속도\t{itemEquipment.Defense}");
             }
         }
         _descriptionText.text = _stringBuilder.ToString();

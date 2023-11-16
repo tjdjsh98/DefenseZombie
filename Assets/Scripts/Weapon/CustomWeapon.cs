@@ -9,6 +9,8 @@ public class CustomWeapon : Weapon
     protected PlayerController _playerController;
     protected HelperAI _helperAi;
 
+    public override bool IsEnableAttack => _attackTime >= AttackData.attackDelay;
+
     ItemAmmo _itemAmmo;
 
     public WeaponData WeaponData => Manager.Data.GetWeaponData(_characterEquipment.EquipWeaponName);
@@ -18,6 +20,7 @@ public class CustomWeapon : Weapon
     {
         _character = GetComponentInParent<Character>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
+
 
         _customCharacter = GetComponentInParent<CustomCharacter>();
         if (_customCharacter != null)
@@ -47,6 +50,8 @@ public class CustomWeapon : Weapon
     {
         base.RegisterControl();
 
+        _animatorHandler.AttackStartedHandler += OnAttackStart;
+
         if (_playerController != null)
         {
             _playerController.AttackKeyDownHandler += OnAttackKeyDown;
@@ -69,6 +74,8 @@ public class CustomWeapon : Weapon
         {
             _helperAi.AttackHanlder -= OnAttackKeyDown;
         }
+        _animatorHandler.AttackStartedHandler -= OnAttackStart;
+
     }
 
     protected override void OnDrawGizmos()

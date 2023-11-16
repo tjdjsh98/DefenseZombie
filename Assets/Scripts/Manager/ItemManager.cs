@@ -66,7 +66,7 @@ public class ItemManager : MonoBehaviour
         position.z = 0;
         item.transform.position = position;
 
-        item.UpBound(10);
+        item.RandomBounding(10);
 
         _itemDictionary.Add(item.ItemId, item);
 
@@ -167,7 +167,7 @@ public class ItemManager : MonoBehaviour
         Vector3 position = new Vector3(packet.posX, packet.posY);
         item.transform.position = position;
 
-        item.UpBound(10);
+        item.RandomBounding(10);
 
         _itemDictionary.Add(item.ItemId, item);
 
@@ -207,7 +207,7 @@ public class ItemManager : MonoBehaviour
             Vector3 position = new Vector3(info.posX, info.posY);
             item.transform.position = position;
 
-            item.UpBound(10);
+            item.RandomBounding(10);
 
             _itemDictionary.Add(item.ItemId, item);
 

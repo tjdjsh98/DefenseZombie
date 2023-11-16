@@ -16,7 +16,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
     protected float _attackTime;
 
-    public bool IsEnableAttack => _attackTime >= _defaultAttack.attackDelay;
+    public virtual bool IsEnableAttack => _attackTime >= _defaultAttack.attackDelay;
 
     public Vector3 TargetPosition { set; get; }
 
@@ -26,7 +26,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
         _character = GetComponentInParent<Character>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
 
-
+        _animatorHandler.AttackStartedHandler += OnAttackStart;
         RegisterControl();
 
         IsDone = true;
@@ -269,6 +269,12 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
             }
         }
+    }
+
+    protected virtual void OnAttackStart()
+    {
+        _attackTime = 0;
+        Client.Instance.SendCharacterControlInfo(_character);
     }
 
     protected virtual void OnAttackEnd()

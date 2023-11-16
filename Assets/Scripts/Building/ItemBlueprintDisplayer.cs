@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class ItemBlueprintDisplayer : MonoBehaviour
 {
-    [SerializeField] GameObject _requireItemOrigin;
     [SerializeField] SpriteRenderer _resultSpriteRenderer;
+    [SerializeField] GameObject _requireItemOrigin;
 
-    Smithy _smithy;
+    Shop _shop;
 
     List<GameObject> _slotList = new List<GameObject>();
     List<SpriteRenderer> _slotImageList = new List<SpriteRenderer>();
@@ -17,16 +17,16 @@ public class ItemBlueprintDisplayer : MonoBehaviour
 
     private void Awake()
     {
-        _smithy = GetComponentInParent<Smithy>();
-        _smithy.ItemChangedHandler += OnItemChanaged;
-        _smithy.MainBlueprintSetHandler += Open;
+        _shop = GetComponentInParent<Shop>();
+        _shop.ItemChangedHandler += OnItemChanaged;
+        _shop.MainBlueprintSetHandler += Open;
         _resultSpriteRenderer.gameObject.SetActive(false);
         gameObject.SetActive(false);
     }
 
     public void Open()
     {
-        ItemBlueprintData blueprint = _smithy.MainBlueprint;
+        ItemBlueprintData blueprint = _shop.MainBlueprint;
 
         _resultSpriteRenderer.sprite = Manager.Data.GetItemData(blueprint.ResultItemName).ItemThumbnail;
         _resultSpriteRenderer.size = Util.CalcFitSize(0.8f, _resultSpriteRenderer.sprite);
@@ -58,7 +58,7 @@ public class ItemBlueprintDisplayer : MonoBehaviour
     {
         if (!Client.Instance.IsSingle && !Client.Instance.IsMain)
         {
-            if (_smithy.MainBlueprint == null)
+            if (_shop.MainBlueprint == null)
             {
                 Hide();
                 return;
@@ -71,7 +71,7 @@ public class ItemBlueprintDisplayer : MonoBehaviour
             return;
         }
 
-        ItemBlueprintData blueprint = _smithy.MainBlueprint;
+        ItemBlueprintData blueprint = _shop.MainBlueprint;
         if (blueprint != null)
         {
             for (int i = 0; i < blueprint.BlueprintItemList.Count; i++)

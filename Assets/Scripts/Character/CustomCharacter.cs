@@ -511,6 +511,7 @@ public class CustomCharacter : Character
             {
                 if (_characterEquipment.TakeOffWeapon())
                 {
+                    holdingItem.ReleaseItem(this, true);
                 }
             }
             _holdingItemId = 0;

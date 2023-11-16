@@ -124,7 +124,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         else
             _customCharacter.SetEnableBehindHandRotate();
 
-        item.IsGraped = true;
+        item.GrapItem(_customCharacter);
         item.Hide();
 
         _weaponId = item.ItemId;
@@ -247,7 +247,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
             }
 
             item.Hide();
-            item.IsGraped = true;
+            item.GrapItem(_customCharacter);
 
         }
         else
@@ -257,9 +257,9 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         ItemEquipment e = null;
         if ((e = item.GetComponent<ItemEquipment>()) != null)
         {
-            _customCharacter.AddedHp += e.AddHp;
-            _customCharacter.AddedDefense += e.AddDefense;
-            _customCharacter.AddedSpeed += e.AddSpeed;
+            _customCharacter.AddedHp += e.Hp;
+            _customCharacter.AddedDefense += e.Defense;
+            _customCharacter.AddedSpeed += e.Speed;
         }
         EquipmentChanged?.Invoke();
 
@@ -310,16 +310,15 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         {
             item.Show();
             item.ReleaseItem(_customCharacter, putDown);
-        }
 
-        ItemEquipment e = null;
-        if ((e = item.GetComponent<ItemEquipment>()) != null)
-        {
-            _customCharacter.AddedHp -= e.AddHp;
-            _customCharacter.AddedDefense -= e.AddDefense;
-            _customCharacter.AddedSpeed -= e.AddSpeed;
+            ItemEquipment e = null;
+            if ((e = item.GetComponent<ItemEquipment>()) != null)
+            {
+                _customCharacter.AddedHp -= e.Hp;
+                _customCharacter.AddedDefense -= e.Defense;
+                _customCharacter.AddedSpeed -= e.Speed;
+            }
         }
-
 
         EquipmentChanged?.Invoke();
 

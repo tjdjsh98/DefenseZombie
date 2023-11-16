@@ -37,7 +37,8 @@ public static class Define
         GroundTile = 7,
         Tower = 8,
         Tree= 9,
-        Smithy = 10,
+        Shop = 10,
+        Smithy = 11,
     }
     public enum CharacterName
     {
@@ -129,14 +130,15 @@ public static class Define
         Commander,
         Item,
         Build,
-        Smithy,
+        Shop,
         Debug,
         GameOver,
         Equipment,
         Core,
         TextDisplayer,
         Ammo,
-        Description
+        Description,
+        Smithy
     }
     public enum EffectName
     {

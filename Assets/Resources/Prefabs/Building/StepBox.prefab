@@ -216,6 +216,7 @@ MonoBehaviour:
     pivotY: 1
     isPlace: 01
   _buildingTime: 1
+  _description: "\uBC1C\uD310"
   _blueprint:
     _blueprintItmeList: []
 --- !u!1 &7871963314126549277

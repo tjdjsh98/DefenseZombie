@@ -218,6 +218,8 @@ MonoBehaviour:
     pivotY: 1
     isPlace: 01
   _buildingTime: 1
+  _description: "\uC815\uBA74\uC758 \uC801\uC5D0\uAC8C \uD3EC\uD0C4\uC744 \uB0A0\uB824
+    \uACF5\uACA9\uD569\uB2C8\uB2E4."
   _blueprint:
     _blueprintItmeList: []
 --- !u!114 &1076116302970844188
@@ -237,7 +239,7 @@ MonoBehaviour:
     size: {x: 15, y: 15, z: 0}
   _cannonPos: {fileID: 7662278256344000495}
   _firePoint: {fileID: 3423124206580363192}
-  _projectile: {fileID: -1882469459523969698, guid: 134218f7f0413934f81594b5d2a0a968, type: 3}
+  _fireProjectileName: 0
   _coolTime: 5
 --- !u!1 &3423124206580363192
 GameObject:

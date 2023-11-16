@@ -10,7 +10,7 @@ using static Define;
 public class UI_Smithy : UIBase
 {
     Character _openCharacter;
-    Smithy _smithy;
+    Shop _smithy;
 
     [SerializeField] GameObject _leftButton;
     [SerializeField] GameObject _rightButton;
@@ -36,7 +36,7 @@ public class UI_Smithy : UIBase
         gameObject.SetActive(false);
     }
 
-    public void Open(Character character, Smithy smithy)
+    public void Open(Character character, Shop smithy)
     {
         _openCharacter = character;
         _smithy = smithy;

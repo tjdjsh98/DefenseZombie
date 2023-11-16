@@ -71,9 +71,9 @@ TrailRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: 872912963
+  m_SortingLayer: 1
+  m_SortingOrder: 8
   m_Time: 0.5
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -272,13 +272,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 086312f634caae34097c116472893beb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ProjectileId: 0
   _projectileName: 1
   _projectileType: 1
-  _autoDestroy: 1
-  _destroyTime: 5
   power: 10
   _effect: 1
+  ProjectileId: 0
+  _autoDestroy: 1
+  _destroyTime: 5
 --- !u!61 &1262683407914301281
 BoxCollider2D:
   m_ObjectHideFlags: 0

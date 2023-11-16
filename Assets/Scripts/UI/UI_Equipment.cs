@@ -223,7 +223,8 @@ public class UI_Equipment : UIBase
         }
 
 
-        _uiDescription.Close();
+        if(_uiDescription!=null)
+            _uiDescription.Close();
         _isDescriptionOpen = false;
     }
 

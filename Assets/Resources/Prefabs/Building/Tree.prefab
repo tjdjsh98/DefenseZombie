@@ -133,6 +133,7 @@ MonoBehaviour:
     pivotY: 1
     isPlace: 010101010101
   _buildingTime: 0
+  _description: 
   _blueprint:
     _blueprintItmeList: []
 --- !u!114 &5918314377060300674
@@ -147,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c524a8a71fdb194409e97ca3d8a9669f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: 01000000
+  data: 0100000001000000010000000100000001000000
 --- !u!1 &5533106364098347326
 GameObject:
   m_ObjectHideFlags: 0

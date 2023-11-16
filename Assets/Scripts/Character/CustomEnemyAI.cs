@@ -74,7 +74,7 @@ public class CustomEnemyAI : EnemyAI
                 _character.StopMove();
                 _character.SetCharacterDirection(Vector2.zero);
 
-                if (_attackDelay < _attackTime)
+                if (_attackDelay < _attackTime && Weapon.IsEnableAttack)
                 {
                     Vector3 targetPos = Vector3.zero;
                     if (character != null)

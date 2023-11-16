@@ -1,111 +1,123 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using static Define;
+using Random = UnityEngine.Random;
 
-[RequireComponent(typeof(Building))]
 public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 {
-    Building _building;
-    BlueprintDisplayer _itemDisplayer;
+    public int _reinforceItemId;
+    public int ReinforceItemId => _reinforceItemId;
+    public Action ReinforeceItemSet;
 
-    [SerializeField] List<ItemBlueprintData> _itemBlueprintDataList;
-    public List<ItemBlueprintData> ItemBlueprintDataList => _itemBlueprintDataList;
-
-    Character _openCharacter;
-    UI_Smithy _ui;
-
-    bool _initDone;
-
-    int _requsetBlueprintIndex = -1;
-    int _mainBlueprintIndex = -1;
-
-    ItemBlueprintData _mainBlueprint;
-    public ItemBlueprintData MainBlueprint => _mainBlueprint;
-
-    public Action<bool> ItemChangedHandler { get; set; }
-
-    public Action MainBlueprintSetHandler { set; get; }
-
-    public void Init()
+    [System.Serializable]
+    public class RequireItems
     {
-        _initDone = true;
-        _building = GetComponent<Building>();
+        public List<RequireItem> requireItems;
     }
-
-    public void Update()
+    [System.Serializable]
+    public class RequireItem
     {
-        if (!_initDone) return;
-
-
-        if (_openCharacter != null)
+        public ItemName itemName;
+        public int requireCount;
+        public int currentCount;
+        public List<int> itemIdList = new List<int>();
+        public void AddCount(int itemId)
         {
-            if ((transform.position - _openCharacter.transform.position).magnitude > 2)
-            {
-                _openCharacter.GetComponent<PlayerController>().ExitInteract();
-            }
+            currentCount++;
+            itemIdList.Add(itemId);
         }
     }
 
+    [SerializeField] List<RequireItems> _requireItemList;
+    public List<RequireItems> RequireItemList=>_requireItemList;
+
+    public Action<bool> ItemChangedHandler { get; set; }
+
+    public void Init()
+    {
+
+    }
+
+
     public override bool Interact(Character character)
     {
-        if (_openCharacter != null || _mainBlueprint != null) return false;
+        CharacterEquipment characterEquipment = character.GetComponent<CharacterEquipment>();
+        if(characterEquipment== null) return false;
 
-        _openCharacter = character;
-        character.IsEnableAttack = false;
-
-        if(_ui == null)_ui = Manager.UI.GetUI(Define.UIName.Smithy) as UI_Smithy;
-
-        _ui.Open(character,this);
+        AddEnforeceItem(characterEquipment.WeaponId);
 
         return true;
+
     }
 
     public override bool ExitInteract(Character character)
     {
-        _ui.Close();
-        character.IsEnableAttack = true;
-        _openCharacter = null;
-
         return true;
     }
-
-    public void SetMainBlueprint(int index)
+    public void AddEnforeceItem(int itemId)
     {
-        if (Client.Instance.IsSingle || Client.Instance.IsMain)
-        {
-            _mainBlueprintIndex = index;
-            ItemBlueprintData data = ItemBlueprintDataList[index];
-            _mainBlueprint = new ItemBlueprintData();
-            _mainBlueprint.BlueprintItemList = data.BlueprintItemList.ConvertAll(o => new BlueprintItem(o));
-            _mainBlueprint.ResultItemName = data.ResultItemName;
-             MainBlueprintSetHandler?.Invoke();
+        Item item = Manager.Item.GetItem(itemId);
+        if (item == null) return;
 
-            Client.Instance.SendBuildingInfo(_building);
-        }
-        else
+        if (item.ItemData.ItemType == Define.ItemType.Equipment)
         {
-            _requsetBlueprintIndex = index;
-            Client.Instance.SendBuildingControlInfo(_building);
-            _requsetBlueprintIndex = -1;
+
+            // 캐릭터에게 아이템을 벗긴다.
+            CharacterEquipment characterEquipment = Manager.Character.GetCharacter(item.GrapedCharacterId).GetComponent<CharacterEquipment>();
+            if (characterEquipment != null)
+            {
+                // 아이템이 무기일 경우
+                if (item.ItemData.EquipmentData == null)
+                {
+                    characterEquipment.TakeOffWeapon();
+                }
+                // 아이템이 방어구 일 경우
+                else
+                {
+                    characterEquipment.TakeOffOther(item.ItemData.EquipmentData.CharacterParts);
+                }
+                _reinforceItemId = itemId;
+                item.Hide();
+            }
         }
+        ReinforeceItemSet?.Invoke();
+    }
+
+
+    public void DeserializeControlData()
+    {
+    }
+
+    public void DeserializeData()
+    {
+    }
+
+
+    public void SerializeControlData()
+    {
+    }
+
+    public void SerializeData()
+    {
 
     }
 
     public bool InsertItem(Item item)
     {
         bool isSuccess = false;
-        if (_mainBlueprint == null) return isSuccess;
+        ItemEquipment itemEquipment = Manager.Item.GetItem(_reinforceItemId).GetComponent<ItemEquipment>();
 
-        for (int i = 0; i < _mainBlueprint.BlueprintItemList.Count; i++)
+        if (itemEquipment == null) return isSuccess;
+
+        for (int i = 0; i < _requireItemList[itemEquipment.Rank].requireItems.Count; i++)
         {
-            if (_mainBlueprint.BlueprintItemList[i].name == item.ItemData.ItemName)
+            if (_requireItemList[itemEquipment.Rank].requireItems[i].itemName== item.ItemData.ItemName)
             {
-                if (_mainBlueprint.BlueprintItemList[i].requireCount > _mainBlueprint.BlueprintItemList[i].currentCount)
+                if (_requireItemList[itemEquipment.Rank].requireItems[i].requireCount > _requireItemList[itemEquipment.Rank].requireItems[i].currentCount)
                 {
-                    _mainBlueprint.BlueprintItemList[i].AddCount(item.ItemId);
+                    _requireItemList[itemEquipment.Rank].requireItems[i].AddCount(item.ItemId);
                     item.Hide();
                     bool isFinish = CheckIsFinish();
                     ItemChangedHandler?.Invoke(isFinish);
@@ -114,23 +126,25 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
                 }
             }
         }
-        if (isSuccess && Client.Instance.IsMain)
-        {
-            Client.Instance.SendBuildingInfo(_building);
-        }
+        //if (isSuccess && Client.Instance.IsMain)
+        //{
+        //    Client.Instance.SendBuildingInfo(_building);
+        //}
 
         return isSuccess;
     }
 
     public bool CheckIsFinish()
     {
-        if (_mainBlueprint == null) return false;
+        ItemEquipment itemEquipment = Manager.Item.GetItem(_reinforceItemId).GetComponent<ItemEquipment>();
+
+        if (itemEquipment == null) return false;
 
         bool isSuccess = true;
 
-        for (int i = 0; i < _mainBlueprint.BlueprintItemList.Count; i++)
+        for (int i = 0; i < _requireItemList[itemEquipment.Rank].requireItems.Count; i++)
         {
-            if (_mainBlueprint.BlueprintItemList[i].requireCount > _mainBlueprint.BlueprintItemList[i].currentCount)
+            if (_requireItemList[itemEquipment.Rank].requireItems[i].requireCount > _requireItemList[itemEquipment.Rank].requireItems[i].currentCount)
             {
                 isSuccess = false;
                 break;
@@ -139,117 +153,28 @@ public class Smithy : InteractableObject, IBuildingOption, IEnableInsertItem
 
         if (isSuccess)
         {
-            foreach (var blueprint in _mainBlueprint.BlueprintItemList)
+            foreach (var requireItem in _requireItemList[itemEquipment.Rank].requireItems)
             {
-                foreach (var id in blueprint.itemIdList)
+                foreach (var id in requireItem.itemIdList)
                 {
                     Manager.Item.RemoveItem(id);
                 }
 
-                blueprint.itemIdList.Clear();
+                requireItem.currentCount = 0;
+                requireItem.itemIdList.Clear();
             }
 
             Item item = null;
-            Manager.Item.GenerateItem(MainBlueprint.ResultItemName, transform.position,ref item);
-            _mainBlueprint = null;
-            _mainBlueprintIndex = -1;
+            int random = Random.Range(0, 3);
+
+            if(random == 0) itemEquipment.AddSpeed(Random.Range(0.2f, 0.6f));
+            if(random == 1) itemEquipment.AddDefense(Random.Range(0, 2));
+            if(random == 2) itemEquipment.AddHp(Random.Range(3,5));
+
+            item = Manager.Item.GetItem(_reinforceItemId);
+            item.Show();
         }
 
         return isSuccess;
-    }
-
-    public void SerializeData()
-    {
-        Util.WriteSerializedData(_mainBlueprintIndex);
-        if (_mainBlueprint != null)
-        {
-            Util.WriteSerializedData(_mainBlueprint.BlueprintItemList.Count);
-            for (int i = 0; i < _mainBlueprint.BlueprintItemList.Count; i++)
-            {
-                int name = (int)_mainBlueprint.BlueprintItemList[i].name;
-                Util.WriteSerializedData(name);
-                int requireCount = _mainBlueprint.BlueprintItemList[i].requireCount;
-                Util.WriteSerializedData(requireCount);
-                int currentCount = _mainBlueprint.BlueprintItemList[i].currentCount;
-                Util.WriteSerializedData(currentCount);
-
-                Util.WriteSerializedData(_mainBlueprint.BlueprintItemList[i].itemIdList.Count);
-                for (int j = 0; j < _mainBlueprint.BlueprintItemList[i].itemIdList.Count; j++)
-                {
-                    int id = _mainBlueprint.BlueprintItemList[i].itemIdList[j];
-                    Util.WriteSerializedData(id);
-                }
-            }
-        }
-        else
-            Util.WriteSerializedData(0);
-    }
-
-    public void DeserializeData()
-    {
-        int mainBlueprintIndex = Util.ReadSerializedDataToInt();
-
-        if (_mainBlueprintIndex == -1 && mainBlueprintIndex != -1)
-        {
-            _mainBlueprintIndex = mainBlueprintIndex;
-            ItemBlueprintData data = ItemBlueprintDataList[mainBlueprintIndex];
-            _mainBlueprint = ScriptableObject.CreateInstance<ItemBlueprintData>();
-            _mainBlueprint.BlueprintItemList = data.BlueprintItemList.ConvertAll(o => new BlueprintItem(o));
-            _mainBlueprint.ResultItemName = data.ResultItemName;
-            MainBlueprintSetHandler?.Invoke();
-        }
-        else if(_mainBlueprintIndex != -1 && mainBlueprintIndex == -1) 
-        {
-            _mainBlueprint = null;
-            _mainBlueprintIndex = -1;
-            ItemChangedHandler?.Invoke(true);
-        }
-
-        int blueprintItemCount = Util.ReadSerializedDataToInt();
-        for (int i = 0; i < blueprintItemCount; i++)
-        {
-            int name = Util.ReadSerializedDataToInt();
-            int requireCount = Util.ReadSerializedDataToInt();
-            int currentCount = Util.ReadSerializedDataToInt();
-
-            if (_mainBlueprint.BlueprintItemList.Count <= i)
-            {
-                _mainBlueprint.BlueprintItemList.Add(new BlueprintItem((ItemName)name, requireCount, currentCount));
-            }
-            else
-            {
-                _mainBlueprint.BlueprintItemList[i].name = (ItemName)name;
-                _mainBlueprint.BlueprintItemList[i].requireCount = requireCount;
-                _mainBlueprint.BlueprintItemList[i].currentCount = currentCount;
-            }
-            int itemIdCount = Util.ReadSerializedDataToInt();
-
-            _mainBlueprint.BlueprintItemList[i].itemIdList.Clear();
-
-            for (int j = 0; j < itemIdCount; j++)
-            {
-                int id = Util.ReadSerializedDataToInt();
-                if (_mainBlueprint.BlueprintItemList[i].itemIdList.Count >= j)
-                    _mainBlueprint.BlueprintItemList[i].itemIdList.Add(id);
-                else
-                    _mainBlueprint.BlueprintItemList[i].itemIdList[j] = id;
-            }
-        }
-        ItemChangedHandler?.Invoke(CheckIsFinish());
-    }
-
-    public void SerializeControlData()
-    {
-        Util.WriteSerializedData(_requsetBlueprintIndex);
-    }
-
-    public void DeserializeControlData()
-    {
-        int requestIndex = Util.ReadSerializedDataToInt();
-        if (requestIndex != -1 && Client.Instance.IsMain)
-        {
-            SetMainBlueprint(requestIndex);
-        }
-
     }
 }

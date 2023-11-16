@@ -14,6 +14,7 @@ public class Item : MonoBehaviour, IDataSerializable
     public bool IsHide { get; private set; }
     public bool IsGraped { set; get; }
     int _grapedCharacterId = -1;
+    public int GrapedCharacterId => _grapedCharacterId;
 
     SpriteRenderer _spriteRenderer;
     Rigidbody2D _rigidbody;
@@ -59,6 +60,7 @@ public class Item : MonoBehaviour, IDataSerializable
             FreezeRigidBody();
             transform.parent = customCharacter.LiftPos.transform;
             transform.localPosition = Vector3.zero;
+            _grapedCharacterId = id;
             IsGraped = true;
         }
 
@@ -112,9 +114,15 @@ public class Item : MonoBehaviour, IDataSerializable
         Client.Instance.SendItemInfo(this);
     }
 
-    public void UpBound(float power)
+    public void Bounding(Vector3 dir, float power)
     {
-        _rigidbody.AddForce(Vector2.up* power,ForceMode2D.Impulse);
+        _rigidbody.AddForce(dir.normalized * power, ForceMode2D.Impulse);
+    }
+    public void RandomBounding(float power)
+    {
+        Vector3 bound = Vector2.up;
+        bound.x = Random.Range(-0.5f, 0.5f);
+        _rigidbody.AddForce(bound.normalized* power,ForceMode2D.Impulse);
     }
 
     public string SerializeData()
