@@ -390,13 +390,9 @@ MonoBehaviour:
   _description: "\uC544\uC774\uD15C\uC744 \uC81C\uC791\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   _blueprint:
     _blueprintItmeList:
-    - name: 1
-      itemIdList: 
-      requireCount: 2
-      currentCount: 0
     - name: 2
       itemIdList: 
-      requireCount: 2
+      requireCount: 1
       currentCount: 0
 --- !u!114 &2797046974312650103
 MonoBehaviour:

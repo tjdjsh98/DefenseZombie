@@ -392,11 +392,7 @@ MonoBehaviour:
     _blueprintItmeList:
     - name: 1
       itemIdList: 
-      requireCount: 2
-      currentCount: 0
-    - name: 2
-      itemIdList: 
-      requireCount: 2
+      requireCount: 1
       currentCount: 0
 --- !u!114 &6185455690212065492
 MonoBehaviour:

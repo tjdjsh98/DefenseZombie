@@ -204,7 +204,6 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
                 _circleSlider.Hide();
             _isConstuctDone = true;
             gameObject.layer = _originLayer;
-            Debug.Log("A");
         }
 
         return isSuccess;
@@ -213,6 +212,9 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
     public string SerializeData()
     {
         Util.StartWriteSerializedData();
+
+        Util.WriteSerializedData(_isConstuctDone);
+
 
         Util.WriteSerializedData(Blueprint.BlueprintItemList.Count);
         for (int i = 0; i < Blueprint.BlueprintItemList.Count; i++)
@@ -238,6 +240,7 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
             option.SerializeData();
         }
 
+
         return Util.EndWriteSerializeData();
     }
 
@@ -246,6 +249,20 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
         if (stringData.Equals(string.Empty)) return;
 
         Util.StartReadSerializedData(stringData);
+
+        bool isConstuctDone = Util.ReadSerializedDataToBoolean();
+
+        if (!_isConstuctDone && isConstuctDone)
+        {
+            _isConstuctDone= isConstuctDone;
+
+            foreach (var s in _spriteRenderers)
+                s.color = Color.white;
+            if (_circleSlider != null)
+                _circleSlider.Hide();
+            _isConstuctDone = true;
+            gameObject.layer = _originLayer;
+        }
 
         int blueprintItemCount = Util.ReadSerializedDataToInt();
         for(int i = 0; i < blueprintItemCount; i++)
@@ -279,6 +296,8 @@ public class Building : MonoBehaviour, IHp, IEnableInsertItem, IDataSerializable
         }
         ItemChangedHandler?.Invoke(CheckIsFinish());
 
+        
+        
         foreach (var option in _buildingOptionList)
         {
             option.DeserializeData();

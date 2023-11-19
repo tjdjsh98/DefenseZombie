@@ -1999,7 +1999,7 @@ MonoBehaviour:
       isRightSpawn: 1
       nextGenDelay: 1
       hp: 2
-    nextInterval: 20
+    nextInterval: 200
   - levelName: 2
     levelCharacterList:
     - characterName: 12

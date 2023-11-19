@@ -247,7 +247,8 @@ public class Shop : InteractableObject, IBuildingOption, IEnableInsertItem
     public void DeserializeControlData()
     {
         int requestIndex = Util.ReadSerializedDataToInt();
-        if (requestIndex <= 0 && Client.Instance.IsMain)
+        Debug.Log(requestIndex);
+        if (requestIndex >= 0 && Client.Instance.IsMain)
         {
             SetMainBlueprint(requestIndex);
         }

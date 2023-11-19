@@ -222,7 +222,7 @@ MonoBehaviour:
     _blueprintItmeList:
     - name: 1
       itemIdList: 
-      requireCount: 2
+      requireCount: 1
       currentCount: 0
 --- !u!1001 &4808508675580610301
 PrefabInstance:

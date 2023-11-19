@@ -207,8 +207,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTile: 0
   <BuildingName>k__BackingField: 2
-  <MaxHp>k__BackingField: 10
-  <Hp>k__BackingField: 10
+  <MaxHp>k__BackingField: 2
+  <Hp>k__BackingField: 2
   _size:
     isShow: 1
     width: 1
