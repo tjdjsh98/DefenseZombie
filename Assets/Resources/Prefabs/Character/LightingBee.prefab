@@ -154,6 +154,7 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
+  InitDone: 0
 --- !u!114 &6994402321533908292
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +214,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _character: {fileID: 5668528248594196161}
-  _customCharacter: {fileID: 0}
   _attackType: 0
   _defaultAttack:
     attackEffectName: 0
@@ -226,17 +226,13 @@ MonoBehaviour:
       size: {x: 15, y: 10, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
-    damage: 1
+    damage: 5
     power: 1
     stagger: 0
     penetrationPower: 0
     actualAttackEffectName: 0
     isTargeting: 0
-  _frontWeapon: {fileID: 0}
-  _frontfirePoint: {fileID: 0}
-  _behindWeapon: {fileID: 0}
-  _behindfirePoint: {fileID: 0}
-  _enableAttackLayer: Player
+    attackDelay: 0
 --- !u!1 &2655085404215405371
 GameObject:
   m_ObjectHideFlags: 0

@@ -33,6 +33,9 @@ public class GameManager : MonoBehaviour
 
     public Building MainCore;
 
+    public bool IsGameOver = false;
+    public bool IsClear = false;
+
     public void Init()
     {
 
@@ -60,10 +63,32 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (MainCore == null)
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
         {
-            MainCore = Manager.Building.GetBuildingByName(BuildingName.Core);
+            if (MainCore == null)
+            {
+                MainCore = Manager.Building.GetBuildingByName(BuildingName.Core);
+                if (MainCore != null)
+                {
+                    MainCore.DestroyedHandler += () =>
+                    {
+                        IsGameOver = true;
+                        Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
+                    };
+                }
+            }
         }
+        if (IsGameOver)
+        {
+            UI_GameOver uI_GameOver = Manager.UI.GetUI(UIName.GameOver) as UI_GameOver;
+            uI_GameOver.GameOver();
+        }
+        if (IsClear)
+        {
+            UI_GameOver uI_GameOver = Manager.UI.GetUI(UIName.GameOver) as UI_GameOver;
+            uI_GameOver.Clear();
+        }
+
     }
 
     IEnumerator CorStartLevel()
@@ -88,8 +113,11 @@ public class GameManager : MonoBehaviour
                     }
                     if (time <= 0)
                     {
-                        if (_levels.Count <= _level) _level = 0;
-
+                        if (_levels.Count <= _level)
+                        {
+                            IsClear=true;
+                            break;
+                        }
                         IsStartLevel = true;
                         index = 0;
                         time = _levels[_level].nextInterval;
@@ -122,10 +150,11 @@ public class GameManager : MonoBehaviour
                                     SummonCount--;
                                     Client.Instance.SendManagerInfo(ManagerName.Game, SerializeData());
                                 };
-                                CustomCharacter customCharacter = c as CustomCharacter;
                                 if (levelCharacter.hp != 0)
-                                    customCharacter.SetHp(levelCharacter.hp);
-                                if (levelCharacter.setupData != null)
+                                    c.SetHp(levelCharacter.hp);
+                                CustomCharacter customCharacter = c as CustomCharacter;
+                                
+                                if (customCharacter != null && levelCharacter.setupData != null)
                                 {
                                     customCharacter.SetSetup(levelCharacter.setupData);
                                 }
@@ -138,6 +167,8 @@ public class GameManager : MonoBehaviour
                                 {
                                     SummonCount--;
                                 };
+                                if (levelCharacter.hp != 0)
+                                    character.SetHp(levelCharacter.hp);
                                 CustomCharacter customCharacter = character as CustomCharacter;
 
                                 if (levelCharacter.setupData != null)
@@ -181,22 +212,26 @@ public class GameManager : MonoBehaviour
                 Building building = Manager.Data.GetBuilding(BuildingName.Rock);
                 Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
 
-                if (cellPos.x != -999)
+                if (cellPos.x < 15 && cellPos.x > -15)
                 {
-                    _rockCount++;
-                    Building rock = null;
-                    int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Rock, cellPos, ref rock,
-                        (b) =>
-                        {
-                            b.DestroyedHandler += () =>
-                            {
-                                _rockCount--;
-                            };
-                        });
 
-                    if (rock != null)
+                    if (cellPos.x != -999)
                     {
-                        rock.DestroyedHandler += () => { _rockCount--; };
+                        _rockCount++;
+                        Building rock = null;
+                        int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Rock, cellPos, ref rock,
+                            (b) =>
+                            {
+                                b.DestroyedHandler += () =>
+                                {
+                                    _rockCount--;
+                                };
+                            });
+
+                        if (rock != null)
+                        {
+                            rock.DestroyedHandler += () => { _rockCount--; };
+                        }
                     }
                 }
             }
@@ -206,22 +241,26 @@ public class GameManager : MonoBehaviour
                 Building building = Manager.Data.GetBuilding(BuildingName.Tree);
                 Vector2Int cellPos = Manager.Building.FindRandomEmptyGroundInRange(building.BuildingSize);
 
-                if (cellPos.x != -999)
+                if (cellPos.x < 15 && cellPos.x > -15)
                 {
-                    Building tree = null;
-                    _treeCount++;
-                    int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos, ref tree,
-                         (b) =>
-                         {
-                             b.DestroyedHandler += () =>
-                             {
-                                 _treeCount--;
-                             };
-                         });
 
-                    if (tree != null)
+                    if (cellPos.x != -999)
                     {
-                        tree.DestroyedHandler += () => { _treeCount--; };
+                        Building tree = null;
+                        _treeCount++;
+                        int requestNumber = Manager.Building.GenerateBuilding(BuildingName.Tree, cellPos, ref tree,
+                             (b) =>
+                             {
+                                 b.DestroyedHandler += () =>
+                                 {
+                                     _treeCount--;
+                                 };
+                             });
+
+                        if (tree != null)
+                        {
+                            tree.DestroyedHandler += () => { _treeCount--; };
+                        }
                     }
                 }
             }
@@ -266,7 +305,10 @@ public class GameManager : MonoBehaviour
 
         Util.WriteSerializedData(IsStartLevel);
         Util.WriteSerializedData(time);
+        Util.WriteSerializedData(_level) ;
         Util.WriteSerializedData(SummonCount);
+        Util.WriteSerializedData(IsGameOver);
+        Util.WriteSerializedData(IsClear);
 
 
         return Util.EndWriteSerializeData();
@@ -279,7 +321,10 @@ public class GameManager : MonoBehaviour
 
         IsStartLevel = Util.ReadSerializedDataToBoolean();
         time = Util.ReadSerializedDataToFloat();
+        _level = Util.ReadSerializedDataToInt();
         SummonCount = Util.ReadSerializedDataToInt();
+        IsGameOver = Util.ReadSerializedDataToBoolean();
+        IsClear = Util.ReadSerializedDataToBoolean();
     }
 }
 

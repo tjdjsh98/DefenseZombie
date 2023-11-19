@@ -11,7 +11,6 @@ public class Item : MonoBehaviour, IDataSerializable
     int _itemNumber;
     public int ItemId => _itemNumber;
 
-    public bool IsHide { get; private set; }
     public bool IsGraped { set; get; }
     int _grapedCharacterId = -1;
     public int GrapedCharacterId => _grapedCharacterId;
@@ -69,7 +68,8 @@ public class Item : MonoBehaviour, IDataSerializable
 
     public void ReleaseItem(Character character = null, bool putDown = false)
     {
-        ReleaseRigidBody();
+        _rigidbody.velocity = Vector3.zero;
+        _rigidbody.isKinematic = false;
         IsGraped = false;
         transform.parent = null;
         _grapedCharacterId = -1;
@@ -101,7 +101,6 @@ public class Item : MonoBehaviour, IDataSerializable
     public void Hide()
     {
         gameObject.SetActive(false);
-        IsHide = true;
 
         Client.Instance.SendItemInfo(this);
     }
@@ -109,20 +108,20 @@ public class Item : MonoBehaviour, IDataSerializable
     public void Show()
     {
         gameObject.SetActive(true);
-        IsHide = false;
 
         Client.Instance.SendItemInfo(this);
     }
 
-    public void Bounding(Vector3 dir, float power)
-    {
-        _rigidbody.AddForce(dir.normalized * power, ForceMode2D.Impulse);
-    }
+  
     public void RandomBounding(float power)
     {
         Vector3 bound = Vector2.up;
         bound.x = Random.Range(-0.5f, 0.5f);
-        _rigidbody.AddForce(bound.normalized* power,ForceMode2D.Impulse);
+        bound = bound.normalized;
+
+        _rigidbody.AddForce(bound * power,ForceMode2D.Impulse);
+
+        Client.Instance.SendItemInfo(this);
     }
 
     public string SerializeData()
@@ -132,10 +131,15 @@ public class Item : MonoBehaviour, IDataSerializable
         Util.WriteSerializedData(_rigidbody.velocity.x);
         Util.WriteSerializedData(_rigidbody.velocity.y);
         Util.WriteSerializedData(_rigidbody.isKinematic);
-        Util.WriteSerializedData(IsHide);
+        Util.WriteSerializedData(gameObject.activeSelf);
         Util.WriteSerializedData(_grapedCharacterId);
         Util.WriteSerializedData(IsGraped);
 
+        foreach (var option in _optionList)
+        {
+            option.SerializeData();
+        }
+      
         return Util.EndWriteSerializeData();
     }
 
@@ -147,11 +151,9 @@ public class Item : MonoBehaviour, IDataSerializable
 
         _rigidbody.velocity = new Vector3(Util.ReadSerializedDataToFloat(),Util.ReadSerializedDataToFloat());
         _rigidbody.isKinematic = Util.ReadSerializedDataToBoolean();
-        bool isHide = Util.ReadSerializedDataToBoolean();
-        if(IsHide && !isHide)
-            Show();
-        if(!IsHide && isHide)
-            Hide();
+        bool active = Util.ReadSerializedDataToBoolean();
+        gameObject.SetActive(active);
+        
 
         int id = Util.ReadSerializedDataToInt();
         bool isGraped = Util.ReadSerializedDataToBoolean();
@@ -163,8 +165,10 @@ public class Item : MonoBehaviour, IDataSerializable
         {
             ReleaseItem();
         }
-        IsGraped = isGraped;
-
+        foreach (var option in _optionList)
+        {
+            option.DeserializeData();
+        }
     }
 
     public void SyncItemInfo(S_BroadcastItemInfo packet)

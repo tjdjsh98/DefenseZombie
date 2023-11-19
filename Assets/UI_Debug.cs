@@ -23,7 +23,8 @@ public class UI_Debug : UIBase
 
     public override void Init()
     {
-        
+        if (Client.Instance.IsSingle)
+            _pingText.text = string.Empty;
     }
 
     public void AddText(string text)
@@ -66,7 +67,8 @@ public class UI_Debug : UIBase
             mean += time;
         }
 
-        _pingText.text = $"Ping : {((int)(mean/_pingQueue.Count)).ToString()}";
+        _pingText.text = $"Ping : {((int)(mean/_pingQueue.Count)).ToString()}\n";
+        _pingText.text += Client.Instance.RecPacketMean.ToString();
 
         stopwatch.Reset();
     }

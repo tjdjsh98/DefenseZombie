@@ -207,8 +207,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTile: 0
   <BuildingName>k__BackingField: 1
-  <MaxHp>k__BackingField: 10
-  <Hp>k__BackingField: 10
+  <MaxHp>k__BackingField: 40
+  <Hp>k__BackingField: 40
   _size:
     isShow: 1
     width: 1
@@ -222,7 +222,7 @@ MonoBehaviour:
     _blueprintItmeList:
     - name: 1
       itemIdList: 
-      requireCount: 3
+      requireCount: 2
       currentCount: 0
 --- !u!1001 &4808508675580610301
 PrefabInstance:

@@ -182,13 +182,16 @@ public class PlayerController : MonoBehaviour, ICharacterOption
     {
         while (true)
         {
-            if (Client.Instance.IsMain)
+            if (_character.InitDone)
             {
-                Client.Instance.SendCharacterInfo(_character);
-            }
-            if (IsControllerable)
-            {
-                Client.Instance.SendCharacterControlInfo(_character);
+                if (Client.Instance.IsMain)
+                {
+                    Client.Instance.SendCharacterInfo(_character);
+                }
+                if (IsControllerable)
+                {
+                    Client.Instance.SendCharacterControlInfo(_character);
+                }
             }
             yield return new WaitForSeconds(Client.SendPacketInterval);
            
@@ -209,6 +212,13 @@ public class PlayerController : MonoBehaviour, ICharacterOption
     }
 
     public void DataDeserialize()
+    {
+    }
+    public void SerializeControlData()
+    {
+    }
+
+    public void DeserializeControlData()
     {
     }
 }

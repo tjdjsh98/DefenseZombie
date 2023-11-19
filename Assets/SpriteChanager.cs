@@ -103,6 +103,13 @@ public class SpriteChanager : MonoBehaviour, ICharacterOption
     {
         
     }
+    public void SerializeControlData()
+    {
+    }
+
+    public void DeserializeControlData()
+    {
+    }
 }
 
 

@@ -1,7 +1,7 @@
 using UnityEngine;
 using static Define;
 
-public class Weapon : MonoBehaviour, ICharacterOption
+public class Weapon : MonoBehaviour
 {
     [SerializeField] protected Character _character;
     
@@ -21,7 +21,7 @@ public class Weapon : MonoBehaviour, ICharacterOption
     public Vector3 TargetPosition { set; get; }
 
 
-    public virtual void Init()
+    public virtual void Awake()
     {
         _character = GetComponentInParent<Character>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
@@ -39,8 +39,6 @@ public class Weapon : MonoBehaviour, ICharacterOption
 
     protected virtual void RegisterControl()
     {
-      
-
         if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
         {
             _animatorHandler.AttackHandler += Attack;
@@ -157,11 +155,11 @@ public class Weapon : MonoBehaviour, ICharacterOption
             int layerMask = 0;
             if (_character.tag.Equals(Define.CharacterTag.Player.ToString()))
             {
-                layerMask = Define.PlayerLayerMask | Define.BuildingLayerMask;
+                layerMask = Define.EnemyLayerMask | Define.BuildingLayerMask;
             }
             else if (_character.tag.Equals(Define.CharacterTag.Enemy.ToString()))
             {
-                layerMask = Define.EnemyLayerMask | Define.BuildingLayerMask;
+                layerMask = Define.PlayerLayerMask | Define.BuildingLayerMask;
             }
 
             RaycastHit2D[] hits = null;

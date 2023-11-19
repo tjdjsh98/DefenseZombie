@@ -16,14 +16,6 @@ public class ItemManager : MonoBehaviour
     public void Init()
     {
         Item item = null;
-        GenerateItem(ItemName.Wood, Vector3.zero,ref item);
-        GenerateItem(ItemName.Wood, Vector3.zero, ref item);
-        GenerateItem(ItemName.Wood, Vector3.zero, ref item);
-
-        if(!Client.Instance.IsSingle && Client.Instance.IsMain)
-        {
-            StartCoroutine(SendPacketCor());
-        }
     }
 
 
@@ -167,10 +159,12 @@ public class ItemManager : MonoBehaviour
         Vector3 position = new Vector3(packet.posX, packet.posY);
         item.transform.position = position;
 
-        item.RandomBounding(10);
+        if (Client.Instance.IsMain)
+        {
+            item.RandomBounding(5);
+        }
 
         _itemDictionary.Add(item.ItemId, item);
-
 
         if(_requestGenerateAction.ContainsKey(packet.requestNumber))
         {
@@ -206,8 +200,6 @@ public class ItemManager : MonoBehaviour
 
             Vector3 position = new Vector3(info.posX, info.posY);
             item.transform.position = position;
-
-            item.RandomBounding(10);
 
             _itemDictionary.Add(item.ItemId, item);
 
@@ -258,15 +250,5 @@ public class ItemManager : MonoBehaviour
         return false;
     }
 
-    IEnumerator SendPacketCor()
-    {
-        while (true)
-        {
-            foreach (var item in _itemDictionary.Values)
-            {
-                Client.Instance.SendItemInfo(item);
-            }
-            yield return new WaitForSeconds(0.25f);
-        }
-    }
+   
 }

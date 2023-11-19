@@ -55,6 +55,7 @@ public class CustomCharacter : Character
     public override void Init()
     {
         base.Init();
+        InitDone = false;
 
         Transform[] trs = GetComponentsInChildren<Transform>();
         foreach (Transform t in trs)
@@ -88,10 +89,15 @@ public class CustomCharacter : Character
         {
             SetSetup(_setupData);
         }
-        else
+        else if((Client.Instance.IsSingle || Client.Instance.IsMain))
         {
             _characterEquipment.TakeOffWeapon();
         }
+        else if(!Client.Instance.IsSingle && !Client.Instance.IsMain )
+        {
+            _characterEquipment.DefaultSetting();
+        }
+        InitDone = true;
     }
 
     public void SetSetup(SetupData data)
@@ -99,7 +105,8 @@ public class CustomCharacter : Character
         if (data == null) return;
 
         ItemData itemData = Manager.Data.GetItemData(data.HatItem);
-        if (itemData.ItemType == ItemType.Equipment)
+
+        if (itemData != null && itemData.ItemType == ItemType.Equipment)
         {
             if (itemData.EquipmentData != null && itemData.EquipmentData.CharacterParts == CharacterParts.Hat)
             {
@@ -116,7 +123,7 @@ public class CustomCharacter : Character
             }
         }
         itemData = Manager.Data.GetItemData(data.WeaponItem);
-        if(itemData.ItemType == ItemType.Equipment)
+        if(itemData != null && itemData.ItemType == ItemType.Equipment)
         {
             if (itemData.EquipmentData == null)
             {
@@ -576,10 +583,12 @@ public class CustomCharacter : Character
     {
         Util.StartWriteSerializedData();
 
+        Util.WriteSerializedData(MaxHp);
         Util.WriteSerializedData(IsDamaged);
         Util.WriteSerializedData(_holdingItemId);
         Util.WriteSerializedData(IsHide);
-
+        Util.WriteSerializedData(_isHited);
+        Util.WriteSerializedData(_damage);
 
         foreach (var option in _optionList)
         {
@@ -597,6 +606,7 @@ public class CustomCharacter : Character
         if (string.IsNullOrEmpty(stringData)) return;
         Util.StartReadSerializedData(stringData);
 
+        _maxHp = Util.ReadSerializedDataToInt();
         bool _isDamaged = Util.ReadSerializedDataToBoolean();
         if (_isDamaged && _isDamaged != IsDamaged)
         {
@@ -612,6 +622,16 @@ public class CustomCharacter : Character
             HideCharacter();
         if (IsHide && !isHide)
             ShowCharacter();
+
+        bool isHited = Util.ReadSerializedDataToBoolean();
+        int damage = Util.ReadSerializedDataToInt();
+        if (isHited)
+        {
+            if (damage == 0)
+                (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText("°¡µå", transform.position + Vector3.up, new Color(0.3f, 0.3f, .9f, 1f), 5);
+            else
+                (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText(damage.ToString(), transform.position + Vector3.up, Color.red, 5);
+        }
 
 
         foreach (var option in _optionList)
@@ -639,6 +659,12 @@ public class CustomCharacter : Character
         Util.WriteSerializedData(_frontHandPos.transform.localRotation.w);
         Util.WriteSerializedData(_behindHandPos.transform.localRotation.z);
         Util.WriteSerializedData(_behindHandPos.transform.localRotation.w);
+
+
+        foreach (var option in _optionList)
+        {
+            option.SerializeControlData();
+        }
 
         return Util.EndWriteSerializeData();
     }
@@ -675,6 +701,12 @@ public class CustomCharacter : Character
 
         _frontHandPos.transform.localRotation = new Quaternion(0, 0, frontHandRotationZ, frontHandRotationW);
         _behindHandPos.transform.localRotation = new Quaternion(0, 0, behindHandRotationZ, behindHandRotationW);
+
+        foreach (var option in _optionList)
+        {
+            option.DeserializeControlData();
+        }
+
     }
 
     public float GetFrontHandRotation()

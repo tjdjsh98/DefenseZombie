@@ -1231,12 +1231,13 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
+  InitDone: 0
   _frontHandPos: {fileID: 9106252758544046926}
   _frontHand: {fileID: 6092340621936118896}
   _behindHandPos: {fileID: 3892684445035655860}
   _behindHand: {fileID: 5036835525673400675}
   _liftPos: {fileID: 579759173754713808}
-  _preHoldingWeaponData: {fileID: 0}
+  _setupData: {fileID: 0}
   attackType: 0
 --- !u!114 &455314585566098085
 MonoBehaviour:
@@ -1263,7 +1264,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _character: {fileID: 8863628757591892851}
-  _customCharacter: {fileID: 0}
   _attackType: 0
   _defaultAttack:
     attackEffectName: 0
@@ -1282,11 +1282,7 @@ MonoBehaviour:
     penetrationPower: 0
     actualAttackEffectName: 0
     isTargeting: 0
-  _frontWeapon: {fileID: 2117841643158420137}
-  _frontfirePoint: {fileID: 8889592209697593388}
-  _behindWeapon: {fileID: 2368006003090742442}
-  _behindfirePoint: {fileID: 3536389312655763737}
-  _enableAttackLayer: Enemy
+    attackDelay: 0
 --- !u!114 &6490744425929117837
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,186 +1,90 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
-using static Define;
 
 public class UI_Smithy : UIBase
 {
-    Character _openCharacter;
-    Shop _smithy;
+    Smithy _smity;
+    CustomCharacter _customCharacter;
+    CharacterEquipment _characterEquipment;
 
-    [SerializeField] GameObject _leftButton;
-    [SerializeField] GameObject _rightButton;
+    [SerializeField] Image _weaponBackground;
+    [SerializeField] Image _weaponiamge;
+    [SerializeField] Image _hatBackground;
+    [SerializeField] Image _hatIamge;
 
-    [SerializeField]List<Image> _slotImageList = new List<Image>();
-    [SerializeField]List<Image> _slotBackList = new List<Image>();
-    [SerializeField]List<Image> _stuffItemImageList = new List<Image>();
-    List<TextMeshProUGUI> _stuffItemCountList = new List<TextMeshProUGUI>();
-
-    int _page = 0;
-
-    int _selectIndex = 0;
-    float _imageSize = 80;
+    int _weaponId = 0;
+    int _hatId = 0;
 
     public override void Init()
     {
-        _isDone = true;
-        foreach(var image in _stuffItemImageList)
-        {
-            _stuffItemCountList.Add(image.GetComponentInChildren<TextMeshProUGUI>());
-        }
-
         gameObject.SetActive(false);
     }
 
-    public void Open(Character character, Shop smithy)
+    public void Open(Smithy smithy, CustomCharacter customCharacter)
     {
-        _openCharacter = character;
-        _smithy = smithy;
+        if (smithy == null || smithy.gameObject == null) return;
 
-        _page = 0;
-        _leftButton.gameObject.SetActive(false);
+        _smity = smithy;
+        _customCharacter = customCharacter;
+        _characterEquipment= customCharacter.GetComponent<CharacterEquipment>();
 
-        if ((_page + 1) * _slotImageList.Count >= _smithy.ItemBlueprintDataList.Count)
+        Item weaponItem = Manager.Item.GetItem(_characterEquipment.WeaponId);
+        if (weaponItem != null)
         {
-            _rightButton.gameObject.SetActive(false);
+            _weaponId = weaponItem.ItemId;
+            _weaponiamge.sprite = weaponItem.ItemData.ItemThumbnail;
+            _weaponiamge.rectTransform.sizeDelta = Util.CalcFitSize(80, weaponItem.ItemData.ItemThumbnail);
         }
         else
         {
-            _rightButton.gameObject.SetActive(true);
+            _weaponId = 0;
+            _weaponiamge.sprite = null;
+            _weaponiamge.rectTransform.sizeDelta = Vector2.zero;
+        }
+        Item hatItem = Manager.Item.GetItem(_characterEquipment.HatItemId);
+        if (hatItem != null)
+        {
+            _hatId = hatItem.ItemId;
+            _hatIamge.sprite = hatItem.ItemData.ItemThumbnail;
+            _hatIamge.rectTransform.sizeDelta = Util.CalcFitSize(80, weaponItem.ItemData.ItemThumbnail);
+        }
+        else
+        {
+            _hatId = 0;
+            _hatIamge.sprite = null;
+            _hatIamge.rectTransform.sizeDelta = Vector2.zero;
         }
 
-        Refresh();
+        Manager.Input.UIMouseDownHandler += OnUIMouseDown;
+
         gameObject.SetActive(true);
     }
 
     public void Close()
     {
+        Manager.Input.UIMouseDownHandler -= OnUIMouseDown;
+
         gameObject.SetActive(false);
-
-        _smithy = null;
-        _openCharacter = null;
-
     }
 
-    private void Update()
+    void OnUIMouseDown(List<GameObject> list)
     {
-        if(Input.GetKeyDown(KeyCode.Escape))
+        foreach(var gameObject in list)
         {
-            Close();
+            if(gameObject == _hatBackground.gameObject && _hatId != 0)
+            {
+                _smity.SetEnforeceItem(_hatId);
+                Close();
+                return;
+            }
+            if (gameObject == _weaponBackground.gameObject && _weaponId != 0)
+            {
+                _smity.SetEnforeceItem(_weaponId);
+                Close();
+                return;
+            }
         }
-    }
-
-    public void RightButton()
-    {
-        _page++;
-        if ((_page + 1) * _slotImageList.Count > _smithy.ItemBlueprintDataList.Count)
-        {
-            _rightButton.gameObject.SetActive(false);
-        }else
-        {
-            _rightButton.gameObject.SetActive(true);
-        }
-
-        if (_page != 0)
-        {
-
-            _leftButton.gameObject.SetActive(true);
-        }
-        else
-            _leftButton.gameObject.SetActive(false);
-        Refresh();
-    }
-
-    public void LeftButton()
-    {
-        _page--;
-        if (_page <= 0)
-        {
-            _leftButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            _leftButton.gameObject.SetActive(true);
-        }
-
-        if ((_page + 1) * _slotImageList.Count > _smithy.ItemBlueprintDataList.Count)
-        {
-            _rightButton.gameObject.SetActive(false);
-        }
-        else
-        {
-            _rightButton.gameObject.SetActive(true);
-        }
-        Refresh();
-    }
-
-
-    void Refresh()
-    {
-        int count = 0;
-        if (_slotImageList.Count < _smithy.ItemBlueprintDataList.Count - _page* _slotImageList.Count)
-        {
-            count = _slotImageList.Count;
-        }
-        else
-        {
-            count = _smithy.ItemBlueprintDataList.Count - _page * _slotImageList.Count;
-        }
-        int i = 0;
-        for (i = 0; i < count; i++)
-        {
-            ItemName itemName = _smithy.ItemBlueprintDataList[_page*_slotImageList.Count + i].ResultItemName;
-            ItemData result = Manager.Data.GetItemData(itemName);
-            _slotImageList[i].sprite = result.ItemSprite;
-            _slotImageList[i].rectTransform.sizeDelta  = Util.CalcFitSize(_imageSize, result.ItemSprite);
-            _slotImageList[i].transform.parent.localPosition = new Vector3(-180 * (count - 1) / 2f + 180 * i, _slotImageList[i].transform.parent.localPosition.y);
-            _slotBackList[i].gameObject.SetActive(true);
-        }
-        for(;i< _slotImageList.Count;i++)
-        {
-            _slotBackList[i].gameObject.SetActive(false);
-        }
-
-
-        PushSelectButton(0);
-    }
-
-
-    public void PushSelectButton(int index)
-    {
-        if(_slotBackList.Count > _selectIndex && _selectIndex >= 0) 
-            _slotBackList[_selectIndex].color = Color.white;
-        _selectIndex = index;
-        _slotBackList[_selectIndex].color = Color.green;
-
-        int i = 0;
-        for(; i < _smithy.ItemBlueprintDataList[_page * _slotBackList.Count + _selectIndex].BlueprintItemList.Count; i++)
-        {
-            ItemName itemName = _smithy.ItemBlueprintDataList[_page* _slotBackList.Count + _selectIndex].BlueprintItemList[i].name;
-            _stuffItemImageList[i].sprite = Manager.Data.GetItemData(itemName).ItemSprite;
-            _stuffItemImageList[i].rectTransform.sizeDelta = Util.CalcFitSize(_imageSize, _stuffItemImageList[i].sprite);
-            _stuffItemCountList[i].text = _smithy.ItemBlueprintDataList[_page * _slotBackList.Count + _selectIndex].BlueprintItemList[i].requireCount.ToString();
-
-            _stuffItemImageList[i].transform.localPosition = new Vector3
-                (-(_smithy.ItemBlueprintDataList[_page * _slotBackList.Count + _selectIndex].BlueprintItemList.Count-1)/2f*120f + i*120f,
-                _stuffItemImageList[i].transform.localPosition.y,0);
-
-            _stuffItemImageList[i].gameObject.SetActive(true);
-        }
-        for (; i < _stuffItemImageList.Count; i++)
-        {
-            _stuffItemImageList[i].gameObject.SetActive(false);
-        }
-    }
-
-    public void PushCreateButton()
-    {
-        _smithy.SetMainBlueprint(_page * _slotBackList.Count + _selectIndex);
-
-        Close();
     }
 }

@@ -285,6 +285,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 151020821006743402}
   - {fileID: 853718508074277364}
   - {fileID: 7131579907123711944}
   - {fileID: 1965779673111069612}
@@ -376,8 +377,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTile: 0
   <BuildingName>k__BackingField: 11
-  <MaxHp>k__BackingField: 10
-  <Hp>k__BackingField: 10
+  <MaxHp>k__BackingField: 20
+  <Hp>k__BackingField: 20
   _size:
     isShow: 1
     width: 3
@@ -388,7 +389,15 @@ MonoBehaviour:
   _buildingTime: 1
   _description: "\uC544\uC774\uD15C\uC744 \uAC15\uD654\uD560 \uC218 \uC788\uC2B5\uB2C8\uB2E4."
   _blueprint:
-    _blueprintItmeList: []
+    _blueprintItmeList:
+    - name: 1
+      itemIdList: 
+      requireCount: 2
+      currentCount: 0
+    - name: 2
+      itemIdList: 
+      requireCount: 2
+      currentCount: 0
 --- !u!114 &6185455690212065492
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -402,6 +411,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _reinforceItemId: 0
+  _requestReinforceItemId: 0
+  _rank: 0
   _requireItemList:
   - requireItems:
     - itemName: 1
@@ -410,11 +421,56 @@ MonoBehaviour:
       itemIdList: 
   - requireItems:
     - itemName: 1
-      requireCount: 3
+      requireCount: 1
       currentCount: 0
       itemIdList: 
     - itemName: 2
-      requireCount: 3
+      requireCount: 1
+      currentCount: 0
+      itemIdList: 
+  - requireItems:
+    - itemName: 1
+      requireCount: 1
+      currentCount: 0
+      itemIdList: 
+    - itemName: 2
+      requireCount: 1
+      currentCount: 0
+      itemIdList: 
+  - requireItems:
+    - itemName: 1
+      requireCount: 1
+      currentCount: 0
+      itemIdList: 
+    - itemName: 2
+      requireCount: 1
+      currentCount: 0
+      itemIdList: 
+  - requireItems:
+    - itemName: 1
+      requireCount: 2
+      currentCount: 0
+      itemIdList: 
+    - itemName: 2
+      requireCount: 2
+      currentCount: 0
+      itemIdList: 
+  - requireItems:
+    - itemName: 1
+      requireCount: 2
+      currentCount: 0
+      itemIdList: 
+    - itemName: 2
+      requireCount: 2
+      currentCount: 0
+      itemIdList: 
+  - requireItems:
+    - itemName: 1
+      requireCount: 2
+      currentCount: 0
+      itemIdList: 
+    - itemName: 2
+      requireCount: 2
       currentCount: 0
       itemIdList: 
   - requireItems:
@@ -522,8 +578,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a41f9fcff215fe64196a0f47f18c4576, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _resultSpriteRenderer: {fileID: 5792499887443734089}
+  _resultSpriteRenderer: {fileID: 7755716420556290503}
   _requireItemOrigin: {fileID: 4944553151469139594, guid: 9fa51384a3ce25b479dc49a9929d085c, type: 3}
+--- !u!1001 &2771582895240832601
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 906330208280151132}
+    m_Modifications:
+    - target: {fileID: 1039598808288293587, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_Name
+      value: RequireItems
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 3.61
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+--- !u!4 &151020821006743402 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2625083287708340531, guid: f03ef92ddc25fd243ab61bc60cbbf329, type: 3}
+  m_PrefabInstance: {fileID: 2771582895240832601}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4808508675580610301
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -675,11 +793,6 @@ PrefabInstance:
 --- !u!4 &1319483478845092117 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6860942878440230095, guid: 9fa51384a3ce25b479dc49a9929d085c, type: 3}
-  m_PrefabInstance: {fileID: 5582572420321246682}
-  m_PrefabAsset: {fileID: 0}
---- !u!212 &5792499887443734089 stripped
-SpriteRenderer:
-  m_CorrespondingSourceObject: {fileID: 2097094116569584531, guid: 9fa51384a3ce25b479dc49a9929d085c, type: 3}
   m_PrefabInstance: {fileID: 5582572420321246682}
   m_PrefabAsset: {fileID: 0}
 --- !u!212 &7755716420556290503 stripped

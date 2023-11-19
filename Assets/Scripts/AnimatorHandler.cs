@@ -75,4 +75,11 @@ public class AnimatorHandler : MonoBehaviour, ICharacterOption
     public void DataDeserialize()
     {
     }
+    public void SerializeControlData()
+    {
+    }
+
+    public void DeserializeControlData()
+    {
+    }
 }

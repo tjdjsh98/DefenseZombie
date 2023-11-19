@@ -17,7 +17,13 @@ public class DropItemCharacterOption : MonoBehaviour, ICharacterOption
     public void DataSerialize()
     {
     }
+    public void SerializeControlData()
+    {
+    }
 
+    public void DeserializeControlData()
+    {
+    }
     public void Init()
     {
         _character= GetComponent<Character>();

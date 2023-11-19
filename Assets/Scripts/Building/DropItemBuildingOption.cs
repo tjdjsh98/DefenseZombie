@@ -29,7 +29,10 @@ public class DropItemBuildingOption : MonoBehaviour, IBuildingOption
         if (Client.Instance.IsSingle || Client.Instance.IsMain)
         {
             Item item = null;
-            Manager.Item.GenerateItem(data.GetRandom(), transform.position, ref item);
+            foreach (var itemName in data)
+            {
+                Manager.Item.GenerateItem(itemName, transform.position, ref item);
+            }
             _building.DestroyedHandler -= OnDestroyed;
         }
     }

@@ -1,13 +1,9 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Text;
 using TMPro;
-using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 using static Define;
-using static UnityEditor.Progress;
 
 public class UI_Description : UIBase
 {
@@ -42,13 +38,19 @@ public class UI_Description : UIBase
             // 무기 아이템일 경우
             if(item.ItemData.EquipmentData== null)
             {
+                itemEquipment = item.GetComponent<ItemEquipment>();
+
                 WeaponName name = WeaponName.None;
                 Enum.TryParse(item.ItemData.ItemName.ToString(), true, out name);
                 WeaponData weaponData = Manager.Data.GetWeaponData(name);
 
                 if(weaponData!= null) 
                 {
-                    _stringBuilder.AppendLine($"공격력\t{weaponData.AttackList[0].damage}");
+                    _stringBuilder.AppendLine($"강화횟수\t{itemEquipment.Rank}");
+                    if(itemEquipment.AddedAttack == 0)
+                        _stringBuilder.AppendLine($"공격력\t{weaponData.AttackList[0].damage}");
+                    else
+                        _stringBuilder.AppendLine($"공격력\t<color=#5EFF23>{weaponData.AttackList[0].damage + itemEquipment.AddedAttack}</color> +({itemEquipment.AddedAttack})");
                     _stringBuilder.AppendLine($"재공격시간\t{weaponData.AttackList[0].attackDelay}");
                     if (weaponData.AttackList[0].projectile!= null)
                     {
@@ -63,12 +65,25 @@ public class UI_Description : UIBase
             // 방어구 일 경우
             else if ((itemEquipment = item.GetComponent<ItemEquipment>()) != null)
             {
-                _stringBuilder.AppendLine($"체력\t{itemEquipment.Hp}");
-                _stringBuilder.AppendLine($"방어력\t{itemEquipment.Defense}");
-                _stringBuilder.AppendLine($"속도\t{itemEquipment.Defense}");
+                _stringBuilder.AppendLine($"강화횟수\t{itemEquipment.Rank}");
+                if(itemEquipment.AddedHp == 0)
+                    _stringBuilder.AppendLine($"체력\t{itemEquipment.Hp}");
+                else
+                    _stringBuilder.AppendLine($"체력\t<color=#5EFF23>{itemEquipment.Hp}</color> +({itemEquipment.AddedHp})");
+
+                if(itemEquipment.AddedDefense == 0)
+                    _stringBuilder.AppendLine($"방어력\t{itemEquipment.Defense}");
+                else
+                    _stringBuilder.AppendLine($"방어력\t<color=#5EFF23>{itemEquipment.Defense}</color> +({itemEquipment.AddedDefense})");
+
+                if(itemEquipment.AddedSpeed == 0)
+                    _stringBuilder.AppendLine($"속도\t{itemEquipment.Speed}");
+                else
+                    _stringBuilder.AppendLine($"속도\t<color=#5EFF23>{itemEquipment.Speed}</color> +({itemEquipment.AddedSpeed})");
             }
         }
         _descriptionText.text = _stringBuilder.ToString();
+        _descriptionDetailText.text = "";
     }
 
     public void OpenBuildingDescription(Building building)

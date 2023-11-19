@@ -195,9 +195,28 @@ public class UI_Equipment : UIBase
             if(list.Contains(_slots[part].itemBackground.gameObject))
             {
                 if (part == CharacterParts.FrontWeapon)
-                    _characterEquipment.TakeOffWeapon();
+                {
+                    if (Client.Instance.IsSingle || Client.Instance.IsMain)
+                    {
+                        _characterEquipment.TakeOffWeapon();
+                    }
+                    else
+                    {
+                        _characterEquipment.RequestTakeOffWeapon();
+                    }
+
+                }
                 else
-                    _characterEquipment.TakeOffOther(part);
+                {
+                    if (Client.Instance.IsSingle || Client.Instance.IsMain)
+                    {
+                        _characterEquipment.TakeOffOther(part);
+                    }
+                    else
+                    {
+                        _characterEquipment.RequestTakeOffHat();
+                    }
+                }
             }
         }
     }

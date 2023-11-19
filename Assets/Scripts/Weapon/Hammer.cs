@@ -7,10 +7,6 @@ public class Hammer : Weapon
 {
     bool _connectCombo;
 
-    public override void Init()
-    {
-        base.Init();
-    }
     protected override void OnAttackKeyDown()
     {
         if (!_character.IsAttacking)

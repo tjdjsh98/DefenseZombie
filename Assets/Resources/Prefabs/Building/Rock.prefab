@@ -217,6 +217,7 @@ MonoBehaviour:
     pivotY: 1
     isPlace: 01
   _buildingTime: 0
+  _description: 
   _blueprint:
     _blueprintItmeList: []
 --- !u!114 &-7425332967044441041
@@ -231,7 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c524a8a71fdb194409e97ca3d8a9669f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  data: 02000000
+  data: 020000000200000002000000
 --- !u!1001 &1451115410857931641
 PrefabInstance:
   m_ObjectHideFlags: 0

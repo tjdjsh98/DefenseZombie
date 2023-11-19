@@ -15,7 +15,7 @@ public class Shop : InteractableObject, IBuildingOption, IEnableInsertItem
     public List<ItemBlueprintData> ItemBlueprintDataList => _itemBlueprintDataList;
 
     Character _openCharacter;
-    UI_Smithy _ui;
+    UI_Shop _ui;
 
     bool _initDone;
 
@@ -51,12 +51,13 @@ public class Shop : InteractableObject, IBuildingOption, IEnableInsertItem
 
     public override bool Interact(Character character)
     {
+        if (!_building.IsConstructDone) return false;
         if (_openCharacter != null || _mainBlueprint != null) return false;
 
         _openCharacter = character;
         character.IsEnableAttack = false;
 
-        if(_ui == null)_ui = Manager.UI.GetUI(Define.UIName.Shop) as UI_Smithy;
+        if(_ui == null)_ui = Manager.UI.GetUI(Define.UIName.Shop) as UI_Shop;
 
         _ui.Open(character,this);
 
@@ -246,7 +247,7 @@ public class Shop : InteractableObject, IBuildingOption, IEnableInsertItem
     public void DeserializeControlData()
     {
         int requestIndex = Util.ReadSerializedDataToInt();
-        if (requestIndex != -1 && Client.Instance.IsMain)
+        if (requestIndex <= 0 && Client.Instance.IsMain)
         {
             SetMainBlueprint(requestIndex);
         }

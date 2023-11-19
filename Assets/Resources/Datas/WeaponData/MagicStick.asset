@@ -28,11 +28,11 @@ MonoBehaviour:
       size: {x: 15, y: 5, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
-    damage: 1
+    damage: 30
     power: 2
     stagger: 0.2
     penetrationPower: 0
     actualAttackEffectName: 0
     isTargeting: 0
-    attackDelay: 0
+    attackDelay: 5
   <Weapon>k__BackingField: {fileID: 3087540297273847347, guid: 5ce3d226b7d990945b3a5ab0b32b37ab, type: 3}

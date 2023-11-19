@@ -112,7 +112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _projectileName: 4
   _projectileType: 0
-  power: 3
+  power: 10
   _effect: 4
   ProjectileId: 0
   _autoDestroy: 1

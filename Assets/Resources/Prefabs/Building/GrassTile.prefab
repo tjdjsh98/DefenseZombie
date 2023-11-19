@@ -205,8 +205,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _isTile: 1
   <BuildingName>k__BackingField: 6
-  <MaxHp>k__BackingField: 10
-  <Hp>k__BackingField: 10
+  <MaxHp>k__BackingField: 1000
+  <Hp>k__BackingField: 1000
   _size:
     isShow: 1
     width: 1
@@ -215,3 +215,6 @@ MonoBehaviour:
     pivotY: 1
     isPlace: 01
   _buildingTime: 0
+  _description: 
+  _blueprint:
+    _blueprintItmeList: []

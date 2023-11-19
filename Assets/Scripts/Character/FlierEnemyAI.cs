@@ -39,7 +39,7 @@ public class FlierEnemyAI : EnemyAI
             Character character = Util.GetGameObjectByPhysics<Character>(transform.position, AttackRange, Define.PlayerLayerMask);
             Building building = Util.GetGameObjectByPhysics<Building>(transform.position, AttackRange, Define.BuildingLayerMask);
 
-            if (character != null || building != null)
+            if (character != null || (building != null && !building.tag.Equals(Define.CharacterTag.Enemy.ToString())))
             {
                 // 원거리 공격하는 캐릭터면 자신의 위치까지 올라가서 공격
                 if (_weapon.AttackData.projectile != null && !CheckIsEnoughFly())
@@ -55,7 +55,7 @@ public class FlierEnemyAI : EnemyAI
                     _attackTime = 0;
                     if (character != null)
                         _character.Turn(character.transform.position.x - transform.position.x);
-                    if (building != null)
+                    if (building != null && !building.tag.Equals(Define.CharacterTag.Enemy.ToString()))
                         _character.Turn(building.transform.position.x - transform.position.x);
 
                     _character.StopMove();
@@ -64,7 +64,7 @@ public class FlierEnemyAI : EnemyAI
                     _character.IsEnableMoveWhileAttack = false;
                     if (character)
                         _weapon.TargetPosition = character.transform.position;
-                    if (building)
+                    if (building != null && !building.tag.Equals(Define.CharacterTag.Enemy.ToString()))
                         _weapon.TargetPosition = building.transform.position;
                     Client.Instance.SendCharacterControlInfo(_character);
                 }

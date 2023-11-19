@@ -28,7 +28,7 @@ MonoBehaviour:
       size: {x: 1.96, y: 1.05, z: 0}
     AttackDirection: {x: 0, y: 0, z: 0}
     attacKShape: 0
-    damage: 3
+    damage: 5
     power: 3
     stagger: 0.2
     penetrationPower: 3

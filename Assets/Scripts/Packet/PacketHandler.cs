@@ -208,7 +208,7 @@ class PacketHandler
 
         if (character == null) return;
 
-        if (Client.Instance.IsMain && character.CharacterId == Client.Instance.ClientId) return;
+        if (Client.Instance.IsMain) return;
 
         character.Damage(0, new Vector2(pkt.directionX, pkt.directionY), pkt.power, pkt.stagger);
     }

@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 20f2c12f84e81014d9ff9e0330a3d41b, type: 3}
-  m_Name: 1 4
+  m_Name: Bow
   m_EditorClassIdentifier: 
-  <ResultItemName>k__BackingField: 11
+  <ResultItemName>k__BackingField: 13
   <BlueprintItemList>k__BackingField:
-  - name: 1
+  - name: 2
     itemIdList: 
-    requireCount: 1
+    requireCount: 2
     currentCount: 0
   - name: 1
     itemIdList: 
-    requireCount: 1
+    requireCount: 2
     currentCount: 0

@@ -166,6 +166,12 @@ public class EnemyAI : MonoBehaviour, ICharacterOption
     public void DataDeserialize()
     {
     }
+    public void SerializeControlData()
+    {
+    }
 
+    public void DeserializeControlData()
+    {
+    }
 
 }

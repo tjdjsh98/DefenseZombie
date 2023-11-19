@@ -34,6 +34,7 @@ public class ReinforceDisplayer : MonoBehaviour
         if (result)
         {
             gameObject.SetActive(false);
+            return;
         }
 
         Item item = Manager.Item.GetItem(_smithy.ReinforceItemId);
@@ -65,6 +66,5 @@ public class ReinforceDisplayer : MonoBehaviour
             _slotList[i].transform.localPosition = slotLocalPos;
         }
 
-        gameObject.SetActive(true);
     }
 }

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5130b598b0cce6049a818ef31fdc159d, type: 3}
-  m_Name: WorkerSetting
+  m_Name: SpearSetting
   m_EditorClassIdentifier: 
-  <HatItem>k__BackingField: 11
-  <WeaponItem>k__BackingField: 0
+  <HatItem>k__BackingField: 0
+  <WeaponItem>k__BackingField: 6

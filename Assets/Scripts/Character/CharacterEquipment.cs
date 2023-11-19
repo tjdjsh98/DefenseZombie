@@ -13,7 +13,7 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     WeaponName _equipWeaponName;
     public WeaponName EquipWeaponName =>_equipWeaponName;
 
-    Weapon _weapon;
+    CustomWeapon _weapon;
     public Weapon Weapon => _weapon;
 
     EquipmentName _equipHatName;
@@ -22,16 +22,19 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
     EquipmentName _equipFrontHandName;
     EquipmentName _equipBehindHandName;
 
-    int _hatItemId;
+    int _hatItemId = 0;
     public int HatItemId => _hatItemId;
-    int _bodyItemId;
+    int _bodyItemId = 0;
     public int BodyItemId => _bodyItemId;
-    int _legsItemId;
+    int _legsItemId = 0;
     public int LegsItemId => _legsItemId;
-    int _handItemId;
+    int _handItemId = 0;
     public int HandItemId => _handItemId;
-    int _weaponId;
+    int _weaponId = 0;
     public int WeaponId => _weaponId;
+
+    bool _isRequesttakeOffWeapon;
+    bool _isRequesttakeOffHat;
 
     public Action EquipmentChanged { get; set; }
 
@@ -46,6 +49,19 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         _customCharacter.DeadHandler += OnDeaded;
 
         IsDone = true;
+    }
+
+    public void DefaultSetting()
+    {
+        WeaponData data = Manager.Data.GetWeaponData(WeaponName.None);
+        if (_weapon)
+        {
+            _weapon.Remove();
+            Destroy(_weapon.gameObject);
+        }
+        _weapon = Instantiate(data.Weapon, transform) as CustomWeapon;
+        _weapon?.Init();
+
     }
     public virtual void Remove()
     {
@@ -125,10 +141,10 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
             _customCharacter.SetEnableBehindHandRotate();
 
         item.GrapItem(_customCharacter);
-        item.Hide();
-
         _weaponId = item.ItemId;
-
+        {
+            item.Hide();
+        }
         if (data.AttackList[0].projectile != null)
         {
             if (Manager.Character.MainCharacter == null || _customCharacter == Manager.Character.MainCharacter)
@@ -138,18 +154,20 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
                     (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Open(itemAmmo);
             }
         }
-
         if (_weapon)
         {
-            _customCharacter.RemoveOption(_weapon);
+            _weapon.Remove();
             Destroy(_weapon.gameObject);
         }
-        _weapon = Instantiate(data.Weapon,transform);
-        _customCharacter.AddOption(_weapon);
+        _weapon = Instantiate(data.Weapon,transform) as CustomWeapon;
+        _weapon?.Init();
 
         EquipmentChanged?.Invoke();
 
-
+        if (Client.Instance.IsMain)
+        {
+            Client.Instance.SendCharacterInfo(_customCharacter);
+        }
         return true;
     }
     public bool TakeOffWeapon(bool putDown = true)
@@ -174,38 +192,46 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         _equipWeaponName = WeaponName.None;
 
         Item item = Manager.Item.GetItem(_weaponId);
-
-        if (Manager.Character.MainCharacter == null|| _customCharacter == Manager.Character.MainCharacter)
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            if (item != null)
+            {
+                item.Show();
+                item.ReleaseItem(_customCharacter, putDown);
+            }
+        }
+        if (item != null) { 
+        if (Manager.Character.MainCharacter == null || _customCharacter == Manager.Character.MainCharacter)
         {
             ItemAmmo itemAmmo = null;
             if ((itemAmmo = item.GetComponent<ItemAmmo>()) != null)
                 (Manager.UI.GetUI(UIName.Ammo) as UI_Ammo)?.Close();
         }
-
-        if (item != null)
-        {
-            item.Show();
-            item.ReleaseItem(_customCharacter, putDown);
-        }
+    }
         _weaponId = 0;
 
 
         if (_weapon)
         {
-            _customCharacter.RemoveOption(_weapon);
+            _weapon.Remove();
             Destroy(_weapon.gameObject);
         }
-        _weapon = Instantiate(data.Weapon, transform);
-        _customCharacter.AddOption(_weapon);
+        _weapon = Instantiate(data.Weapon, transform) as CustomWeapon;
+        _weapon?.Init();
 
         EquipmentChanged?.Invoke();
 
+        if (Client.Instance.IsMain)
+        {
+            Client.Instance.SendCharacterInfo(_customCharacter);
+        }
         return true;
     }
 
     public bool EquipOther(Item item)
     {
         if(item == null) return false;
+        if (item.ItemData.EquipmentData == null) return false;
 
         EquipmentName equipmentName = item.ItemData.EquipmentData.EquipmentName;
         CharacterParts part = item.ItemData.EquipmentData.CharacterParts;
@@ -246,8 +272,11 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
                     break;
             }
 
-            item.Hide();
             item.GrapItem(_customCharacter);
+            if (Client.Instance.IsSingle || Client.Instance.IsMain)
+            {
+                item.Hide();
+            }
 
         }
         else
@@ -263,6 +292,10 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         }
         EquipmentChanged?.Invoke();
 
+        if (Client.Instance.IsMain)
+        {
+            Client.Instance.SendCharacterInfo(_customCharacter);
+        }
         return true;
     }
 
@@ -306,21 +339,28 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
 
         Item item = Manager.Item.GetItem(returnId);
 
-        if (item != null)
+        if (Client.Instance.IsSingle || Client.Instance.IsMain)
         {
-            item.Show();
-            item.ReleaseItem(_customCharacter, putDown);
-
-            ItemEquipment e = null;
-            if ((e = item.GetComponent<ItemEquipment>()) != null)
+            if (item != null)
             {
-                _customCharacter.AddedHp -= e.Hp;
-                _customCharacter.AddedDefense -= e.Defense;
-                _customCharacter.AddedSpeed -= e.Speed;
+                item.Show();
+                item.ReleaseItem(_customCharacter, putDown);
+
+                ItemEquipment e = null;
+                if ((e = item.GetComponent<ItemEquipment>()) != null)
+                {
+                    _customCharacter.AddedHp -= e.Hp;
+                    _customCharacter.AddedDefense -= e.Defense;
+                    _customCharacter.AddedSpeed -= e.Speed;
+                }
             }
         }
-
         EquipmentChanged?.Invoke();
+
+        if (Client.Instance.IsMain)
+        {
+            Client.Instance.SendCharacterInfo(_customCharacter);
+        }
 
         return returnId;
     }
@@ -380,6 +420,20 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         }
     }
 
+    public void RequestTakeOffWeapon()
+    {
+        _isRequesttakeOffWeapon = true;
+        Client.Instance.SendCharacterControlInfo(_customCharacter);
+        _isRequesttakeOffWeapon = false;
+    }
+
+    public void RequestTakeOffHat()
+    {
+        _isRequesttakeOffHat = true;
+        Client.Instance.SendCharacterControlInfo(_customCharacter);
+        _isRequesttakeOffHat = false;
+    }
+
     void OnDeaded()
     {
         if (_hatItemId != 0) Manager.Item.DestroyItem(_hatItemId);
@@ -387,5 +441,26 @@ public class CharacterEquipment : MonoBehaviour, ICharacterOption
         if (_bodyItemId != 0) Manager.Item.DestroyItem(_bodyItemId);
         if (_handItemId != 0) Manager.Item.DestroyItem(_handItemId);
         if (_legsItemId != 0) Manager.Item.DestroyItem(_legsItemId);
+    }
+
+    public void SerializeControlData()
+    {
+        Util.WriteSerializedData(_isRequesttakeOffWeapon);
+        Util.WriteSerializedData(_isRequesttakeOffHat);
+    }
+
+    public void DeserializeControlData()
+    {
+        bool takeOffWeapon = Util.ReadSerializedDataToBoolean();
+        bool takeOffHat = Util.ReadSerializedDataToBoolean();
+
+        if (takeOffWeapon)
+        {
+            TakeOffWeapon();
+        }
+        if(takeOffHat)
+        {
+            TakeOffOther(CharacterParts.Hat);
+        }
     }
 }

@@ -25,8 +25,6 @@ public class Core : MonoBehaviour, IBuildingOption
 
     void OnDestroyed()
     {
-        UI_GameOver gameOver = Manager.UI.GetUI(Define.UIName.GameOver) as UI_GameOver;
-        gameOver.GameOver();
     }
 
     public void SerializeControlData()

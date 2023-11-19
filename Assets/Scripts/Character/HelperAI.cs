@@ -182,4 +182,11 @@ public class HelperAI : MonoBehaviour, ICharacterOption
     public void DataDeserialize()
     {
     }
+    public void SerializeControlData()
+    {
+    }
+
+    public void DeserializeControlData()
+    {
+    }
 }

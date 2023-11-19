@@ -34,7 +34,7 @@ public class ProjectileManager : MonoBehaviour
         _direction = direction;
         _tag1 = tag1;
         _tag2 = tag2;
-        _damage = _damage;
+        _damage = damage;
     }
 
 

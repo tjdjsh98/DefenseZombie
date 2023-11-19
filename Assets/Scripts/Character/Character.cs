@@ -91,9 +91,15 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
     float _time = 0;
     float _interval = 0.1f;
 
+    // 멀티에서 UI를 띄어주기위한 변수
+    protected bool _isHited;
+    protected int _damage;
 
     // 캐릭터의 옵션
     protected List<ICharacterOption> _optionList = new List<ICharacterOption>();
+
+    float _recoverTime;
+    public bool InitDone = false;
 
     public virtual void Init()
     {
@@ -113,6 +119,7 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
             _optionList.Add(option);
             option.Init();
         }
+        InitDone = true;
     }
 
     public void AddOption(ICharacterOption option)
@@ -144,6 +151,19 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         MoveCharacter();
         CheckGround();
         ControlAnimation();
+        if (tag == CharacterTag.Player.ToString() && InitDone && Client.Instance.IsSingle || Client.Instance.IsMain)
+        {
+            _recoverTime += Time.deltaTime;
+
+            if (_recoverTime > 5)
+            {
+                _recoverTime = 0;
+                if (Hp < MaxHp)
+                {
+                    Hp++;
+                }
+            }
+        }
     }
     private void FixedUpdate()
     {
@@ -153,9 +173,7 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
 
         _time += Time.fixedDeltaTime;
 
-        Vector3 distanceInterval = new Vector3(_currentPos.x - transform.position.x, _currentPos.y - transform.position.y, 0);
-        distanceInterval /= (10f / _interval);
-        transform.position += distanceInterval;
+        transform.position = Vector3.Lerp(transform.position, _currentPos, 0.01f);
 
     }
     protected virtual void ControlAnimation()
@@ -408,6 +426,7 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
 
         if (dmg != 0)
         {
+            _recoverTime = 0;
             _rigidBody.velocity = Vector2.zero;
             AddForce(attackDirection, power);
 
@@ -425,19 +444,24 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
             Hp -= dmg;
             (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText(dmg.ToString(), transform.position + Vector3.up, Color.red, 5);
 
+            _isHited = true;
+            _damage = dmg;
+            Client.Instance.SendCharacterInfo(this);
+            _isHited = false;
+
+
             if (Hp < 0) Hp = 0;
 
-            // 메인 클라가 아니고 다른 클라라면 데미지 패킷을 보냅니다.
-            if (Client.Instance.IsMain)
-            {
-                Client.Instance.SendDamage(CharacterId, attackDirection, power, staggerTime);
-            }
             if (Hp <= 0)
                 Dead();
         }
         else
         {
             (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText("가드", transform.position + Vector3.up, new Color(0.3f,0.3f,.9f,1f), 5);
+            _isHited = true;
+            _damage = 0;
+            Client.Instance.SendCharacterInfo(this);
+            _isHited = false;
 
         }
     }
@@ -590,8 +614,11 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         _interval = _time;
         Util.StartWriteSerializedData();
 
+        Util.WriteSerializedData(MaxHp);
         Util.WriteSerializedData(IsHide);
         Util.WriteSerializedData(IsDamaged);
+        Util.WriteSerializedData(_isHited);
+        Util.WriteSerializedData(_damage);
 
         foreach (var option in _optionList)
         {
@@ -608,6 +635,8 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         if (string.IsNullOrEmpty(stringData)) return;
 
         Util.StartReadSerializedData(stringData);
+
+        _maxHp = Util.ReadSerializedDataToInt();
         bool isHide = Util.ReadSerializedDataToBoolean();
         if (!IsHide && isHide)
             HideCharacter();
@@ -621,6 +650,16 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
             _shakingCoroutine = StartCoroutine(CorShaking());
         }
         IsDamaged = _isDamaged;
+
+        bool isHited = Util.ReadSerializedDataToBoolean();
+        int damage = Util.ReadSerializedDataToInt();
+        if(isHited)
+        {
+            if (damage == 0)
+                (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText("가드", transform.position + Vector3.up, new Color(0.3f, 0.3f, .9f, 1f), 5);
+            else
+                (Manager.UI.GetUI(UIName.TextDisplayer) as UI_TextDisplayer).DisplayText(damage.ToString(), transform.position + Vector3.up, Color.red, 5);
+        }
 
 
         foreach (var option in _optionList)
@@ -642,6 +681,10 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         Util.WriteSerializedData(IsContactGround);
         Util.WriteSerializedData(IsConncetCombo);
 
+        foreach (var option in _optionList)
+        {
+            option.SerializeControlData();
+        }
 
         return Util.EndWriteSerializeData();
     }
@@ -659,7 +702,11 @@ public class Character : MonoBehaviour, IHp, IDataSerializable
         IsJumping = Util.ReadSerializedDataToBoolean();
         IsContactGround = Util.ReadSerializedDataToBoolean();
         IsConncetCombo = Util.ReadSerializedDataToBoolean();
-      
+
+        foreach (var option in _optionList)
+        {
+            option.DeserializeControlData();
+        }
     }
 }
 

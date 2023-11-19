@@ -1437,12 +1437,13 @@ MonoBehaviour:
     center: {x: 0, y: 0, z: 0}
     size: {x: 0.2, y: 0.2, z: 0}
   _jumpPower: 10
+  InitDone: 0
   _frontHandPos: {fileID: 9214590172164724445}
   _frontHand: {fileID: 270150092319229456}
   _behindHandPos: {fileID: 5551859977916438208}
   _behindHand: {fileID: 7291942318908313539}
   _liftPos: {fileID: 4739439959996475644}
-  _setupData: {fileID: 11400000, guid: ecb64d7f8ea10bf4f9cbf077b6e13137, type: 2}
+  _setupData: {fileID: 0}
   attackType: 0
 --- !u!114 &-3789622636814383866
 MonoBehaviour:

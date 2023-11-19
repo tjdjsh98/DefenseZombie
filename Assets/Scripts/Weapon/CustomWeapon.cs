@@ -16,7 +16,12 @@ public class CustomWeapon : Weapon
     public WeaponData WeaponData => Manager.Data.GetWeaponData(_characterEquipment.EquipWeaponName);
     public override AttackData AttackData => WeaponData.AttackList[0];
 
-    public override void Init()
+    public override void Awake()
+    {
+        
+    }
+
+    public virtual void Init()
     {
         _character = GetComponentInParent<Character>();
         _animatorHandler = GetComponentInParent<AnimatorHandler>();
@@ -238,9 +243,14 @@ public class CustomWeapon : Weapon
 
                         if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
                         {
+                            Item item = Manager.Item.GetItem(_characterEquipment.WeaponId);
+                            ItemEquipment itemEquipment = null;
+                            if (item != null)
+                                itemEquipment = item.GetComponent<ItemEquipment>();
+
                             Vector3 attackDirection = AttackData.AttackDirection;
                             attackDirection.x = _character.transform.localScale.x > 0 ? attackDirection.x : -attackDirection.x;
-                            character.Damage(AttackData.damage, attackDirection, AttackData.power, AttackData.stagger);
+                            character.Damage(AttackData.damage + (itemEquipment != null? itemEquipment.AddedAttack:0), attackDirection, AttackData.power, AttackData.stagger);
 
                             Vector3 point = hit.point;
 
@@ -253,9 +263,15 @@ public class CustomWeapon : Weapon
                     else if (building != null && (_character.tag.Equals(CharacterTag.Player.ToString()) && building.tag.Equals(CharacterTag.Enemy.ToString())
                         || _character.tag.Equals(CharacterTag.Enemy.ToString()) && !building.tag.Equals(CharacterTag.Enemy.ToString())))
                     {
+
                         if (Client.Instance.ClientId == -1 || Client.Instance.IsMain)
                         {
-                            building.Damage(AttackData.damage);
+                            Item item = Manager.Item.GetItem(_characterEquipment.WeaponId);
+                            ItemEquipment itemEquipment = null;
+                            if(item != null)
+                                itemEquipment = item.GetComponent<ItemEquipment>();
+
+                            building.Damage(AttackData.damage + (itemEquipment != null ? itemEquipment.AddedAttack : 0));
 
                             Vector3 point = hit.point;
 
@@ -294,24 +310,29 @@ public class CustomWeapon : Weapon
                 CharacterTag tag1 = CharacterTag.Enemy;
                 CharacterTag tag2 = CharacterTag.Enemy;
 
-                if (gameObject.tag == CharacterTag.Player.ToString())
+                if (_customCharacter.tag == CharacterTag.Player.ToString())
                 {
                     tag1 = CharacterTag.Enemy;
                     tag2 = CharacterTag.Enemy;
                 }
-                else if (gameObject.tag == CharacterTag.Enemy.ToString())
+                else if (_customCharacter.tag == CharacterTag.Enemy.ToString())
                 {
                     tag1 = CharacterTag.Player;
                     tag2 = CharacterTag.Building;
                 }
-                Manager.Projectile.SetPacketDetail(direction, tag1, tag2, AttackData.damage);
+                Item item = Manager.Item.GetItem(_characterEquipment.WeaponId);
+                ItemEquipment itemEquipment = null;
+                if (item != null)
+                    itemEquipment = item.GetComponent<ItemEquipment>();
+
+                Manager.Projectile.SetPacketDetail(direction, tag1, tag2, AttackData.damage + (itemEquipment != null ? itemEquipment.AddedAttack : 0));
                 Manager.Projectile.GenerateProjectile(AttackData.projectile.ProjectileName, firePoint, ref projectile);
 
-                projectile?.Fire(direction, tag1, tag2, AttackData.damage);
+                projectile?.Fire(direction, tag1, tag2, AttackData.damage + (itemEquipment != null ? itemEquipment.AddedAttack : 0));
 
                 if (_itemAmmo != null)
                 {
-                    _itemAmmo.currentAmmo--;
+                    //_itemAmmo.currentAmmo--;
                 }
             }
         }

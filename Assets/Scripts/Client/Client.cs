@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TextCore.Text;
@@ -40,12 +41,16 @@ public class Client : MonoBehaviour
     public bool IsSingle { get { return ClientId == -1; } }
     [field: SerializeField] public float Delay = 0;
 
-    public static float SendPacketInterval = 0.1f;
+    public static float SendPacketInterval = 0.25f;
     public bool IsMain => (ClientId == 1);
 
     List<int> _clientList = new List<int>();
 
     public static bool IsFinishLoadScene;
+
+    int SecondPacketCount = 0;
+    public int RecPacketMean = 0;
+    float _time;
 
     public void Send(ArraySegment<byte> segment)
     {
@@ -103,9 +108,20 @@ public class Client : MonoBehaviour
             return;
         }
 
+        if ((int)_time <(int)(_time + Time.deltaTime))
+        {
+            RecPacketMean = SecondPacketCount / (int)(_time + Time.deltaTime);
+        }
+        _time += Time.deltaTime;
+        if(_time > 10)
+        {
+            _time /= 2;
+            SecondPacketCount /= 2;
+        }
         List<IPacket> packets = PacketQueue.Instance.PopAll();
         foreach (IPacket packet in packets)
         {
+            SecondPacketCount++;
             PacketManager.Instance.HandlePacket(_session, packet);
         }
     }
